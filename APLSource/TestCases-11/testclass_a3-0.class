@@ -1,0 +1,894 @@
+:Class testclass_a3
+⍝ Check all kinds of function syntax
+
+⍝⍝⍝ Niladic, no result
+    ∇ fns01_a
+    ⍝ fns01_a
+      :Access Public
+    ∇
+
+    ∇ fns01_b;l1
+    ⍝ fns01_b;l1
+      :Access Public
+    ∇
+
+    ∇ fns01_c;l1;l2
+    ⍝ fns01_c;l1;l2
+      :Access Public
+    ∇
+
+    ∇ fns01_d;l1;l2 ⍝ comment
+    ⍝ fns01_d;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ fns01_e ⍝ comment
+    ⍝ fns01_e ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Niladic with result
+
+    ∇ r←fns02_a
+    ⍝ r←fns02_a
+      :Access Public
+    ∇
+
+    ∇ r←fns02_b;l1
+    ⍝ r←fns02_b;l1
+      :Access Public
+    ∇
+
+    ∇ r←fns02_c;l1;l2
+    ⍝ r←fns02_c;l1;l2
+      :Access Public
+    ∇
+
+    ∇ r←fns02_d;l1;l2 ⍝ comment
+    ⍝ r←fns02_d;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ r←fns02_e ⍝ comment
+    ⍝ r←fns02_e ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Niladic with shy result
+
+    ∇ {r}←fns03_a
+    ⍝ {r}←fns03_a
+      :Access Public
+    ∇
+
+    ∇ {r}←fns03_b;l1
+    ⍝ {r}←fns03_b;l1
+      :Access Public
+    ∇
+
+    ∇ {r}←fns03_c;l1;l2
+    ⍝ {r}←fns03_c;l1;l2
+      :Access Public
+    ∇
+
+    ∇ {r}←fns03_d;l1;l2 ⍝ comment
+    ⍝ {r}←fns03_d;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {r}←fns03_e ⍝ comment
+    ⍝ {r}←fns03_e ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Niladic with multiple shy result
+
+    ∇ {(r1 r2)}←fns04_a
+    ⍝ {(r1 r2)}←fns04_a
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←fns05_b;l1
+    ⍝ {(r1 r2)}←fns05_b;l1
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←fns05_c;l1;l2
+    ⍝ {(r1 r2)}←fns05_c;l1;l2
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←fns05_d;l1;l2 ⍝ comment
+    ⍝ {(r1 r2)}←fns05_d;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←fns05_e ⍝ comment
+    ⍝ {(r1 r2)}←fns05_e ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Simple monadic, no result
+
+    ∇ fns11_a y
+    ⍝ fns11_a y
+      :Access Public
+    ∇
+
+    ∇ fns11_b y;l1
+    ⍝ fns11_b y;l1
+      :Access Public
+    ∇
+
+    ∇ fns11_c y;l1;l2
+    ⍝ fns11_c y;l1;l2
+      :Access Public
+    ∇
+
+    ∇ fns11_d y;l1;l2 ⍝ comment
+    ⍝ fns11_d y;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ fns11_e y ⍝ comment
+    ⍝ fns11_e y ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Simple monadic with result
+
+    ∇ r←fns12_a y
+    ⍝ r←fns12_a y
+      :Access Public
+    ∇
+
+    ∇ r←fns12_b y;l1
+    ⍝ r←fns12_b y;l1
+      :Access Public
+    ∇
+
+    ∇ r←fns12_c y;l1;l2
+    ⍝ r←fns12_c y;l1;l2
+      :Access Public
+    ∇
+
+    ∇ r←fns12_d y;l1;l2 ⍝ comment
+    ⍝ r←fns12_d y;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ r←fns12_e y ⍝ comment
+    ⍝ r←fns12_e y ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Simple monadic with shy result
+
+    ∇ {r}←fns13_a y
+    ⍝ {r}←fns13_a y
+      :Access Public
+    ∇
+
+    ∇ {r}←fns13_b y;l1
+    ⍝ {r}←fns13_b y;l1
+      :Access Public
+    ∇
+
+    ∇ {r}←fns13_c y;l1;l2
+    ⍝ {r}←fns13_c y;l1;l2
+      :Access Public
+    ∇
+
+    ∇ {r}←fns13_d y;l1;l2 ⍝ comment
+    ⍝ {r}←fns13_d y;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {r}←fns13_e y ⍝ comment
+    ⍝ {r}←fns13_e y ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Simple monadic with multiple shy result
+
+    ∇ {(r1 r2)}←fns14_a y
+    ⍝ {(r1 r2)}←fns14_a y
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←fns14_b y;l1
+    ⍝ {(r1 r2)}←fns14_b y;l1
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←fns14_c y;l1;l2
+    ⍝ {(r1 r2)}←fns14_c y;l1;l2
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←fns14_d y;l1;l2 ⍝ comment
+    ⍝ {(r1 r2)}←fns14_d y;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←fns14_e y ⍝ comment
+    ⍝ {(r1 r2)}←fns14_e y ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Multiple monadic, no result
+
+    ∇ fns21_a(y1 y2)
+    ⍝ fns21_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ fns21_b(y1 y2);l1
+    ⍝ fns21_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ fns21_c(y1 y2);l1;l2
+    ⍝ fns21_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ fns21_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ fns21_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ fns21_e(y1 y2) ⍝ comment
+    ⍝ fns21_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Multiple monadic with result
+
+    ∇ r←fns22_a(y1 y2)
+    ⍝ r←fns22_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ r←fns22_b(y1 y2);l1
+    ⍝ r←fns22_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ r←fns22_c(y1 y2);l1;l2
+    ⍝ r←fns22_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ r←fns22_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ r←fns22_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ r←fns22_e(y1 y2) ⍝ comment
+    ⍝ r←fns22_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Multiple monadic with shy result
+
+    ∇ {r}←fns24_a(y1 y2)
+    ⍝ {r}←fns24_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ {r}←fns24_b(y1 y2);l1
+    ⍝ {r}←fns24_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ {r}←fns24_c(y1 y2);l1;l2
+    ⍝ {r}←fns24_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ {r}←fns24_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ {r}←fns24_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {r}←fns24_e(y1 y2) ⍝ comment
+    ⍝ {r}←fns24_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Multiple monadic with multiple shy result
+
+    ∇ {(r1 r2)}←fns25_a(y1 y2)
+    ⍝ {(r1 r2)}←fns25_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←fns25_b(y1 y2);l1
+    ⍝ {(r1 r2)}←fns25_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←fns25_c(y1 y2);l1;l2
+    ⍝ {(r1 r2)}←fns25_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←fns25_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ {(r1 r2)}←fns25_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←fns25_e(y1 y2) ⍝ comment
+    ⍝ {(r1 r2)}←fns25_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+ ⍝⍝⍝ Multiple monadic with multiple result
+
+    ∇ (r1 r2)←fns26_a(y1 y2)
+    ⍝ (r1 r2)←fns26_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←fns26_b(y1 y2);l1
+    ⍝ (r1 r2)←fns26_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←fns26_c(y1 y2);l1;l2
+    ⍝ (r1 r2)←fns26_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←fns26_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ (r1 r2)←fns26_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←fns26_e(y1 y2) ⍝ comment
+    ⍝ (r1 r2)←fns26_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Simple dyadic, no result
+
+    ∇ x fns91_a y
+    ⍝ x fns91_a y
+      :Access Public
+    ∇
+
+    ∇ x fns91_b y;l1
+    ⍝ x fns91_b y;l1
+      :Access Public
+    ∇
+
+    ∇ x fns91_c y;l1;l2
+    ⍝ x fns91_c y;l1;l2
+      :Access Public
+    ∇
+
+    ∇ x fns91_d y;l1;l2 ⍝ comment
+    ⍝ x fns91_d y;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ x fns91_e y ⍝ comment
+    ⍝ x fns91_e y ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Simple dyadic with result
+
+    ∇ r←x fns92_a y
+    ⍝ r←x fns92_a y
+      :Access Public
+    ∇
+
+    ∇ r←x fns92_b y;l1
+    ⍝ r←x fns92_b y;l1
+      :Access Public
+    ∇
+
+    ∇ r←x fns92_c y;l1;l2
+    ⍝ r←x fns92_c y;l1;l2
+      :Access Public
+    ∇
+
+    ∇ r←x fns92_d y;l1;l2 ⍝ comment
+    ⍝ r←x fns92_d y;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ r←x fns92_e y ⍝ comment
+    ⍝ r←x fns92_e y ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Simple dyadic with shy result
+
+    ∇ {r}←x fns93_a y
+    ⍝ {r}←x fns93_a y
+      :Access Public
+    ∇
+
+    ∇ {r}←x fns93_b y;l1
+    ⍝ {r}←x fns93_b y;l1
+      :Access Public
+    ∇
+
+    ∇ {r}←x fns93_c y;l1;l2
+    ⍝ {r}←x fns93_c y;l1;l2
+      :Access Public
+    ∇
+
+    ∇ {r}←x fns93_d y;l1;l2 ⍝ comment
+    ⍝ {r}←x fns93_d y;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {r}←x fns93_e y ⍝ comment
+    ⍝ {r}←x fns93_e y ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Simple dyadic with multiple shy result
+
+    ∇ {(r1 r2)}←x fns94_a y
+    ⍝ {(r1 r2)}←x fns94_a y
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←x fns94_b y;l1
+    ⍝ {(r1 r2)}←x fns94_b y;l1
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←x fns94_c y;l1;l2
+    ⍝ {(r1 r2)}←x fns94_c y;l1;l2
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←x fns94_d y;l1;l2 ⍝ comment
+    ⍝ {(r1 r2)}←x fns94_d y;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←x fns94_e y ⍝ comment
+    ⍝ {(r1 r2)}←x fns94_e y ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Simple dyadic with multiple result
+
+    ∇ (r1 r2)←x fns95_a y
+    ⍝ (r1 r2)←x fns95_a y
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←x fns95_b y;l1
+    ⍝ (r1 r2)←x fns95_b y;l1
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←x fns95_c y;l1;l2
+    ⍝ (r1 r2)←x fns95_c y;l1;l2
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←x fns95_d y;l1;l2 ⍝ comment
+    ⍝ (r1 r2)←x fns95_d y;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←x fns95_e y ⍝ comment
+    ⍝ (r1 r2)←x fns95_e y ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Multiple dyadic, no result
+
+    ∇ x fns31_a(y1 y2)
+    ⍝ x fns31_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ x fns31_b(y1 y2);l1
+    ⍝ x fns31_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ x fns31_c(y1 y2);l1;l2
+    ⍝ x fns31_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ x fns31_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ x fns31_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ x fns31_e(y1 y2) ⍝ comment
+    ⍝ x fns31_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Multiple dyadic with result
+
+    ∇ r←x fns32_a(y1 y2)
+    ⍝ r←x fns32_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ r←x fns32_b(y1 y2);l1
+    ⍝ r←x fns32_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ r←x fns32_c(y1 y2);l1;l2
+    ⍝ r←x fns32_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ r←x fns32_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ r←x fns32_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ r←x fns32_e(y1 y2) ⍝ comment
+    ⍝ r←x fns32_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Multiple dyadic with shy result
+
+    ∇ {r}←x fns33_a(y1 y2)
+    ⍝ {r}←x fns33_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ {r}←x fns33_b(y1 y2);l1
+    ⍝ {r}←x fns33_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ {r}←x fns33_c(y1 y2);l1;l2
+    ⍝ {r}←x fns33_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ {r}←x fns33_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ {r}←x fns33_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {r}←x fns33_e(y1 y2) ⍝ comment
+    ⍝ {r}←x fns33_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Multiple dyadic with multiple shy result
+
+    ∇ {(r1 r2)}←x fns34_a(y1 y2)
+    ⍝ {(r1 r2)}←x fns34_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←x fns34_b(y1 y2);l1
+    ⍝ {(r1 r2)}←x fns34_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←x fns34_c(y1 y2);l1;l2
+    ⍝ {(r1 r2)}←x fns34_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←x fns34_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ {(r1 r2)}←x fns34_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←x fns34_e(y1 y2) ⍝ comment
+    ⍝ {(r1 r2)}←x fns34_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Multiple dyadic with multiple result
+
+    ∇ (r1 r2)←x fns35_a(y1 y2)
+    ⍝ (r1 r2)←x fns35_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←x fns35_b(y1 y2);l1
+    ⍝ (r1 r2)←x fns35_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←x fns35_c(y1 y2);l1;l2
+    ⍝ (r1 r2)←x fns35_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←x fns35_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ (r1 r2)←x fns35_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←x fns35_e(y1 y2) ⍝ comment
+    ⍝ (r1 r2)←x fns35_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Simple ambivalent, no result
+
+    ∇ {x}fns41_a y
+    ⍝ {x}fns41_a y
+      :Access Public
+    ∇
+
+    ∇ {x}fns41_b y;l1
+    ⍝ {x}fns41_b y;l1
+      :Access Public
+    ∇
+
+    ∇ {x}fns41_c y;l1;l2
+    ⍝ {x}fns41_c y;l1;l2
+      :Access Public
+    ∇
+
+    ∇ {x}fns41_d y;l1;l2 ⍝ comment
+    ⍝ {x}fns41_d y;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {x}fns41_e y ⍝ comment
+    ⍝ {x}fns41_e y ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Simple ambivalent with result
+
+    ∇ r←{x}fns42_a y
+    ⍝ r←{x}fns42_a y
+      :Access Public
+    ∇
+
+    ∇ r←{x}fns42_b y;l1
+    ⍝ r←{x}fns42_b y;l1
+      :Access Public
+    ∇
+
+    ∇ r←{x}fns42_c y;l1;l2
+    ⍝ r←{x}fns42_c y;l1;l2
+      :Access Public
+    ∇
+
+    ∇ r←{x}fns42_d y;l1;l2 ⍝ comment
+    ⍝ r←{x}fns42_d y;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ r←{x}fns42_e y ⍝ comment
+    ⍝ r←{x}fns42_e y ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Simple ambivalent with shy result
+
+    ∇ {r}←{x}fns43_a y
+    ⍝ {r}←{x}fns43_a y
+      :Access Public
+    ∇
+
+    ∇ {r}←{x}fns43_b y;l1
+    ⍝ {r}←{x}fns43_b y;l1
+      :Access Public
+    ∇
+
+    ∇ {r}←{x}fns43_c y;l1;l2
+    ⍝ {r}←{x}fns43_c y;l1;l2
+      :Access Public
+    ∇
+
+    ∇ {r}←{x}fns43_d y;l1;l2 ⍝ comment
+    ⍝ {r}←{x}fns43_d y;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {r}←{x}fns43_e y ⍝ comment
+    ⍝ {r}←{x}fns43_e y ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Simple ambivalent with multiple shy result
+
+    ∇ {(r1 r2)}←{x}fns44_a y
+    ⍝ {(r1 r2)}←{x}fns44_a y
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←{x}fns44_b y;l1
+    ⍝ {(r1 r2)}←{x}fns44_b y;l1
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←{x}fns44_c y;l1;l2
+    ⍝ {(r1 r2)}←{x}fns44_c y;l1;l2
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←{x}fns44_d y;l1;l2 ⍝ comment
+    ⍝ {(r1 r2)}←{x}fns44_d y;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←{x}fns44_e y ⍝ comment
+    ⍝ {(r1 r2)}←{x}fns44_e y ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Simple ambivalent with multiple result
+
+    ∇ (r1 r2)←{x}fns45_a y
+    ⍝ (r1 r2)←{x}fns45_a y
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←{x}fns45_b y;l1
+    ⍝ (r1 r2)←{x}fns45_b y;l1
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←{x}fns45_c y;l1;l2
+    ⍝ (r1 r2)←{x}fns45_c y;l1;l2
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←{x}fns45_d y;l1;l2 ⍝ comment
+    ⍝ (r1 r2)←{x}fns45_d y;l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←{x}fns45_e y ⍝ comment
+    ⍝ (r1 r2)←{x}fns45_e y ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Multiple ambivalent, no result
+
+    ∇ {x}fns51_a(y1 y2)
+    ⍝ {x}fns51_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ {x}fns51_b(y1 y2);l1
+    ⍝ {x}fns51_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ {x}fns51_c(y1 y2);l1;l2
+    ⍝ {x}fns51_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ {x}fns51_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ {x}fns51_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {x}fns51_e(y1 y2) ⍝ comment
+    ⍝ {x}fns51_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Multiple ambivalent with result
+
+    ∇ r←{x}fns52_a(y1 y2)
+    ⍝ r←{x}fns52_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ r←{x}fns52_b(y1 y2);l1
+    ⍝ r←{x}fns52_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ r←{x}fns52_c(y1 y2);l1;l2
+    ⍝ r←{x}fns52_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ r←{x}fns52_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ r←{x}fns52_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ r←{x}fns52_e(y1 y2) ⍝ comment
+    ⍝ r←{x}fns52_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Multiple ambivalent with shy result
+
+    ∇ {r}←{x}fns53_a(y1 y2)
+    ⍝ {r}←{x}fns53_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ {r}←{x}fns53_b(y1 y2);l1
+    ⍝ {r}←{x}fns53_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ {r}←{x}fns53_c(y1 y2);l1;l2
+    ⍝ {r}←{x}fns53_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ {r}←{x}fns53_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ {r}←{x}fns53_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {r}←{x}fns53_e(y1 y2) ⍝ comment
+    ⍝ {r}←{x}fns53_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Multiple ambivalent with multiple shy result
+
+    ∇ {(r1 r2)}←{x}fns54_a(y1 y2)
+    ⍝ {(r1 r2)}←{x}fns54_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←{x}fns54_b(y1 y2);l1
+    ⍝ {(r1 r2)}←{x}fns54_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←{x}fns54_c(y1 y2);l1;l2
+    ⍝ {(r1 r2)}←{x}fns54_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←{x}fns54_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ {(r1 r2)}←{x}fns54_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ {(r1 r2)}←{x}fns54_e(y1 y2) ⍝ comment
+    ⍝ {(r1 r2)}←{x}fns54_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+⍝⍝⍝ Multiple ambivalent with multiple result
+
+    ∇ (r1 r2)←{x}fns55_a(y1 y2)
+    ⍝ (r1 r2)←{x}fns55_a(y1 y2)
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←{x}fns55_b(y1 y2);l1
+    ⍝ (r1 r2)←{x}fns55_b(y1 y2);l1
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←{x}fns55_c(y1 y2);l1;l2
+    ⍝ (r1 r2)←{x}fns55_c(y1 y2);l1;l2
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←{x}fns55_d(y1 y2);l1;l2 ⍝ comment
+    ⍝ (r1 r2)←{x}fns55_d(y1 y2);l1;l2 ⍝ comment
+      :Access Public
+    ∇
+
+    ∇ (r1 r2)←{x}fns55_e(y1 y2) ⍝ comment
+    ⍝ (r1 r2)←{x}fns55_e(y1 y2) ⍝ comment
+      :Access Public
+    ∇
+
+:EndClass

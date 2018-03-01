@@ -1,0 +1,23 @@
+ R←Test_Browse_61(stopFlag batchFlag);⎕TRAP;buffer;ps;filename;html;allVars
+⍝ `Browse` a scripted namespace embedded into another one with variables, with comments.
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ 'MyApp'#.Temp.⎕CY'Tests\TestData'
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.MyApp.EXIT
+ ##.ADOC.RestoreDefaults
+ html←#.APLTreeUtils.ReadUtf8File filename
+ #.FilesAndDirs.DeleteFile filename
+ html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
+ allVars←' '~¨⍨↓#.Temp.MyApp.EXIT.⎕NL 2
+ →PassesIf(⍴allVars)=+/↑∨/('>',¨allVars,¨⊂'</h5>')⍷¨⊂html
+ →PassesIf+/'<p>&lt;Really!&gt;</p>'⍷html
+ →PassesIf+/'<p>&lt;Is single-line <em>however</em>!&gt;</p>'⍷html
+ →PassesIf+/'<p>&lt;Does <strong>not</strong> show becaus it''s a matrix&gt;</p>'⍷html
+ R←∆OK

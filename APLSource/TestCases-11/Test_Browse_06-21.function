@@ -1,0 +1,21 @@
+ R←Test_Browse_06(stopFlag batchFlag);newdoc;buffer;flag;sep;⎕TRAP;body;htmlFilename;buff;ps
+⍝ `Browse` a class that carries comments before the `:Class` statement (that was once illegal).
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+
+ body←,¨'⍝ My comment from line 1' ':Class Foo' '∇ r←Hello' ':Access Public Shared' 'r←''World''' '∇' ':EndClass'
+ #.Temp.⎕FIX body ⍝ Does it work?
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ htmlFilename←ps ##.ADOC.Browse #.Temp.Foo
+ ##.ADOC.RestoreDefaults
+ buff←#.APLTreeUtils.ReadUtf8File htmlFilename
+ →PassesIf 1=+/'My comment from line 1'⍷∊buff
+
+ R←∆OK

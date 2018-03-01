@@ -1,0 +1,3 @@
+ Demo_Browse
+ ⎕←'⍝ The following is equivalent to:  ]ADoc #.FilesAndDirs'
+ ##.ADOC.Browse #.FilesAndDirs

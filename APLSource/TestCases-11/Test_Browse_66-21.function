@@ -1,0 +1,52 @@
+ R←Test_Browse_66(stopFlag batchFlag);newdoc;buffer;flag;sep;⎕TRAP;code;html;filename;list;ps;ss
+⍝ `Browse` a scripted namespace with dfns and dops and a `Public` definition.
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+
+ code←''
+ code,←⊂':Namespace ScriptedNamespace'
+ code,←⊂''
+ code,←⊂''
+ code,←⊂'    Public1←{''World''}'
+ code,←⊂''
+ code,←⊂'    Public2←{'
+ code,←⊂'''World2'''
+ code,←⊂'}'
+ code,←⊂''
+ code,←⊂'    Public3←{'
+ code,←⊂'''World2'''
+ code,←⊂'}'
+ code,←⊂''
+ code,←⊂'    Public4←{⍺⍺''World''}'
+ code,←⊂''
+ code,←⊂'    Public5←{'
+ code,←⊂'⍺⍺''World2'''
+ code,←⊂'}'
+ code,←⊂''
+ code,←⊂'    Public6←{'
+ code,←⊂'⍺⍺''World2'''
+ code,←⊂'}'
+ code,←⊂''
+ code,←⊂'∇r←Public'
+ code,←⊂'r←''Public1'' ''Public3'' ''Public4'' ''Public6'''
+ code,←⊂'∇'
+ code,←⊂''
+ code,←⊂':EndNamespace'
+
+ #.Temp.⎕FIX code
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.ScriptedNamespace
+ ##.ADOC.RestoreDefaults
+ html←#.APLTreeUtils.ReadUtf8File filename
+ #.FilesAndDirs.DeleteFile filename
+ html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
+ ss←'<h5 class="aplname" id="'
+ →PassesIf 4=+/ss⍷html
+
+ R←∆OK

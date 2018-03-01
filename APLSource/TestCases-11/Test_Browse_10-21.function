@@ -1,0 +1,44 @@
+ R←Test_Browse_10(stopFlag batchFlag);newdoc;buffer;flag;sep;⎕TRAP;code;filename;html;ps
+⍝ `Browse` a class with a list with (many) leading blanks.
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ code←⊂':Class MyClass'
+ code,←⊂'⍝ This is a test for a list that might be mistaken as a nested list:'
+ code,←⊂'⍝     * First'
+ code,←⊂'⍝     * Second'
+ code,←⊂'⍝ While here we have true nested lists, both unordered:'
+ code,←⊂'⍝ * First (2)'
+ code,←⊂'⍝ * Second (2)'
+ code,←⊂'⍝   * AAA'
+ code,←⊂'⍝   * BBB'
+ code,←⊂'⍝ * Third (2)'
+ code,←⊂'⍝ Again two truely nested lists, the outer one unordered, the inner one ordered:'
+ code,←⊂'⍝ * First (2)'
+ code,←⊂'⍝ * Second (2)'
+ code,←⊂'⍝   + AAA'
+ code,←⊂'⍝   + BBB'
+ code,←⊂'⍝ * Third (2)'
+ code,←⊂'⍝ Finally two truely nested lists with the outer one ordered and the inner one not:'
+ code,←⊂'⍝ 1. First (2)'
+ code,←⊂'⍝ 1. Second (2)'
+ code,←⊂'⍝   * AAA'
+ code,←⊂'⍝   * BBB'
+ code,←⊂'⍝ 1. Third (2)'
+ code,←⊂':EndClass'
+ #.Temp.⎕FIX code
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.MyClass
+ html←#.APLTreeUtils.ReadUtf8File filename
+ #.FilesAndDirs.DeleteFile filename
+ ##.ADOC.RestoreDefaults
+ html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html
+ →PassesIf 4=+/'<ul'⍷html
+ →PassesIf 1=+/'<ol'⍷html
+ →PassesIf 15=+/'<li'⍷html
+
+ R←∆OK

@@ -1,0 +1,3 @@
+ Demo_SummaryFull
+ ⎕←'⍝ The following is equivalent to:  ]ADoc #.FilesAndDirs -summary=full'
+ 'full'##.ADOC.List #.FilesAndDirs

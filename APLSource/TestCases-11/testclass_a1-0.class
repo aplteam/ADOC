@@ -1,0 +1,86 @@
+:Class testclass_a1
+⍝ Basic class defining some methods, fields and properties, shared and instanded omce.
+
+    :field  Public Shared MySharedField1←'a'
+    :field  Public Shared MySharedField2←'a'
+    :field  Public InstancE MyInstanceField1←'a'
+    :field  Public InstancE MyInstanceField2←'a'
+    :field  Private MyPrivateField
+
+    :Property MyPublicSharedProp1
+    :Access Public Shared
+        ∇ r←get arg
+          r←1
+        ∇
+    :EndProperty
+
+    :Property MyInstanceProp1
+    :Access  Public
+        ∇ r←get arg
+          r←1
+        ∇
+        ∇ set arg
+        ∇
+    :EndProperty
+
+    :Property MyPublicSharedProp2
+    :Access Public Shared
+        ∇ r←get arg
+          r←1
+        ∇
+    :EndProperty
+
+    :Property MyInstanceProp2
+    :Access  Public
+        ∇ r←get arg
+          r←1
+        ∇
+        ∇ set arg
+        ∇
+    :EndProperty
+
+    :Property MyPrivateProp
+    :Access  Private
+        ∇ r←get arg
+          r←1
+        ∇
+    :EndProperty
+
+    ∇ r←MySharedFns1
+      :Access Public Shared
+      r←'shared1 a1'
+    ∇
+
+    ∇ r←MySharedFns2
+      :Access Public Shared
+      r←'shared2 a1'
+    ∇
+
+    ∇ r←MySharedFns3
+      :Access Public Shared
+      r←'shared3 a1'
+    ∇
+
+    ∇ r←MyInstanceFns1
+      :Access Public
+      r←'Instance1 a1'
+    ∇
+
+    ∇ r←MyInstanceFns2Overridable
+      :Access Public Overridable
+      r←'Instance2 a1'
+    ∇
+
+    ∇ r←MyInstanceFns3
+      :Access Public Instance
+      r←'Instance3 a1'
+    ∇
+
+    ∇ r←MyPrivateFns1
+      :Access Private
+      r←'Instance1 a1'
+    ∇
+
+    Prim←{⍵/⍨2=+⌿0=⍵∘.|⍵}
+
+:EndClass

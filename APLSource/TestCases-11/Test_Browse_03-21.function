@@ -1,0 +1,17 @@
+ R←Test_Browse_03(stopFlag batchFlag);⎕TRAP;sep;show;ps;filename;html
+⍝ `Browse` a class (`IniFiles`) that contains a "requires" directive (old syntax)
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ sep←⎕UCS 13
+ show←batchFlag∘{⍺:⍬ ⋄ ⎕←⍵ ⋄ ⍬}
+ ##.ADOC.RestoreDefaults
+
+ ⎕SE.SALT.Load'..\..\APLTree\_Source\IniFiles.dyalog -t=#'
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.IniFiles
+ html←#.APLTreeUtils.ReadUtf8File filename
+ #.FilesAndDirs.DeleteFile filename
+ ##.ADOC.RestoreDefaults
+
+ R←∆OK

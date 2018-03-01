@@ -1,0 +1,5 @@
+ ∆RemoveCSS←{
+ ⍝ ⍵ is a vtv (HTML)
+ ⍝ Remove everything between <style and </style>
+     '<style.*</style>'⎕R''⍠('Mode' 'M')('DotAll' 1)⊣⍵
+ }

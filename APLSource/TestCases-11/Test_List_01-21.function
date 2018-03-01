@@ -1,0 +1,9 @@
+ R←Test_List_01(stopFlag batchFlag);⎕TRAP;expexted;buff
+⍝ `List` a on ADOC itself.
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ buff←##.ADOC.List ##.ADOC
+
+ R←∆OK

@@ -1,0 +1,30 @@
+ R←Test_Info_04(stopFlag batchFlag);newdoc;buffer;flag;sep;show;_;⎕TRAP
+⍝ Exercising the shared "Info" command
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ sep←⎕UCS 13
+ show←batchFlag∘{⍺:⍬ ⋄ ⎕←⍵ ⋄ ⍬}
+ newdoc←##.ADOC.Info testclass_a2
+ ##.ADOC.RestoreDefaults
+
+ :If Correct_testclass_010≢newdoc
+     _←show'   --- ',0⊃⎕SI
+     flag←0
+     :If ~0∊⍴buffer←↑{⍺/⍨~⍺∊⍵}/{⍵⊂⍨sep=⍵}¨Correct_testclass_010 newdoc
+         _←show'   ***  Should be contained but does:'
+         _←show buffer
+         flag←1
+     :EndIf
+     :If ~0∊⍴buffer←↑{⍺/⍨~⍺∊⍵}/{⍵⊂⍨sep=⍵}¨newdoc Correct_testclass_010
+         _←show'    ***  Should not be contained but does not:'
+         _←show buffer
+         flag←1
+     :EndIf
+     :If ~flag
+         _←show'   *** Contents matches, sequence doesn''t!'
+         R←∆OK ⍝ Because that's acceptable
+     :EndIf
+     →FailsIf flag∧stopFlag
+ :EndIf
+
+ R←∆OK

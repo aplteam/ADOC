@@ -1,0 +1,11 @@
+:Namespace Overview
+
+⍝ While `FilesAndDirs` offers all the methods needed to deal with files and directories, any operating specific
+⍝ methods and functions are to be found in `#.OS`.
+⍝
+⍝ In order to function properly `FilesAndDirs` needs `OS`.
+⍝
+⍝ `APLTreeUtils` is a namespace script that is `:Include`d into pretty much every class script of the APLTree
+⍝ project. It contains every-day utilities.
+
+:EndNamespace

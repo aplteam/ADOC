@@ -1,0 +1,50 @@
+ R←Test_Browse_68(stopFlag batchFlag);newdoc;buffer;flag;sep;⎕TRAP;code;html;filename;list;ps
+⍝ `Browse` a scripted namespace that has just `Version`, `Copyright` and `History` (but all ignored!) plus one function
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+
+ code←''
+ code,←⊂':Namespace ScriptedNamespace'
+ code,←⊂'⍝ This namespace script is used in the test for how ADOC processes namespace scripts.'
+ code,←⊂''
+ code,←⊂'    ∇ r←Copyright'
+ code,←⊂'      r←''APL Team Ltd'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ r←Version'
+ code,←⊂'      r←''Test'' ''1.2.3'' ''2017-04-10'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇History'
+ code,←⊂'     ⍝ * 1.0.0'
+ code,←⊂'     ⍝   * Bug fixes'
+ code,←⊂'     ⍝    * Fix 1'
+ code,←⊂'     ⍝    * Fix 2'
+ code,←⊂'     ⍝    * Fix 3'
+ code,←⊂'    ∇'
+ code,←⊂'    ∇r←Hello'
+ code,←⊂'     r←''World'''
+ code,←⊂'    ∇'
+ code,←⊂'    '
+ code,←⊂':EndNamespace'
+
+ #.Temp.⎕FIX code
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ ps.(ignoreCopyright ignoreHistory ignoreVersion)←1
+ filename←ps ##.ADOC.Browse #.Temp.ScriptedNamespace
+ ##.ADOC.RestoreDefaults
+ html←#.APLTreeUtils.ReadUtf8File filename
+ html←∆RemoveCSS html
+ #.FilesAndDirs.DeleteFile filename
+ →PassesIf 4=+/∨/¨'class="aplname"'∘⍷¨html   ⍝ Two functions and one operator, dfns and tfn
+ →PassesIf 0=+/∨/¨'id="version"'∘⍷¨html      ⍝ No special "Version" function
+ →PassesIf 0=+/∨/¨'id="copyright"'∘⍷¨html    ⍝ No special "copyright" function
+ →PassesIf 0=+/∨/¨'id="history"'∘⍷¨html      ⍝ No special "History" function
+
+ R←∆OK

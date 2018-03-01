@@ -1,0 +1,42 @@
+ R←Test_Browse_55(stopFlag batchFlag);newdoc;buffer;flag;sep;⎕TRAP;code;html;filename;list;ps;ss
+⍝ `Browse` a scripted namespace that has only functions (tfns and dfns)
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+
+ code←''
+ code,←⊂':Namespace ScriptedNamespace'
+ code,←⊂'⍝ This namespace script is used in the test for how ADOC processes namespace script.'
+ code,←⊂''
+ code,←⊂'    ∇ r←Public1 arg'
+ code,←⊂'      r←''Public1'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ r←leftArg Public2 rightArg'
+ code,←⊂'      r←''Public2'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    Public3←{''World''}'
+ code,←⊂''
+ code,←⊂'    Public4←{'
+ code,←⊂'''World'''
+ code,←⊂'}'
+ code,←⊂''
+ code,←⊂':EndNamespace'
+
+ #.Temp.⎕FIX code
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.ScriptedNamespace
+ ##.ADOC.RestoreDefaults
+ html←#.APLTreeUtils.ReadUtf8File filename
+ #.FilesAndDirs.DeleteFile filename
+ html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
+ ss←'<h5 class="aplname" id="'
+ →PassesIf 4=+/ss⍷html
+
+ R←∆OK

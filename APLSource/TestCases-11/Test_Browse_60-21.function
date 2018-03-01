@@ -1,0 +1,49 @@
+ R←Test_Browse_60(stopFlag batchFlag);newdoc;buffer;flag;sep;⎕TRAP;code;html;filename;list;ps;ind
+⍝ `Browse` a scripted namespace with an enclosed scripted namespace
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+
+ code←''
+ code,←⊂':Namespace ScriptedNamespace'
+ code,←⊂'⍝ This namespace script is used in the test for how ADOC processes namespaces script.'
+ code,←⊂'⍝ This one has an embedded namespace'
+ code,←⊂''
+ code,←⊂'    ∇ r←Private1'
+ code,←⊂'      r←''Private1'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ r←Public2(arg1 arg2)'
+ code,←⊂'    ⍝ Comment 1.'
+ code,←⊂'    ⍝ Comment 2.'
+ code,←⊂'      r←''Public3'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'   :Namespace Foo'
+ code,←⊂'      ∇ r←left Public4 arg'
+ code,←⊂'      ⍝ Comment 1.\\'
+ code,←⊂'      ⍝ Comment 2 on separate line.'
+ code,←⊂'        r←''Public4'''
+ code,←⊂'      ∇'
+ code,←⊂'   :EndNamespace'
+ code,←⊂''
+ code,←⊂':EndNamespace'
+
+ #.Temp.⎕FIX code
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.ScriptedNamespace
+ ##.ADOC.RestoreDefaults
+ html←#.APLTreeUtils.ReadUtf8File filename
+ #.FilesAndDirs.DeleteFile filename
+ html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
+ →PassesIf 4=+/'Private1'⍷html
+ →PassesIf 4=+/'Public2'⍷html
+ →PassesIf 0=+/'Public4'⍷html
+
+ R←∆OK

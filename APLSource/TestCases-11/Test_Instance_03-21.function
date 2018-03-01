@@ -1,0 +1,19 @@
+ R←Test_Instance_03(stopFlag batchFlag);filename;MyADOC;⎕TRAP
+⍝ Create an instance, set some parameters and then call the "Make" & the "View" method
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ ##.ADOC.RestoreDefaults
+ filename←#.FilesAndDirs.GetTempPath,'test_',('- :'~⍨∆FormatDateTime ⎕TS),'.html'
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ 'Hash'#.TEMP.⎕CY'Tests/TestData'
+ MyADOC←⎕NEW ##.ADOC(,⊂filename)
+ MyADOC.(Title Inherit)←'ADOC and Hash in one file' 0  ⍝ Set parameters
+ MyADOC.Make(##.ADOC #.TEMP.Hash)
+ MyADOC.View filename
+ ##.ADOC.RestoreDefaults
+ ⎕DL 1
+ ⎕NDELETE filename
+
+ R←∆OK

@@ -1,0 +1,1287 @@
+:Class Pepper
+⍝ Very simple APL Library Toolkit for V11
+⍝ Copyright: Kai Jaeger ⋄ APL Team Ltd
+
+    ⎕USING←0⍴⊂'' ⋄ ⎕ML←3 ⋄ ⎕IO←1 ⋄ ⎕wx←1
+
+    :Field Public Shared Stop←0
+
+⍝ --- Private fields
+
+    :Field Private Shared FS←'\'
+    :Field Private Shared LINDEL←13 10
+    :Field Private Shared LU←⊃'abcdefghijklmnopqrstuvwxyzàáâãåèéêëòóôõöøùúûäæü' 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÅÈÉÊËÒÓÔÕÖØÙÚÛÄÆÜ'
+
+⍝ --- Public methods
+
+    ∇ {r}←{parms}Load fullname;∆targetRef;∆returnSource;∆scriptName;path;filename;source;ref;globalName;bool;f;key
+    ⍝ Load a script from file into the workspace
+      :Access Shared Public
+
+      ∆targetRef←#
+      ∆returnSource←0
+      ∆scriptName←¯1 ⍝ defaults to the last part of the filename
+
+      :If ~0∊⍴parms←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'parms'
+      :AndIf ~0∊⍴parms←{2=≡⍵:,⊂⍵ ⋄ ,⍵}parms
+          :If bool←∨/¨'targetref'∘⍷¨Lowercase¨1⊃¨parms
+              ∆targetRef←2⊃(bool⍳1)⊃parms
+              ∆targetRef←⍎⍕{11::⍕⍵ ⋄ ⍎⍵}⍕∆targetRef
+          :EndIf
+          :If bool←∨/¨'returnSource'∘⍷¨Lowercase¨1⊃¨parms
+              ∆returnSource←2⊃(bool⍳1)⊃parms
+          :EndIf
+          :If bool←∨/¨'scriptName'∘⍷¨Lowercase¨1⊃¨parms
+              ∆scriptName←2⊃(bool⍳1)⊃parms
+          :EndIf
+      :EndIf
+
+      :If 0∊⍴fullname
+      :AndIf 'CANCEL'≡1⊃(key fullname)←FileBox(GetDefaultPath ⍬)'' 'Load APL Script'
+          ⎕←'Cancelled by user'
+          :Return
+      :EndIf
+      (path filename)←SplitPath fullname
+      filename{'.'∊⍵:⍵ ⋄ ⍵,'.dyalog'}←filename
+      :If ¯1≡∆scriptName
+          ∆scriptName←filename
+      :EndIf
+
+      ('Value Error - target namespace not found: ',⍕∆targetRef)⎕SIGNAL 6/⍨{(,'#')≡⍵:0 ⋄ 9.1≠⎕NC⊂⍵}⍕∆targetRef
+
+      fullname←path,filename
+      source←##.UnicodeFile.ReadNestedText fullname
+      :If ∆returnSource
+          r←source
+      :Else
+          globalName←(⍕∆targetRef),'.',¯1↓1⊃'.'SplitPath ∆scriptName
+          ⎕EX globalName
+          :Trap 11
+              ref←∆targetRef.⎕FIX source
+          :Else
+              ⎕←'Cannot fix script: ',globalName
+              . ⍝ Check "source"
+          :EndTrap
+          SetDelta(ref fullname globalName)
+          r←'Loaded: ',globalName
+      :EndIf
+    ∇
+
+⍝⍝⍝⍝⍝
+    ∇ r←{quiet}Save _Y;_source;_refToClass;_path;_filename;f;∆;DQ_R;defaultPath;subversionDomain;filename;path;_newFlag;key;_fullFilename;_nameClass
+       ⍝ Save a script on disk
+      :Access Shared Public
+      quiet←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'quiet'
+      quiet←'quiet'≡quiet
+      :If ⍬≡⍴_Y
+          _nameClass←_Y
+          :If 9={⍵.⎕NC'∆'}_Y
+              _fullFilename←_Y.∆.SourceFile
+          :Else
+              _fullFilename←''
+          :EndIf
+      :Else
+          (_nameClass _fullFilename)←_Y
+      :EndIf
+      _nameClass←⍕_nameClass
+      :If ~(1⊃_nameClass)∊'#⎕'
+          _nameClass←(1⊃⎕NSI),'.',_nameClass
+      :EndIf
+      'Script must be a namespace, interface or class'⎕SIGNAL 11/⍨~(⎕NC⊂_nameClass)∊9.1 9.4 9.5
+      _refToClass←⍎_nameClass
+      _newFlag←0=⎕NC _nameClass,'.∆'
+      _source←⎕SRC _refToClass
+      :If 0∊⍴_fullFilename
+          :If 0<⎕NC _nameClass,'.∆.SourceFile'
+              (path filename)←SplitPath{⍵.∆.SourceFile}_refToClass
+          :Else
+              path←GetDefaultPath ⎕WSID
+              filename←({⍵↓⍨2×'#.'≡2⍴⍵}_nameClass),'.dyalog'
+          :EndIf
+          :If 'CANCEL'≡1⊃(key _fullFilename)←FileBox path filename'Save APL Script'(⊂'*.*' 'APL Script')
+              r←'Cancelled by user'
+              :Return
+          :EndIf
+      :EndIf
+      :If '/\'∊⍨¯1↑_fullFilename
+          _fullFilename,←{'.dyalog',⍨⍵↓⍨2×'#.'≡2↑⍵}_nameClass
+      :EndIf
+      (_path _filename)←SplitPath _fullFilename
+      _filename,←(~'.'∊_filename)/'.dyalog'
+      ##.UnicodeFile.Write(_path,'\',_filename)_source''LINDEL
+      SetDelta _refToClass(_path,_filename)({0::'' ⋄ ⍵.∆.GlobalName}_refToClass)
+      r←'Saved: "',_fullFilename
+      :If _newFlag
+      :AndIf ~0∊⍴subversionDomain←'SubVersionDomains'Registry.GetString 2⊃SplitPath ⎕WSID
+      :AndIf msgBox'Pepper: New'('Add'(_path,_filename)'to SubVersion?')'Query'
+          {}⎕CMD'svn add "',(((1+⍴Files.Cd'')↓_path),_filename),'"'
+          r,←' and added to SubVersion'
+      :Else
+          r,←'.'
+      :EndIf
+      :If quiet
+          ⎕EX'r'
+      :EndIf
+    ∇
+
+⍝⍝⍝⍝⍝
+
+    ∇ SetDelta(ref filename globalname)
+      ref.∆←⎕NS''
+      ref.∆.SourceFile←filename
+      ref.∆.LastWriteTime←⍕Files.GetLastWriteTime filename
+      ref.∆.GlobalName←globalname
+    ∇
+
+    ∇ r←fmtDate v
+      r←'' ⋄ →0⍴⍨0∊⍴v
+      r←v ⋄ →0⍴⍨82∊⎕DR v ⍝ empty v is char: skip
+      r←,'I4,2(<->,ZI2),I3,2(<:>,ZI2)'⎕FMT⊃,6↑¨↓∊v
+    ∇
+
+⍝⍝⍝⍝⍝
+    ∇ EditorFix args;file;msgbox;z;r;t;target;nc;i;OrigDelta;obj;event;scriptName;scriptSource;scriptParent;dummy;refToScript
+      :Access Public Shared
+⍝
+
+      ⍎Stop/'.' ⍝ Enforce a stop
+
+      :Select 2⊃args
+
+      :Case 9998 ⍝ Restore ∆ and save source
+          (obj event scriptSource scriptParent scriptName dummy)←3 1⊃args
+          OrigDelta←3 2⊃args
+          refToScript←scriptParent⍎scriptName
+          :If ¯1≡OrigDelta ⍝ It's new!
+        ⍝ ... but what is it? We are interested in scripts only!
+              :If 9=⊃{⍺.⎕NC ⍵}/(1⊃3⊃args)[4 5]
+                  ⎕←'********* Don''t forget to save:'
+                  ⎕←(⍕⎕THIS),'.Save ',(⊃{(⍕⍺),'.',⍵}/(1⊃3⊃args)[4 5]),' '''''
+              :EndIf
+          :Else
+              :If 0=refToScript.⎕NC'∆' ⍝ If ∆ is gone the class WAS refixed
+                  refToScript.∆←OrigDelta
+                  Fixed(refToScript OrigDelta)
+              :EndIf
+          :EndIf
+
+      :Case 'Fix'
+          target←args[4]
+          :If 9≠target.⎕NC 5⊃args
+          :AndIf (9=target.⎕NC'∆')∨(⊂'⍝SALTSource="')∊13↑¨t←{0::⍬ ⋄ ⎕SRC ⍵}target ⍝ looks like we edited something IN a class
+              args[5]←⊂{(1-(⌽⍵)⍳'.')↑⍵}⍕target ⍝ So "move up"
+              args[4]←args[4].##
+          :EndIf
+
+          :If 3≠(args[4].⎕NC)5⊃args
+              :If 9=(args[4].⎕NC)(5⊃args),'.∆' ⍝ Which has a ∆ /// Why parens?
+                  OrigDelta←args[4]⍎(5⊃args),'.∆'
+                  args[4].⎕EX(5⊃args),'.∆'     ⍝ Delete ∆ so we realize it was refixed
+                  ⎕NQ'⎕SE' 9998(args OrigDelta)        ⍝ Record info and requeue for later
+              :ElseIf (⍴t)≥i←(13↑¨t←{0::⍬ ⋄ ⎕SRC ⍵[4]⍎5⊃⍵}args)⍳⊂'⍝SALTSource="'
+                  OrigDelta←⎕NS''
+                  ⎕←OrigDelta.SourceFile←{⍵↑⍨¯1+⍵⍳'"'}{⍵↓⍨⍵⍳'"'}i⊃t
+                  OrigDelta.Version←0
+                  OrigDelta.LastWriteTime←⍕Files.GetLastWriteTime OrigDelta.SourceFile
+                  OrigDelta.GlobalName←''
+                  .
+                  ⎕NQ'⎕SE' 9998(args OrigDelta)        ⍝ Record info and requeue for later
+              :ElseIf 0=args[4]⍎'⎕nc ''',(5⊃args),'''' ⍝ New?!
+                  ⎕NQ'⎕SE' 9998(args ¯1)        ⍝ Record info and requeue for later
+              :EndIf
+          :EndIf
+
+      :EndSelect
+    ∇
+
+    ∇ Fixed(ref OrigDelta);name;oldSource;newSource
+⍝ Called after class has been fixed to update the source file
+⍝ OrigDelta is the old ∆ namespace of the saved script
+      newSource←⎕SRC ref
+      name←⍕ref
+      oldSource←fixTabs ##.UnicodeFile.ReadNestedText OrigDelta.SourceFile
+      :If newSource≢oldSource ⍝ Any changes?
+      :AndIf ≢/{⍵↓¨⍨+/∧\' '=⊃⍵}¨newSource oldSource ⍝ we shouldn't have to do this!
+          :If (({⍵↓⍨2×'#.'≡2↑⍵}⍕ref))≢name←':'~⍨2⊃{' '{⍵⊂⍨⍵≠⍺}dmb ⍵}1⊃newSource
+              OrigDelta.SourceFile←({⍵↑⍨1+-'.'⍳⍨⌽⍵}name){(1⊃⍵),⍺,({⍵↓⍨¯1+⍵⍳'.'}2⊃⍵)}SplitPath OrigDelta.SourceFile
+              OrigDelta.LastWriteTime←'⍬'
+          :EndIf
+          :If Talk(name OrigDelta.SourceFile OrigDelta.LastWriteTime OrigDelta.GlobalName newSource)
+              ##.UnicodeFile.Write OrigDelta.SourceFile newSource''LINDEL
+              OrigDelta.LastWriteTime←⍕Files.GetLastWriteTime OrigDelta.SourceFile
+              ⎕←⎕TC[3],'*** ',name,' saved in ',OrigDelta.SourceFile
+          :Else
+              ⎕←⎕TC[3],'*** Not saved on disk: ',name,' (',OrigDelta.SourceFile,')'
+          :EndIf
+      :EndIf
+    ∇
+
+⍝ --- Utilities
+
+    ∇ r←rlb w;⎕IO
+      ⎕IO←0 ⋄ r←(0⍳⍨w=' ')↓w
+    ∇
+
+    ∇ s←lCase s;b;⎕IO;i
+      →(∨/b←(1↓⍴LU)>i←LU[1;]⍳s)↓⎕IO←0
+      (b/s)←LU[0;b/i]
+    ∇
+
+    ∇ {r}←msgBox(Caption Text Mode);parms;msgbox
+⍝ Return 1, 2 or 3 for buttons pressed
+      'msgbox'⎕WC'msgBox'Caption Text Mode('Event' 'All' 1)
+      r←4|'MsgBtn1' 'MsgBtn2' 'MsgBtn3'⍳(r←⎕DQ'msgbox')[2]
+    ∇
+
+    ∇ r←{noOfSpaces}fixTabs source;tab;replace
+⍝ Change <Tabs> into "noOfSpaces" except those found between quotes
+      noOfSpaces←{0<⎕NC ⍵:⍎⍵ ⋄ 4}'noOfSpaces'
+      tab←10⊃⎕AV
+      replace←tab∘{
+          ⎕ML←3
+          0=+/⍺=w←⍵:w ⍝ no tabs at all
+          bool←~{⍵∨≠\⍵}w=''''
+          clearedString←bool\bool/w
+          0=+/bool←clearedString=⍺:w
+          (bool/w)←⊂4⍴' '
+          ∊w
+      }
+      r←replace¨source
+    ∇
+
+    ∇ r←GetEnvironmentVars w
+      r←2 ⎕NQ'.' 'GetEnvironment'w
+    ∇
+
+    ∇ bool←Talk(name fullFilename ts globalName source);∆;f;res;txt;backupPath;fullBackupFilename;compareCmd;cmd;tempfile;path;filename;buffer;about;quitFlag;wsid;existFlag;q;origDelta;MatchTimestamps;dir
+    ⍝ Talks to the user about how and where to "Save" a script.
+    ⍝ Offers a "Compare" feature
+      backupPath←Registry.GetString'ScriptBackupPath'
+      compareCmd←GetCompareCmd
+      bool←0
+      existFlag←Files.IsFile fullFilename
+      (path filename)←SplitPath fullFilename
+
+      ∆←⊂'Form'
+      ∆,←⊂'Caption'('Pepper: ',name)
+      ∆,←⊂'Coord' 'Pixel'
+      ∆,←⊂'Size'(285 350)
+      ∆,←⊂'Posn'(50 25)
+      ∆,←⊂'Sizeable' 0
+      ∆,←⊂'MinButton' 0
+      ∆,←⊂'MaxButton' 0
+      ∆,←⊂'SysMenu' 0
+      'f'⎕WC ∆
+
+      'f.fnt'⎕WC'Font'
+      f.FontObj←f.fnt
+
+      'f.mb'⎕WC'Menubar'
+      'f.mb.settings'⎕WC'Menu' 'Settings'
+      'f.mb.settings.defaultdir'⎕WC'MenuItem' 'Set Default Dir'('Event' 'Select' 1)('HintObj' 'f.sb.info')('Hint' 'Specify the workspace-related default directory')
+      'f.mb.settings.bkppath'⎕WC'MenuItem' 'Set Backup Dir'('Event' 'Select' 1)('HintObj' 'f.sb.info')('Hint' 'Specify the general backup directory')
+      'f.mb.help'⎕WC'Menu' 'Help'
+      'f.mb.help.help'⎕WC'MenuItem' 'Help'('Active' 0)('Event' 'Select' 1)
+      'f.mb.help.about'⎕WC'MenuItem' 'About'('Event' 'Select' 1)
+
+      'f.sb'⎕WC'Statusbar' ⍝ ('Coord' 'Prop')
+      'f.sb.info'⎕WC'Statusfield'('Size'(⍬ 290))
+      'f.sb.version'⎕WC'Statusfield'('Size'(⍬ 48))
+      f.sb.version.Text←'V 0.1 *'
+
+      'f.fnt'⎕WC'Font' 'Courier New'
+
+      ∆←⊂'Label'
+      ∆,←⊂'Posn'(5 5)
+      ∆,←⊂'Caption' 'Script is already fixed in the workspace'
+      'f.info'⎕WC ∆
+
+      ∆←⊂'Button'
+      ∆,←⊂'Caption' 'Save it!'
+      ∆,←⊂'Default' 1
+      ∆,←⊂'Posn'((f.Size[1]-60),5)
+      ∆,←⊂'Size'(30 80)
+      ∆,←⊂'Event' 'Select' 1
+      ∆,←⊂'HintObj' 'f.sb.info'
+      ∆,←⊂'Hint' 'Save the script onto the disk'
+      'f.ok'⎕WC ∆
+
+      ∆←⊂'Button'
+      ∆,←⊂'Caption' '&Backup + Save'
+      ∆,←⊂'Posn'((f.Size[1]-60),90)
+      ∆,←⊂'Size'(30 100)
+      ∆,←⊂'Event' 'Select' 1
+      ∆,←⊂'Active'(~0∊⍴,backupPath)
+      ∆,←⊂'HintObj' 'f.sb.info'
+      ∆,←⊂'Hint' 'Take a copy from the disk version, then save'
+      ∆,←⊂'Active'existFlag
+      'f.bkp'⎕WC ∆
+
+      ∆←⊂'Button'
+      ∆,←⊂'Caption' 'Take File'
+      ∆,←⊂'Posn'((f.Size[1]-60)195)
+      ∆,←⊂'Size'(30 80)
+      ∆,←⊂'Event' 'Select' 1
+      ∆,←⊂'HintObj' 'f.sb.info'
+      ∆,←⊂'Hint' 'Load the file version into the workspace'
+      'f.file'⎕WC ∆
+
+      ∆←⊂'Button'
+      ∆,←⊂'Caption' '&Cancel'
+      ∆,←⊂'Posn'((f.Size[1]-60)280)
+      ∆,←⊂'Size'(30 65)
+      ∆,←⊂'Event' 'Select' 1
+      ∆,←⊂'HintObj' 'f.sb.info'
+      ∆,←⊂'Hint' 'Dont''t save script on disk (is already fixed in workspace!)'
+      'f.cancel'⎕WC ∆
+
+      ∆←⊂'Label'
+      ∆,←⊂'Caption' 'Path:'
+      ∆,←⊂'Posn'(25 7)
+      'f.l_path'⎕WC ∆
+
+      ∆←⊂'Edit'
+      ∆,←⊂'Text'path
+      ∆,←⊂'ReadOnly' 1
+      ∆,←⊂'Posn'(45 5)
+      ∆,←⊂'BCol' ¯1
+      ∆,←⊂'FontObj' 'f.fnt'
+      ∆,←⊂'Size'(⍬(f.Size[2]-10))
+      'f.path'⎕WC ∆
+      f.path.Size[1]-←7
+
+      ∆←⊂'Label'
+      ∆,←⊂'Caption' 'filename:'
+      ∆,←⊂'Posn'(75 7)
+      'f.l_filename'⎕WC ∆
+
+      ∆←⊂'Edit'
+      ∆,←⊂'Text'filename
+      ∆,←⊂'ReadOnly' 1
+      ∆,←⊂'Posn'(95 5)
+      ∆,←⊂'BCol' ¯1
+      ∆,←⊂'FontObj' 'f.fnt'
+      ∆,←⊂'Size'(⍬(f.Size[2]-10))
+      'f.filename'⎕WC ∆
+      f.filename.Size[1]-←7
+
+      ∆←⊂'Group'
+      ∆,←⊂'Caption' ' Timestamps'
+      ∆,←⊂'Posn'(125 7)
+      ∆,←⊂'Size'(85 337)
+      'f.grp1'⎕WC ∆
+
+      ∆←⊂'Label'
+      ∆,←⊂'Caption' 'File:'
+      ∆,←⊂'Posn'(20 7)
+      'f.grp1.l_ts'⎕WC ∆
+
+      MatchTimestamps←{existFlag∧(~0∊⍴⍎⍵)∧(∊⍺)≢∊⍎⍵}
+      ∆←⊂'Edit'
+      ∆,←⊂'Text'(fmtDate fileTS←,Files.GetLastWriteTime fullFilename)
+      ∆,←⊂'ReadOnly' 1
+      ∆,←⊂'Posn'(20 40)
+      ∆,←⊂'BCol' ¯1
+      ∆,←⊂'FontObj' 'f.fnt'
+      'f.grp1.fileTimestamp'⎕WC ∆
+      f.grp1.fileTimestamp.Size[1]-←7
+
+      ∆←⊂'Label'
+      ∆,←⊂'Caption' 'WS:'
+      ∆,←⊂'Posn'(50 7)
+      ∆,←⊂'FCol'(255 0 0×fileTS MatchTimestamps ts)
+      'f.grp1.l_wsts'⎕WC ∆
+
+      ∆←⊂'Edit'
+      ∆,←⊂'Text'(fmtDate⍎ts)
+      ∆,←⊂'ReadOnly' 1
+      ∆,←⊂'Posn'(50 40)
+      ∆,←⊂'BCol' ¯1
+      ∆,←⊂'FontObj' 'f.fnt'
+      'f.grp1.wsts'⎕WC ∆
+      f.grp1.wsts.Size[1]-←7
+      f.grp1.wsts.FCol←(255 0 0×fileTS MatchTimestamps ts)
+
+      ∆←⊂'Button'
+      ∆,←⊂'Caption'(' &Compare WS',⎕TC[3],' with file ')
+      ∆,←⊂'Posn'(20 247)
+      ∆,←⊂'Size'(55 85)
+      ∆,←⊂'Active' 1
+      ∆,←⊂'Event' 'Select' 1
+      ∆,←⊂'HintObj' 'f.sb.info'
+      ∆,←⊂'Hint' 'Compare WS and file version with a compare utility'
+      ∆,←⊂'Active'existFlag
+      'f.grp1.compare'⎕WC ∆
+
+      f.file.Active←existFlag∧fileTS≢⍎ts
+
+⍝!!⍝ At the time being (1007-08-26) callbacks defined in a script are not recognized by Dyalog
+      quitFlag←0
+      :Repeat
+          res←⎕DQ'f'
+          :Select 1⊃res
+          :Case 'f.bkp'
+              fullBackupFilename←backupPath,'\',({b←' '=a←⍵ ⋄ (b/a)←'_' ⋄ a}'-:'~⍨fmtDate ⎕TS){(1⊃⍵),'_',⍺,'.',2⊃⍵}'.'SplitPath 2⊃SplitPath fullFilename
+              fullFilename Files.MoveTo fullBackupFilename
+              bool←quitFlag←1
+          :Case 'f.grp1.compare'
+              source CompareWithFile fullFilename
+          :Case 'f.file'
+              :If 1=msgBox('Pepper: ',name)'Sure you want overwrite the workspace version with the file version?' 'Query'
+                  buffer←##.UnicodeFile.ReadNestedText fullFilename
+                  origDelta←⍎globalName,'.∆'
+                  buffer{⍵.⎕FIX ⍺}⍎{⍵↓⍨-'.'⍳⍨⌽⍵}globalName
+                  (globalName,'.∆')⎕NS origDelta
+                  ⎕EX'origDelta'
+                  ⎕←'*** Workspace version of "',globalName,'" overwritten with file version'
+                  quitFlag←1
+              :EndIf
+          :Case 'f.mb.help.about'
+              txt←'Script Management Utility' '' 'Copyright: APL Team Ltd' '' 'Author: Kai Jaeger' '' 'http://aplteam.com'
+              'about'⎕WC'MsgBox' 'Pepper: About'txt('Style' 'Info')
+              ⎕DQ'about'
+          :Case 'f.mb.settings.defaultdir'
+              txt←{0∊⍴⍵:'Select default directory for ',wsid ⋄ 'Current default directory for ',wsid,': ',⍵}'Pathes'Registry.GetString wsid←{2⊃SplitPath ⍵}⎕WSID
+              :If ~0∊⍴dir←SelectDir txt
+                  'Pathes'Registry.PutString(wsid dir)
+              :EndIf
+          :Case 'f.mb.settings.bkppath'
+              txt←'Select the default backup directory'
+              :If ~0∊⍴dir←SelectDir txt
+                  Registry.PutString('BackupPath'dir)
+              :EndIf
+          :Case 'f.ok'
+              quitFlag←bool←1
+          :Case 'f.cancel'
+              quitFlag←1
+              bool←0
+          :Else
+              . ⍝ Huuh?
+          :EndSelect
+      :Until quitFlag
+    ∇
+
+    ∇ {r}←{quiet}Delete y;name;filename
+      ⍝ Delete a particular script. Use SubVersion commands for this if SubVersion is available.
+      :Access Public Shared
+      quiet←{0=⎕NC ⍵:0 ⋄ 'quiet'≡Lowercase ⍵}'quiet'
+      name←⍕y
+      r←''
+      :If ':'∊name
+          filename←(1+⍴Files.Cd'')↓name
+      :Else
+          filename←name
+      :EndIf
+      :If quiet
+      :OrIf msgBox'Pepper: Delete'('Delete "',name,'" ?')'Query'
+          :If ~0∊⍴GetSubVersionDomain 2⊃SplitPath ⎕WSID
+              {}⎕CMD'svn delete "',filename,'" --force'
+              r←'Deleted via SubVersion Delete command: ',name
+          :Else
+              :If Files.Delete filename
+                  r←'Deleted from file system: ',filename
+              :Else
+                  r←'Delete of "',filename,'"failed"'
+              :EndIf
+          :EndIf
+      :Else
+          ⎕←'Delete operation cancelled'
+      :EndIf
+    ∇
+
+    ∇ {wsid}SetDefaultPath path;drop
+      :Access Public Shared
+      drop←{⍵↑⍨1+-⌊/'/\'⍳⍨⌽⍵}
+      wsid←{0<⎕NC ⍵:drop⍎⍵ ⋄ drop ⎕WSID}'wsid'
+      'Pathes'Registry.PutString(wsid path)
+    ∇
+
+    ∇ r←GetDefaultPath wsid;drop
+      :Access Public Shared
+      drop←{⍵↑⍨1+-⌊/'/\'⍳⍨⌽⍵}
+      wsid←{0∊⍴⍵:drop ⎕WSID ⋄ drop ⍵}wsid
+      r←'Pathes'Registry.GetString wsid
+    ∇
+
+    ∇ {wsid}SetSubVersionDomain domain;drop
+      :Access Public Shared
+      drop←{⍵↑⍨1+-⌊/'/\'⍳⍨⌽⍵}
+      wsid←{0<⎕NC ⍵:drop⍎⍵ ⋄ drop ⎕WSID}'wsid'
+      'SubVersionDomains'Registry.PutString(wsid domain)
+    ∇
+
+    ∇ r←GetSubVersionDomain wsid;drop
+      :Access Public Shared
+      drop←{⍵↑⍨1+-⌊/'/\'⍳⍨⌽⍵}
+      wsid←{0∊⍴⍵:drop ⎕WSID ⋄ drop ⍵}wsid
+      r←'SubVersionDomains'Registry.GetString wsid
+    ∇
+
+      SplitPath←{
+          ⍺←'/\'
+          l←1+-⌊/⍺⍳⍨⌽⍵
+          (l↓⍵)(l↑⍵)
+      }
+
+    ∇ {path}CompareScript Y;scriptName_1;scriptName_2;searchPath;ref;⎕IO;⎕ML;filename;cmd;∆DeleteFileA;tempFilename2;buffer;tempFilename;filename2
+⍝ Can be used in two very different ways depending on what is passed as right argument:
+⍝ 1. Specifying a single reference to a script:
+⍝    Compare a script in the workspace with the file defined by ∆.SourceFile of
+⍝    that script. Instead, you can define a path via the left argument which
+⍝    overwrites the default behaviour then.
+⍝ 2. Specifying two references to scripts in the current workspace:
+⍝    The two scripts are compared; any left argument is ignored in this case.
+⍝ Experimetental: works only on my machine at the time being
+      :Access Public Shared
+      ⎕IO←1 ⋄ ⎕ML←3
+
+      :If '?'≡Y
+          ⎕←'#.Pepper.CompareScript  #.Pepper   ⍝ compares script in WS with #.Pepper.∆.SourceFile'
+          ⎕←'#.Pepper.CompareScript  #.Pepper   #.Other ⍝ Compare two scripts in the workspace'
+          ⎕←'#.Pepper.CompareScript  #.Pepper   ''c:\temp\my.dyalog' ⍝ Compare WS scripts with specified file'
+          :Return
+      :EndIf
+
+      filename2←''
+      :If 2=⍴,Y
+          (scriptName_1 scriptName_2)←Y
+          :If {11::0 ⋄ 82=⎕DR ⍵}scriptName_2
+              filename2←scriptName_2
+              scriptName_2←{⍵↓⍨-'.'⍳⍨⌽⍵}{⍵↑⍨1+-⌊/'/\'⍳⍨⌽⍵}scriptName_2
+              scriptName_1←⍕1⊃Y
+              scriptName_1←{⍵,⍨'#.'/⍨'#.'≢2↑⍵}scriptName_1
+          :Else
+              (scriptName_1 scriptName_2)←⍕¨Y
+              (scriptName_1 scriptName_2)←{⍵,⍨'#.'/⍨'#.'≢2↑⍵}¨scriptName_1 scriptName_2
+              :If ≡/Y
+                  ⎕←'Equals'
+                  :Return
+              :ElseIf ≡/{{⍵↓⍨¨+/∧\' '=⊃⍵}⎕SRC ⍵}¨Y
+                  ⎕←'Equals'
+                  :Return
+              :EndIf
+          :EndIf
+          tempFilename←(¯4↓Files.GetTempFileName),(' '~⍨⍕⎕TS),'.tmp'
+          ##.UnicodeFile.Write tempFilename(⎕SRC 1⊃Y)''(13 10)
+          :If 0∊⍴filename2
+              ⎕DL 0.1
+              filename2←tempFilename2←(¯4↓Files.GetTempFileName),(' '~⍨⍕⎕TS),'.tmp'
+              ##.UnicodeFile.Write tempFilename2(⎕SRC 2⊃Y)''(13 10)
+          :EndIf
+          cmd←GetCompareCmd
+          cmd,←' ',tempFilename
+          cmd,←' /=',scriptName_1 ⍝ Alias name 1
+          cmd,←' ',filename2
+          cmd,←' /=',scriptName_2 ⍝ Alias name 2
+          cmd,←' /r'  ⍝ Readonly mode
+          (⊂'Wait' 1)Process.Run cmd
+          '∆DeleteFileA'⎕NA'I kernel32.C32∣DeleteFileA <0T'
+          {}∆DeleteFileA⊂tempFilename
+          :Trap 0 ⋄ {}∆DeleteFileA⊂tempFilename2 ⋄ :EndTrap
+      :Else
+          scriptName_1,⍨←'#.'/⍨'#.'≢2↑scriptName_1←⍕Y
+          :Trap 0
+              ref←⍎scriptName_1
+          :Else
+              11 ⎕SIGNAL⍨'Not found: ',⍕∊scriptName_1
+          :EndTrap
+          :If 2=⎕NC'path'
+              searchPath←path
+          :Else
+              :Trap 6
+                  searchPath←{⍵↓⍨1+-'\'⍳⍨⌽⍵}ref.∆.SourceFile
+              :Else
+                  11 ⎕SIGNAL⍨scriptName_1,'does not contain a ∆-variable'
+              :EndTrap
+          :EndIf
+          filename←searchPath,({1↓⍵↑⍨-'.'⍳⍨⌽⍵}scriptName_1),'.dyalog'
+          (⎕SRC ref)CompareWithFile filename
+      :EndIf
+    ∇
+
+    ∇ fullName MoveScript to;source
+⍝ Move a script from "fullName" to "to" (a namespace name) including any ∆ sub-namespaces
+⍝ Example:
+⍝ )ns #.GeneralClasses
+⍝ #.DB_ACCESS #.MoveScript ⍬
+⍝ shall move #.DB_ACCESS into the current namespace which is #.GeneralClasses
+      :Access Public Shared
+      source←⎕SRC fullName
+      :If 0∊⍴to
+          to←1⊃⎕NSI
+      :EndIf
+      ⎕←' -------- Move ',fullName,' to ',to
+      :With to
+          ⎕FIX source
+      :End
+      ⎕←fullName,' fixed in ',to
+      :If 9=fullName.⎕NC'∆'
+          ((⍕to),'.',2↓⍕fullName)⎕NS(⍕fullName),'.∆'
+          ⎕←'∆ copied into ',to
+      :Else
+          ⎕←'No ∆ namespace found in ',fullName
+      :EndIf
+      ⎕EX⍕fullName
+      ⎕←fullName,' deleted'
+      ⎕←'*** Done'
+    ∇
+
+    ∇ {moveFlag}CopyScript(fullScriptName into);source;type
+⍝ Copy script "fullScriptName" to "into" (a namespace name) including any ∆ sub-namespaces
+⍝ Example:
+⍝ )ns #.GeneralClasses
+⍝ #.DB_ACCESS #.MoveScript ⍬
+⍝ shall copy #.DB_ACCESS into the current namespace which is #.GeneralClasses, while
+⍝ 1 #.DB_ACCESS #.MoveScript ⍬
+⍝ does not only copy the script but also delete it in #, so it is performing a move operation.
+      :Access Public Shared
+      moveFlag←(,1)≡,{0<⎕NC ⍵:⍎⍵ ⋄ 0}'moveFlag'
+      source←⎕SRC fullScriptName
+      :If 0∊⍴into
+          into←1⊃⎕NSI
+      :EndIf
+      type←'Copy' 'Move'⊃⍨1+moveFlag
+      ⎕←' -------- ',type,' ',fullScriptName,' into ',into
+      :With into
+          ⎕FIX source
+      :End
+      ⎕←fullScriptName,' fixed in ',into
+      :If 9=fullScriptName.⎕NC'∆'
+          ((⍕into),'.',2↓⍕fullScriptName)⎕NS(⍕fullScriptName),'.∆'
+          ⎕←'∆ copied into ',into
+      :Else
+          ⎕←'No ∆ namespace found in ',fullScriptName
+      :EndIf
+      :If moveFlag
+          ⎕EX⍕fullScriptName
+          ⎕←fullScriptName,' deleted'
+      :EndIf
+      ⎕←'*** Done'
+    ∇
+
+    ∇ r←MakeScriptFromNamespace name
+      :Access Public Shared
+      . ⍝TODO⍝
+    ∇
+
+    ∇ Settings;∆;fnt;f;res;bkpPath;defaultPath;comparePath;dir;stopFlag;domainPath;wsid
+      :Access Public Shared
+ ⍝ Displays a GUI which allows the user to specify some options
+
+      bkpPath←Registry.GetString'BackupPath'
+      defaultPath←GetDefaultPath ⎕WSID
+      comparePath←GetCompareCmd
+      wsid←{⍵↑⍨1+-⌊/'/\'⍳⍨⌽⍵}⎕WSID
+      domainPath←'SubVersionDomains'Registry.GetString wsid
+
+      ∆←⊂'Form'
+      ∆,←⊂'Coord' 'Pixel'
+      ∆,←⊂'Caption' 'Pepper: Settings'
+      ∆,←⊂'Posn'(35 15)
+      ∆,←⊂'Size'(290 600)
+      'f'⎕WC ∆
+
+      'fnt'⎕WC'Font' 'Courier New'
+
+      ∆←⊂'Label'
+      ∆,←⊂'Posn'(5 15)
+      ∆,←⊂'Caption' 'Backup Path:'
+      ∆,←⊂'Attach'(4⍴'Top' 'Left')
+      'f.bkppath_l'⎕WC ∆
+
+      ∆←⊂'Edit'
+      ∆,←⊂'ReadOnly' 1
+      ∆,←⊂'Text'bkpPath
+      ∆,←⊂'Posn'(30 15)
+      ∆,←⊂'Size'(⍬(f.Size[2]-60))
+      ∆,←⊂'FontObj' 'fnt'
+      ∆,←⊂'BCOL' ¯1
+      ∆,←⊂'Attach'('Top' 'Left' 'Top' 'Right')
+      'f.bkppath'⎕WC ∆
+      f.bkppath.Size[1]-←5
+
+      ∆←⊂'Button'
+      ∆,←⊂'Caption' '...'
+      ∆,←⊂'Posn'(33,(f.Size[2]-35))
+      ∆,←⊂'Size'(20 30)
+      ∆,←⊂'Event' 'Select' 1
+      ∆,←⊂'Attach'(4⍴'Top' 'Right')
+      'f.bkppathbtn'⎕WC ∆
+
+      ∆←⊂'Label'
+      ∆,←⊂'Posn'(65 15)
+      ∆,←⊂'Caption' 'Default Path:'
+      ∆,←⊂'Attach'(4⍴'Top' 'Left')
+      'f.defpath_l'⎕WC ∆
+
+      ∆←⊂'Edit'
+      ∆,←⊂'ReadOnly' 1
+      ∆,←⊂'Text'defaultPath
+      ∆,←⊂'Posn'(90 15)
+      ∆,←⊂'Size'(⍬(f.Size[2]-60))
+      ∆,←⊂'FontObj' 'fnt'
+      ∆,←⊂'BCOL' ¯1
+      ∆,←⊂'Attach'('Top' 'Left' 'Top' 'Right')
+      'f.defpath'⎕WC ∆
+      f.defpath.Size[1]-←5
+
+      ∆←⊂'Button'
+      ∆,←⊂'Caption' '...'
+      ∆,←⊂'Posn'(93 460)
+      ∆,←⊂'Posn'(93,(f.Size[2]-35))
+      ∆,←⊂'Size'(20 30)
+      ∆,←⊂'Event' 'Select' 1
+      ∆,←⊂'Attach'(4⍴'Top' 'Right')
+      'f.defpathbtn'⎕WC ∆
+
+      ∆←⊂'Label'
+      ∆,←⊂'Posn'(125 15)
+      ∆,←⊂'Caption' 'Path to Compare It!:'
+      ∆,←⊂'Attach'(4⍴'Top' 'Left')
+      'f.comppath_l'⎕WC ∆
+
+      ∆←⊂'Edit'
+      ∆,←⊂'ReadOnly' 1
+      ∆,←⊂'Text'comparePath
+      ∆,←⊂'Posn'(150 15)
+      ∆,←⊂'Size'(⍬(f.Size[2]-60))
+      ∆,←⊂'FontObj' 'fnt'
+      ∆,←⊂'BCOL' ¯1
+      ∆,←⊂'Attach'('Top' 'Left' 'Top' 'Right')
+      'f.comppath'⎕WC ∆
+      f.comppath.Size[1]-←5
+
+      ∆←⊂'Button'
+      ∆,←⊂'Caption' '...'
+      ∆,←⊂'Posn'(153,(f.Size[2]-35))
+      ∆,←⊂'Size'(20 30)
+      ∆,←⊂'Event' 'Select' 1
+      ∆,←⊂'Attach'(4⍴'Top' 'Right')
+      'f.comppathbtn'⎕WC ∆
+
+      ∆←⊂'Label'
+      ∆,←⊂'Posn'(185 15)
+      ∆,←⊂'Caption'('SubVersion domain name to be used for ',wsid,':')
+      ∆,←⊂'Attach'(4⍴'Top' 'Left')
+      'f.domainpath_l'⎕WC ∆
+
+      ∆←⊂'Edit'
+      ∆,←⊂'Text'domainPath
+      ∆,←⊂'Posn'(210 15)
+      ∆,←⊂'Size'(⍬(f.Size[2]-60))
+      ∆,←⊂'FontObj' 'fnt'
+      ∆,←⊂'Attach'('Top' 'Left' 'Top' 'Right')
+      'f.domainpath'⎕WC ∆
+      f.domainpath.Size[1]-←5
+
+      ∆←⊂'Button'
+      ∆,←⊂'OK'
+      ∆,←⊂(f.Size[1]-45),10
+      ∆,←⊂35 110
+      ∆,←⊂'Event' 'Select' 1
+      ∆,←⊂'Default' 1
+      ∆,←⊂'Attach'(4⍴'Top' 'Left')
+      'f.ok'⎕WC ∆
+
+
+      ∆←⊂'Button'
+      ∆,←⊂'Cancel'
+      ∆,←⊂(f.Size-45 125)
+      ∆,←⊂35 110
+      ∆,←⊂'Event' 'Select' 1
+      ∆,←⊂'Cancel' 1
+      ∆,←⊂'Attach'(4⍴'Top' 'Right')
+      'f.cancel'⎕WC ∆
+
+      stopFlag←0
+
+      :Repeat
+          res←⎕DQ'f'
+          :If ~0∊⍴res
+              :Select 1⊃res
+              :Case 'f.bkppathbtn'
+                  :If ~0∊⍴dir←SelectDir'Select backup path'
+                      bkpPath←dir
+                  :EndIf
+              :Case 'f.defpathbtn'
+                  :If ~0∊⍴dir←SelectDir'Select default directory'
+                      defaultPath←dir
+                  :EndIf
+              :Case 'f.comppathbtn'
+                  :If ~0∊⍴dir←SelectDir'Select CompareIt''s directory'
+                      comparePath←dir
+                  :EndIf
+              :Case 'f.ok'
+                  Registry.PutString'BackupPath'bkpPath
+                  'Pathes'Registry.PutString(⎕WSID)defaultPath
+                  Registry.PutString'CompareCmd'comparePath
+                  :If ~0∊⍴domainPath←f.domainpath.Text
+                      'SubVersionDomains'Registry.PutString(wsid domainPath)
+                  :EndIf
+                  stopFlag←1
+                  ⎕←'Pepper Settings: Values saved in the Windows registry'
+              :Case 'f.cancel'
+                  ⎕←'Pepper Settings: nothing saved/changed'
+                  stopFlag←1
+              :Else
+                  . ⍝ Huuh?
+              :EndSelect
+          :EndIf
+      :Until stopFlag
+⍝Done
+    ∇
+
+    ∇ compareCmd←GetCompareCmd
+      :If ∧/'[]'∊compareCmd←Registry.GetString'CompareCmd'
+          compareCmd{'"','"',⍨⍵,'\',⍺↓⍨⍺⍳']'}←GetEnvironmentVars'[]'~⍨{⍵/⍨{⍵∨≠\⍵}⍵∊'[]'}compareCmd
+      :EndIf
+      :If 0∊⍴compareCmd
+          compareCmd←'"C:\Program Files\Compare It\wincmp3.exe"'
+      :EndIf
+    ∇
+
+    ∇ source CompareWithFile fullFilename;cmd;tempfile
+      tempfile←Files.GetTempFileName
+      ##.UnicodeFile.Write tempfile source''LINDEL
+      cmd←GetCompareCmd
+      cmd,←' ',tempfile,' /="WS" '
+      cmd,←fullFilename,' /="',fullFilename,'"'
+      cmd,←' /r'
+      (⊂'Wait' 1)Process.Run cmd
+    ∇
+
+    ∇ CopyThisToQSE;source
+     ⍝ Copy the Pepper script from # to []SE
+      :Access Public Shared
+      ⎕EX'⎕se.Pepper'
+      source←⎕SRC #.Pepper
+      '⎕se.Pepper'⎕NS''
+      :With ⎕SE
+          ⎕FIX source
+      :EndWith
+      :If 9=#.Pepper.⎕NC'∆'
+          '⎕se.Pepper'⎕NS'#.Pepper.∆'
+      :EndIf
+      ⎕←'*** #.Pepper copied to ⎕SE.Pepper'
+    ∇
+
+    ∇ SavePepper dummy;source;installDir;fullFilename
+      :Access Public Shared
+     ⍝ Save itself in [DYALOG]\Classes\APLTeam\pepper.dyalog (backup only)
+      source←⎕SRC ⎕THIS
+      installDir←GetEnvironmentVars'DYALOG'
+      fullFilename←installDir,'\Classes\APLTeam\pepper.dyalog'
+      ##.UnicodeFile.Write(fullFilename source)
+      ⎕←'*** #.Pepper saved in ',fullFilename
+    ∇
+
+    ∇ r←List in;get
+      :Access Public Shared
+    ⍝ List all classes in "in" (empty=#) and all sub-namespaces
+      in←{0∊⍴⍵:# ⋄ ⍎⍕⍵}in
+      get←{
+          list←('#.Pepper')~⍨(⊂'.',⍨⍕⍵),¨' '~¨⍨↓⍵.⎕NL 9.4
+          0∊⍴subList←(⊂'.',⍨⍕⍵),¨' '~¨⍨↓⍵.⎕NL 9.1:list
+          children←get¨⍎¨subList
+          0∊⍴children←(0<↑¨⍴¨children)/children:list
+          list,↑,/children
+      }
+      r←get in
+    ∇
+
+      dmb←{
+      ⍝ delete leading, trailing and multiple blanks
+          1↓¯1↓{⍵/⍨~'  '⍷⍵}' ',⍵,' '
+      }
+
+    Lowercase←{((26↑17↓⎕AV),⎕AV)[((26↑65↓⎕AV),⎕AV)⍳⍵]}
+    Uppercase←{((26↑65↓⎕AV),⎕AV)[((26↑17↓⎕AV),⎕AV)⍳⍵]}
+
+    ∇ r←SelectDir info;∆;q
+⍝ Let the use select a directory
+      r←''
+      ∆←⊂'BrowseBox'
+      ∆,←⊂'BrowseFor' 'Directory'
+      ∆,←⊂'Caption'info
+      ∆,←⊂'HasEdit' 0
+      ∆,←⊂'Event' 'FileBoxOK' 1
+      ∆,←⊂'Event' 'FileBoxCancel' 1
+      'q'⎕WC ∆
+      :If 'FileBoxOK'≡2⊃⎕DQ'q'
+          r←q.Target
+      :EndIf
+    ∇
+
+    ∇ (key filename)←FileBox y;∆;path;filename;caption;extension;mode;DQ_R;key
+      y←{0 1∊⍨≡⍵:⊂⍵ ⋄ ⍵}y
+      (path filename caption extension mode)←y,(⍴y)↓'' '' ''(⊂'*.dyalog' 'APL Scripts')'read'
+      ∆←⊂'FILEBOX'
+      ∆,←⊂'Directory'path
+      ∆,←⊂'File'filename
+      ∆,←⊂'CAPTION'caption
+      ∆,←⊂'EVENT'('FileBoxOK' 'FileBoxCancel')1
+      ∆,←⊂'Style' 'Single'
+      ∆,←⊂'FileMode'mode
+      ∆,←⊂'Filters'extension
+      'FileBoxForm'⎕WC ∆
+      DQ_R←⎕DQ'FileBoxForm'
+      :If 'FileBoxCancel'≡2⊃DQ_R
+          key←'CANCEL'
+      :Else
+          key←'OK'
+          filename←3⊃DQ_R
+      :EndIf
+    ∇
+
+    :class Registry
+
+        :Field Private Shared RegKeyPath←'Software\APLTeam\Pepper\'
+
+        ∇ Close HANDLE;RegCloseKey;sink
+          ⎕NA'U ADVAPI32.dll.C32|RegCloseKey U'
+          sink←RegCloseKey HANDLE
+        ∇
+
+        ∇ HANDLE←GetHandle KEY;HKEY;RegCreateKeyExA;KEY_ALL_ACCESS
+          HKEY←2147483649             ⍝ 'HKEY_CURRENT_USER' HEX 0x80000001
+          KEY_ALL_ACCESS←983103       ⍝ HEX 0xF003F
+          ⎕NA'I ADVAPI32.dll.C32|RegCreateKeyExA U <0T I <0T I I I >U >U'
+          HANDLE←⊃2⊃RegCreateKeyExA HKEY KEY 0 '' 0 KEY_ALL_ACCESS 0 0 0
+        ∇
+
+        ∇ {subPath}PutString(SUBKEY STRING);SUBKEY;STRING;RegSetValueExA;REG_SZ;Path;HANDLE;ver
+          ⍝ Stores the value of a Registry SUBKEY
+          :Access Public Shared
+          subPath←{2=⎕NC ⍵:⍎⍵ ⋄ ''}'subPath'
+          ver←{(2>+\'.'=⍵)/⍵}2⊃'#'⎕WG'aplversion'
+          Path←RegKeyPath,{⍵,'\'/⍨~'/\'∊⍨¯1↑⍵}subPath
+          HANDLE←GetHandle Path
+          STRING←,STRING
+          REG_SZ←1 ⍝ String data type
+          ⎕NA'I ADVAPI32.dll.C32|RegSetValueExA U <0T I I <0T I4'
+          STRING←RegSetValueExA HANDLE SUBKEY 0 REG_SZ STRING(1+⊃⍴STRING)
+          Close HANDLE
+        ∇
+
+        ∇ r←{subPath}GetString key;handle;REG_SZ;RC;STR;RegQueryValueExA;path
+          :Access Public Shared
+          subPath←{2=⎕NC ⍵:⍎⍵ ⋄ ''}'subPath'
+          path←RegKeyPath,{⍵,'\'/⍨~'/\'∊⍨¯1↑⍵}subPath
+          handle←GetHandle path
+          REG_SZ←1 ⍝ String data type
+          ⎕NA'I ADVAPI32.dll.C32|RegQueryValueExA U <0T I =I >0T =I4'
+          (RC STR)←1 0 1/3↑RegQueryValueExA handle key 0 REG_SZ 255 255
+          :If RC=0
+              r←STR
+          :Else
+              r←''
+          :EndIf
+          Close handle
+        ∇
+    :endclass
+
+    :Class Files
+
+        ∇ r←IsDir w
+          :Access Public Shared
+          r←1∊↑'a'Dir w
+        ∇
+
+        ∇ r←IsFile w
+          :Access Public Shared
+          r←0∊↑'a'Dir w ⍝ assume max 1 result only
+        ∇
+
+        ∇ files←{parms}Dir x;switches;dfa
+          :Access Public Shared
+        ⍝ List directory using DOS DIR command
+        ⍝ parms may be
+        ⍝ dD: list dirs only
+        ⍝ fF: list files only
+        ⍝ aA: list all data (timestamp, size, name)
+          parms←{2=⎕NC ⍵:⍎⍵ ⋄ ''}'parms'
+          files←NtDirX x
+          :If ∨/2↑dfa←∨/3 2⍴'dDfFaA'∊parms
+              files←((↑files)=↑dfa)∘⌿¨files
+          :EndIf
+          :If 0=3⊃dfa ⋄ files←4⊃files ⋄ :EndIf
+        ∇
+
+        ∇ rslt←NtDirX path;handle;next;ok;attrs;⎕IO;FindFirstFileA;FindNextFileA;FindClose;FileTimeToLocalFileTime;FileTimeToSystemTime;GetLastError;max
+          :Access Public Shared
+        ⍝ Return NT directory information
+          ⎕IO←0 ⋄ rslt←4⍴⊂'' ⋄ max←2*32
+          FindDefine
+          handle next←FindFirstFile path
+          →handle↓0 ⍝ file not found
+          rslt←,⊂next
+          :While 1=0⊃ok next←FindNextFile handle ⋄ rslt,←⊂next ⋄ :EndWhile
+          :If 0 18∨.≠ok next ⋄ ('ntdir error:',⍕next)⎕SIGNAL 11 ⋄ :EndIf
+          ok←FindClose handle
+          rslt←↓[0]1 0 0 1 1 0 1 0/⊃rslt       ⍝ bin the unwanted elements
+          (0⊃rslt)←(attrs←(32⍴2)⊤0⊃rslt)[27;]  ⍝ Get attributes into bits
+          rslt[1]←Filetime_to_TS¨¨rslt[1]      ⍝ put times into ⎕ts format
+          (2⊃rslt)←max⊥max|⍉⊃2⊃rslt            ⍝ combine size elements
+          rslt←(~(3⊃rslt)∊1 2⍴¨'.')∘⌿¨rslt     ⍝ remove . & ..
+        ∇
+
+        ∇ rslt←Filetime_to_TS filetime;⎕IO
+          :If 1≠0⊃rslt←FileTimeToLocalFileTime filetime(⎕IO←0)
+          :OrIf 1≠0⊃rslt←FileTimeToSystemTime(1⊃rslt)0
+              rslt←0 0                   ⍝ if either call failed then zero the time elements
+          :EndIf
+          rslt←1 1 0 1 1 1 1 1/1⊃rslt    ⍝ remove day of week
+        ∇
+
+        ∇ FindDefine;WIN32_FIND_DATA
+          WIN32_FIND_DATA←'{I4 {I4 I4} {I4 I4} {I4 I4} {U4 U4} {I4 I4} T[260] T[14]}'
+          ⎕NA'I4 kernel32.C32|FindFirstFileA <0T >',WIN32_FIND_DATA
+          ⎕NA'U4 kernel32.C32|FindNextFileA I4 >',WIN32_FIND_DATA
+          ⎕NA'kernel32.C32|FindClose I4'
+          ⎕NA'I4 kernel32.C32|FileTimeToLocalFileTime <{I4 I4} >{I4 I4}'
+          ⎕NA'I4 kernel32.C32|FileTimeToSystemTime <{I4 I4} >{I2 I2 I2 I2 I2 I2 I2 I2}'
+          ⎕NA'I4 kernel32.C32∣GetLastError'
+        ∇
+
+        ∇ rslt←FindFirstFile name;⎕IO
+          rslt←FindFirstFileA name(⎕IO←0)
+          :If ¯1=0⊃rslt                   ⍝ INVALID_HANDLE_VALUE
+              rslt←0 GetLastError
+          :Else
+              (1 6⊃rslt)trimAt←↑⎕AV   ⍝ shorten the file name at the null delimiter
+              (1 7⊃rslt)trimAt←↑⎕AV   ⍝ and for the alternate name
+          :EndIf
+        ∇
+
+        ∇ rslt←FindNextFile handle;⎕IO
+          rslt←FindNextFileA handle(⎕IO←0)
+          :If 1≠0⊃rslt
+              rslt←0 GetLastError
+          :Else
+              (1 6⊃rslt)trimAt←↑⎕AV   ⍝ shorten the filename
+              (1 7⊃rslt)trimAt←↑⎕AV   ⍝ shorten the alternate name
+          :EndIf
+        ∇
+
+        ∇ name←name trimAt char;⎕IO
+⍝ Truncates a character vector at the char delimiting byte.
+          ⎕IO←0 ⋄ name↑⍨←name⍳char
+        ∇
+
+        ∇ R←GetTempFileName;GetTempFileName;GetTempPath;PathName
+          :Access Public Shared
+        ⍝ Returns a fully qualified temporary filename
+          'GetTempFileName'⎕NA'I4 KERNEL32.C32|GetTempFileNameA <0T <0T I4 >0T'
+          'GetTempPath'⎕NA'I4 KERNEL32.C32|GetTempPathA I4 >T[]'
+          :If 0∊⍴PathName←↑↑/GetTempPath 260 260
+              'Could not get name of temp path'⎕SIGNAL 11
+          :ElseIf 0∊⍴,R←2⊃GetTempFileName PathName'' 1 260
+              'Could not get a temp file name'⎕SIGNAL 11
+          :EndIf
+        ∇
+
+        ∇ r←GetLastWriteTime w ⍝ Last Write Time for file
+          :Access Public Shared
+          r←2⊃'a'Dir w
+        ∇
+
+        ∇ R←Cd Name;Rc;∆GetCurrentDirectoryA;∆SetCurrentDirectoryA
+        ⍝ Report/change the current directory
+          :Access Public Shared
+          '∆GetCurrentDirectoryA'⎕NA'I4 KERNEL32.C32|GetCurrentDirectoryA I4 >T[]'
+          '∆SetCurrentDirectoryA'⎕NA'I4 KERNEL32.C32|SetCurrentDirectoryA <0T'
+          :If 0=↑Rc←∆GetCurrentDirectoryA 260 260
+              R←GetLastError'GetCurrentDirectory error' ''
+          :Else
+              R←↑↑/Rc
+          :EndIf
+          :If ~0∊⍴Name←∊Name
+          :AndIf ' '=1↑0⍴Name
+              :If ~∆SetCurrentDirectoryA⊂Name
+                  11 ⎕SIGNAL⍨⊃{⍵,'; rc=',⍕⍺}/GetLastError'SetCurrentDirectory error'
+              :EndIf
+          :EndIf
+        ∇
+
+        ∇ Source MoveTo Target;CurrDir;Rc;Hint;SourceDrive;TargetDrive;Rc;Hint;∆MoveFileExA;∆MoveFileA;rc
+    ⍝ Copy "Source" to "Target"
+          :Access Public Shared
+          '∆MoveFileExA'⎕NA'I kernel32.C32|MoveFileExA <0T <0T I4'
+          '∆MoveFileA'⎕NA'I Kernel32.C32|MoveFileA <0T <0T'
+          :Trap 0
+              CurrDir←Cd''
+              :If ∨/'*?'∊Source,Target
+                  .
+              :Else
+                  SourceDrive←TargetDrive←''
+                  (('/'=Source)/Source)←'\'
+                  (('/'=Target)/Target)←'\'
+                  :If '\\'≢2↑Source
+                      :If ':'∊Source
+                          SourceDrive←Source↑⍨¯1+Source⍳':'
+                      :Else
+                          SourceDrive←CurrDir↑⍨¯1+CurrDir⍳':'
+                          Source,⍨←CurrDir,'\'
+                      :EndIf
+                      SourceDrive←{('abcdefghijklmnopqrstuvwxyz',⎕AV)[(⎕A,⎕AV)⍳⍵]}SourceDrive
+                  :EndIf
+                  :If '\\'≢2↑Target
+                      :If ':'∊Target
+                          TargetDrive←Target↑⍨¯1+Target⍳':'
+                      :Else
+                          TargetDrive←CurrDir↑⍨¯1+CurrDir⍳':'
+                          Target,⍨←CurrDir,'\'
+                      :EndIf
+                      :If '\'=¯1↑Target
+                      :AndIf '\'≠¯1↑Source
+                          Target,←1↓Source↑⍨-'\'⍳⍨⌽Source
+                      :EndIf
+                      TargetDrive←{('abcdefghijklmnopqrstuvwxyz',⎕AV)[(⎕A,⎕AV)⍳⍵]}TargetDrive
+                  :EndIf
+                  :If SourceDrive≢TargetDrive
+                  :AndIf '\'=¯1↑Source
+                      '"MoveTo" cannot move directories on different drives'⎕SIGNAL 11
+                  :Else
+                      :If 0=∆MoveFileExA(Source Target),3       ⍝ 3=REPLACE_EXISTING (1) + COPY_ALLOWED (2)
+                          ⎕EN ⎕SIGNAL⍨'MoveFile error; rc=',⍕GetLastError
+                      :EndIf
+                  :EndIf
+              :EndIf
+          :Else
+              ⎕EN ⎕SIGNAL⍨{⎕ML←3 ⋄ 1↓∊⎕TC[2],¨⍵}⎕DM
+          :EndTrap
+        ∇
+
+        ∇ {Bool}←Delete Filename;Bool;i;a;∆DeleteFileA
+    ⍝ Delete a file
+          :Access Public Shared
+          '∆DeleteFileA'⎕NA'I kernel32.C32|DeleteFileA <0T'
+          :If (≡Filename)∊0 1
+              Filename←,⊂Filename
+          :EndIf
+          Bool←1⍴⍨⍴Filename←,Filename
+          :For i :In ⍳⍴Bool
+              (i⊃Bool)←~0=∆DeleteFileA Filename[i]
+          :EndFor
+        ∇
+
+    :endClass
+
+    :Class Process
+        ⍝ Allows you to spawn a Windows process
+
+        ⎕io←1
+        ⎕ML←3
+        ∇ {R}←{Parms}Run This;ProcessInfo;Buffer;StartUpInfo;Allowed;Rc;ExpandEnvironmentStrings;∆GetExitCodeProcess;∆WaitForSingleObject;ProcessHandle;StillActive;∆TerminateProcess;Ctrl_C_Is;∆GetExitCodeThread;ThreadHandle;∆TerminateThread;ProcessAborted;∆CloseHandle;Trash;⎕ML;null;true;false;okay;∆CreateProcess;GetLastError;∆GetCurrentDirectoryA;∆ExpandEnvironmentStrings;Lowercase;∆dir;∆priority;∆wait
+     ⍝ Run application "This" in the same environment as the calling process.
+          :Access Public Shared
+          okay←false←null←0
+          true←1
+          ∆dir←''
+          ∆priority←32
+          ∆wait←0
+          Parms←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'Parms'
+          Lowercase←{((26↑17↓⎕AV),⎕AV)[((26↑65↓⎕AV),⎕AV)⍳⍵]}
+          :If ~0∊⍴Parms
+              ⍎¨('∆',¨Lowercase¨1⊃¨Parms),¨'←',¨⍕¨2⊃¨Parms
+          :EndIf
+ ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+          StartUpInfo←68 0 0 0 0 0 640 480 80 25 30 0 0 0 0 0 0 0
+          '∆CreateProcess'⎕NA'I4 KERNEL32.C32|CreateProcessA I4 <0T I4 I4 I4 I4 I4 <0T <{I4 I4 I4 I4 I4 I4 I4 I4 I4 I4 I4 I4 I2 I2 I4 I4 I4 I4} >{I4 I4 I4 I4}'
+          '∆CloseHandle'⎕NA'I4 KERNEL32.C32|CloseHandle I4'
+          'GetLastError'⎕NA'I4 KERNEL32.C32|GetLastError'
+          '∆ExpandEnvironmentStrings'⎕NA'I4 KERNEL32.C32|ExpandEnvironmentStringsA <0T >0T I4'
+          :If 0∊⍴∆dir
+              '∆GetCurrentDirectoryA'⎕NA'I4 KERNEL32.C32|GetCurrentDirectoryA I4 >T[]'
+              :If 0=↑Rc←∆GetCurrentDirectoryA 260 260
+                  R←GetLastError'GetCurrentDirectory error'
+                  :Return
+              :Else
+                  ∆dir←⊃↑/Rc
+              :EndIf
+          :EndIf
+          This←ExpandEnv This
+          (Rc ProcessInfo)←∆CreateProcess null This null null true ∆priority null ∆dir StartUpInfo 0
+          :If false=Rc
+              Rc←GetLastError
+          :Else
+              (ProcessHandle ThreadHandle)←2↑ProcessInfo
+              :If ∆wait
+                  StillActive←259
+                  Ctrl_C_Is←¯1073741510
+                  ProcessAborted←1067
+                  '∆GetExitCodeProcess'⎕NA'I4 KERNEL32.C32|GetExitCodeProcess I4 >I4'
+                  '∆GetExitCodeThread'⎕NA'I4 KERNEL32.C32|GetExitCodeThread I4 >I4'
+                  '∆WaitForSingleObject'⎕NA'I4 KERNEL32.C32|WaitForSingleObject I4 I4'
+                  '∆TerminateProcess'⎕NA'I4 KERNEL32.C32|TerminateProcess I4 I4'
+                  '∆TerminateThread'⎕NA'I4 KERNEL32.C32|TerminateThread I4 I4'
+                  :Trap 1002 1003
+                      :While (okay StillActive)≡2↑(∆GetExitCodeProcess GetExitCodeProcess)ProcessHandle
+                      :Until null=↑(∆WaitForSingleObject WaitForSingleObject)ProcessHandle 10
+                  :Else
+                      (∆TerminateProcess TerminateProcess)(ProcessHandle Ctrl_C_Is)
+                      R←ProcessAborted'Gestarteter Prozess ist verstorben!'
+                  :EndTrap
+                  :While (true StillActive)≡(∆GetExitCodeThread GetExitCodeThread)(ThreadHandle)
+                      (∆TerminateThread TerminateThread)(ThreadHandle 0) ⍝ Wait Status
+                  :EndWhile
+              :EndIf
+              Rc←okay
+          :EndIf
+          :Trap 0
+              Trash←∆CloseHandle¨ProcessHandle ThreadHandle
+          :EndTrap
+          R←Rc ProcessInfo
+        ∇
+
+        ∇ R←ExpandEnv String
+     ⍝⍝  'C:\Windows\MyDir' ←→ ExpandDir '%WinDir%\MyDir'
+          :If '%'∊R←String
+              R←2⊃∆ExpandEnvironmentStrings(String 1024 1024)
+          :EndIf
+        ∇
+
+        ∇ R←(ExFns GetExitCodeProcess)ProcessHandle;Trash;Result
+          R←0 0 ''
+          Result←ExFns ProcessHandle 1
+          :If 0=↑Result
+              R[1 3]←GetLastError'Error in GetExitCodeProcess'
+          :Else
+              R[2]←2⊃Result
+          :EndIf
+        ∇
+
+        ∇ R←(ExFns WaitForSingleObject)Parms;Milliseconds;Full;Last;Handle;WaitForTimeout;Status
+ ⍝⍝ 1⊃R gets the status
+ ⍝⍝ 2⊃R is empty or an error code
+          WaitForTimeout←258
+          (Handle Milliseconds)←2↑Parms,¯1 ⍝ ¯1=Infinite wait for timeout
+          (Full Last)←0(Milliseconds←25)⊤Milliseconds
+          R←0 ⍬
+          :Trap 1000
+              :Repeat
+                  :If ¯1=Full←¯1+Full
+                      Milliseconds←Last
+                  :EndIf
+                  Status←R[1]←ExFns(Handle Milliseconds)
+                  :If WaitForTimeout≠Status←ExFns(Handle Milliseconds)
+                      :Leave
+                  :EndIf
+              :Until ¯1=Full
+              :OrIf 0 0≡Full Last
+          :Else
+              R←0 GetLastError
+          :EndTrap
+        ∇
+
+        ∇ R←(ExFns GetExitCodeThread)ThreadHandle;ExitCode;Rc;q
+          R←0 ⍬
+          (Rc ExitCode)←ExFns(ThreadHandle 1)
+          :If 0=Rc
+              (1⊃R)←GetLastError
+              (2⊃R)←⍬
+          :EndIf
+        ∇
+    :EndClass
+
+:EndClass

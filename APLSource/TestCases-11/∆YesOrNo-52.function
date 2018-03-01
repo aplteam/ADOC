@@ -1,0 +1,11 @@
+ bool←∆YesOrNo question;flag;answer
+ flag←0
+ :Repeat
+     ⎕←question
+     ⎕←'(y=yes, n=no)'
+     answer←¯1↑⍞
+     :If answer∊'YyNn'
+         bool←answer∊'Yy'
+         flag←1
+     :EndIf
+ :Until flag

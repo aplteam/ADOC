@@ -1,0 +1,57 @@
+*** testclass < testinterface ***
+
+Constructors:
+  make0
+  make1(arg1)
+  make2(arg1 arg2)
+  makeAny arg
+Instance Properties:
+  MyDefaultProp
+  MyDefaultPropReadOnly (ReadOnly)
+  MyInstancePropDefaultNumbered (default,numbered)
+  MyInstancePropReadOnlykeyed (ReadOnly,keyed)
+Shared Properties:
+  MySharedPropDefaultNumbered (Default,Numbered)
+  MySharedPropKeyedReadOnly (ReadOnly,keyed)
+Instance Fields:
+  MyDefaultFieldPublic
+  MyInstanceField
+  MyReadOnlyField (readonly)
+Shared Fields:
+  MySharedField
+Instance Methods:
+  foo
+  Copyright
+  EmptyFns
+  MyDefaultFnsAmbi
+  MyDefaultFnsAmbiWithResult
+  MyDefaultFnsAmbiWithShy
+  MyDefaultFnsDyadic
+  MyDefaultFnsDyadicWithResult
+  MyDefaultFnsMonadic
+  MyDefaultFnsMonadicWithResult
+  MyDefaultNiladicFns
+  MyDefaultNiladicFnsWithResult
+  MyInstanceAmbiFns
+  MyInstanceAmbiFnsWithResult
+  MyInstanceAmbiFnsWithShy
+  MyInstanceDyadicFns
+  MyInstanceDyadicFnsWithResult
+  MyInstanceMonadicFns
+  MyInstanceMonadicFnsWithResult
+  MyInstanceNiladicFns
+  MyInstanceNiladicFnsWithResult
+  Overridable
+Shared Methods:
+  MySharedAmbiFns
+  MySharedAmbiFnsWithResult
+  MySharedAmbiFnsWithShy
+  MySharedDyadicFns
+  MySharedDyadicFnsWithResult
+  MySharedMonadicFns
+  MySharedMonadicFnsWithResult
+  MySharedNiladicFns
+  MySharedNiladicFnsWithResult
+  OverwriteMethodInEmbeddedClass
+Implemented Interface(s):
+  AnInterface

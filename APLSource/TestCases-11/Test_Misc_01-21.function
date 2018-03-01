@@ -1,0 +1,20 @@
+ R←Test_Misc_01(stopFlag batchFlag);newdoc;buffer;flag;MyADOC;⎕TRAP;First;ps;filename;html;expected
+⍝ Check whether the retired left argument of `Browse` is rejected
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ :Trap 11
+     'Demo'##.ADOC.Browse ##.ADOC
+     →FailsIf 1
+ :Else
+     →PassesIf'This syntax is retired; set "embeddedClassesFlag" in a parameter space instead'≡⊃⎕DM
+ :EndTrap
+
+ :Trap 11
+     1 ##.ADOC.Browse ##.ADOC
+     →FailsIf 1
+ :Else
+     →PassesIf'This syntax is retired; set "embeddedClassesFlag" in a parameter space instead'≡⊃⎕DM
+ :EndTrap
+
+ R←∆OK

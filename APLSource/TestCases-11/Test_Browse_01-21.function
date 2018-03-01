@@ -1,0 +1,21 @@
+ R←Test_Browse_01(stopFlag batchFlag);newdoc;buffer;flag;p;sep;⎕TRAP;filename;html;expected
+⍝ `Browse` an embedded class
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ ##.ADOC.RestoreDefaults
+ p←⎕NS''
+ p.embeddedClassesFlag←1
+ p.Title←'Gathers information about classes embedded into ADOC'
+ p.view←0
+ filename←p ##.ADOC.Browse ##.ADOC
+ ##.ADOC.RestoreDefaults
+ html←#.APLTreeUtils.ReadUtf8File filename
+ #.FilesAndDirs.DeleteFile filename
+ html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html
+ expected←⊂'<h1 id="topmost">Gathers information about classes embedded into ADOC</h1>'
+ expected,←⊂'<h1 id="ch0001">Demo (Class embedded into #._ADOC.ADOC)</h1>'
+ expected,←⊂'<h5 class="aplname" id="ch0001:Hello">Hello</h5>'
+ →PassesIf∧/∨/¨expected⍷¨⊂html
+
+ R←∆OK

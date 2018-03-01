@@ -1,0 +1,70 @@
+*** testclass < #.TestCases.testinterface ***
+
+Constructors:
+  make0
+  make1(arg1)
+  make2(arg1 arg2)
+  makeAny arg
+Instance Properties:
+  MyDefaultPropReadOnly (ReadOnly)
+  MyDefaultProp
+  MyInstancePropDefaultNumbered (default,numbered)
+  MyInstancePropReadOnlykeyed (ReadOnly,keyed)
+Shared Properties:
+  MySharedPropDefaultNumbered (Default,Numbered)
+  MySharedPropKeyedReadOnly (ReadOnly,keyed)
+Instance Fields:
+  MyDefaultFieldPublic
+  MyInstanceField
+  MyReadOnlyField (readonly)
+Shared Fields:
+  MySharedField
+Instance Methods:
+  r ← AmbiWithResult x
+  {r} ← AmbiWithShyResult x
+  {x} Ambi y
+  Copyright InClassItself
+  r ← x DyadicWithResult y
+  {r} ← x DyadicWithShyResult y
+  x Dyadic y
+  {r} ← {left} EmptyFns right
+  foo arg
+  r ← MonadicWithResult y
+  {r} ← MonadicWithShyResult y
+  Monadic y
+  r ← {x} MyDefaultFnsAmbiWithResult y
+  {r} ← {x} MyDefaultFnsAmbiWithShy y
+  {x} MyDefaultFnsAmbi y
+  r ← x MyDefaultFnsDyadicWithResult y
+  x MyDefaultFnsDyadic y
+  r ← MyDefaultFnsMonadicWithResult y
+  MyDefaultFnsMonadic y
+  r ← MyDefaultNiladicFnsWithResult
+  MyDefaultNiladicFns
+  r ← {x} MyInstanceAmbiFnsWithResult y
+  {r} ← {x} MyInstanceAmbiFnsWithShy y
+  {x} MyInstanceAmbiFns y
+  r ← x MyInstanceDyadicFnsWithResult y
+  x MyInstanceDyadicFns y
+  r ← MyInstanceMonadicFnsWithResult y
+  MyInstanceMonadicFns y
+  r ← MyInstanceNiladicFnsWithResult
+  MyInstanceNiladicFns
+  r ← NiladicWithResult
+  {r} ← NiladicWithShyResult
+  Niladic
+  Overridable
+Shared Methods:
+  r ← {x} MySharedAmbiFnsWithResult y
+  {r} ← {x} MySharedAmbiFnsWithShy y
+  {x} MySharedAmbiFns y
+  r ← x MySharedDyadicFnsWithResult y
+  x MySharedDyadicFns y
+  r ← MySharedMonadicFnsWithResult y
+  MySharedMonadicFns y
+  r ← MySharedNiladicFnsWithResult
+  MySharedNiladicFns
+  r ← OverwriteMethodInEmbeddedClass
+  r ← ReadBytesAs8BitSignedIntegersFromFile filename
+Implemented Interface(s):
+  r ← AnInterface y

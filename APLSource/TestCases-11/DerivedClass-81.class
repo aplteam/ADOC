@@ -1,0 +1,20 @@
+:Class DerivedClass: BaseClass
+
+    ∇ make
+      :Access Public
+      :Implements Constructor
+    ∇
+
+    ∇ r←fns1
+      :Access Public Override
+      r←'fns1, overrider'
+    ∇
+
+    ∇ r←fns2
+      :Access Public
+      r←⎕BASE.callFns1
+    ∇
+
+
+
+:EndClass

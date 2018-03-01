@@ -1,0 +1,86 @@
+ R←Test_Browse_57(stopFlag batchFlag);newdoc;buffer;flag;sep;⎕TRAP;code;html;filename;list;ps;ind;ss
+⍝ `Browse` a scripted namespace that has a `Public` definition
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+
+ code←''
+ code,←⊂':Namespace ScriptedNamespace'
+ code,←⊂'⍝ This namespace script is used in the test for how ADOC processes namespace scripts.'
+ code,←⊂''
+ code,←⊂'    ∇ r←Private1'
+ code,←⊂'      r←''Private1'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ r←Private2 arg'
+ code,←⊂'    ⍝ Comment 1.'
+ code,←⊂'      r←''Private2'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ r←Public3(arg1 arg2)'
+ code,←⊂'    ⍝ Comment 1.'
+ code,←⊂'    ⍝ Comment 2.'
+ code,←⊂'      r←''Public3'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ r←left Public4 arg'
+ code,←⊂'    ⍝ Comment 1.\\'
+ code,←⊂'    ⍝ Comment 2 on separate line.'
+ code,←⊂'      r←''Public4'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ r←{left} Public5 arg'
+ code,←⊂'    ⍝ Comment 1.\\'
+ code,←⊂'    ⍝ Comment 2 on separate line.'
+ code,←⊂'      r←''Public5'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ {r}←{left} Public6 arg'
+ code,←⊂'    ⍝ Comment 1.\\'
+ code,←⊂'    ⍝ Comment 2 on separate line.'
+ code,←⊂'      r←''Public6'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ {(r1 r2)}←{left} Public7 arg'
+ code,←⊂'    ⍝ Comment 1.\\'
+ code,←⊂'    ⍝ Comment 2 on separate line.'
+ code,←⊂'      r←''Public7'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ r←(fns Public8)arg'
+ code,←⊂'      r←''Public8'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ r←leftArg(fns Public9)rightArg'
+ code,←⊂'    ⍝ Operator comment 1.\\'
+ code,←⊂'    ⍝ Operator comment 2 on separate line.'
+ code,←⊂'      r←''Public9'''
+ code,←⊂'    ∇'
+ code,←⊂'    '
+ code,←⊂'    ∇ r←Public'
+ code,←⊂'     r←''Public1'' ''Public9'' ''DoesNotExist'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂':EndNamespace'
+
+ #.Temp.⎕FIX code
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.ScriptedNamespace
+ ##.ADOC.RestoreDefaults
+ html←#.APLTreeUtils.ReadUtf8File filename
+ #.FilesAndDirs.DeleteFile filename
+ html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
+ ss←'<h5 class="aplname" id="ch0001:Public'
+ ind←{⍵/⍳⍴,⍵}⊃(ss∘⍷¨⊂html)
+ →PassesIf(,9)≡'Public'∘{{⍎⍵↑⍨⍵⍳'"'}(⍴⍺)↓⍵↓⍨1⍳⍨⍺⍷⍵}¨↓html[ind∘.+⍳3+⍴ss]
+ ss←'<h5 class="aplname" id="ch0001:Private'
+ →PassesIf 0∊⍴{⍵/⍳⍴,⍵}⊃(ss∘⍷¨⊂html)
+ →PassesIf 0∊⍴'<h4\b[^>]*>Shared Functions</h4>'⎕S 0⍠('Mode' 'M')('Greedy' 0)⊣html
+ →PassesIf 1=⍴'<h4\b[^>]*>Shared Operator</h4>'⎕S 0⍠('Mode' 'M')('Greedy' 0)⊣html
+
+ R←∆OK

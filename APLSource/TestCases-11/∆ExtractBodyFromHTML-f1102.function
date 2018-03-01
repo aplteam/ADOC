@@ -1,0 +1,5 @@
+ ∆ExtractBodyFromHTML←{
+     html←⍵
+     hit←⊃'<body.*</body>'⎕S 0 1⍠('DotAll' 1)('Greedy' 1)('Mode' 'D')⊣html
+     html{⍵[1]↑⍵[0]↓⍺}hit
+ }

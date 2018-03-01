@@ -1,0 +1,44 @@
+ R←Test_Browse_05(stopFlag batchFlag);newdoc;buffer;flag;sep;⎕TRAP;code;filename;html;list;expected;ps
+⍝ `Browse` a class that has a multi-line field definition
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+
+ code←⊂':Class MyClass'
+ code,←⊂':Field Public Instance ReadOnly abc←1 2 3 ⍝ First comment\\'
+ code,←⊂'⍝ Second comment\\'
+ code,←⊂'⍝ Third comment'
+ code,←⊂'⍝ * This'
+ code,←⊂'⍝ * That '
+ code,←⊂'⍝ * More'
+ code,←⊂'∇ Hello'
+ code,←⊂':Access Public Shared'
+ code,←⊂'r←(⍕⎕THIS)''5.0.3'' ''2016-04-20'''
+ code,←⊂,'∇'
+ code,←⊂':EndClass'
+
+ #.Temp.⎕FIX code
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.MyClass
+ ##.ADOC.RestoreDefaults
+ html←#.APLTreeUtils.ReadUtf8File filename
+ #.FilesAndDirs.DeleteFile filename
+
+ →PassesIf(⊂'<a name="abc" />')∊html
+ html←(html⍳⊂'<a name="abc" />')↓html
+ html←(html⍳⊂'</div>')↑html
+ →PassesIf'<h5 class="aplname" id="ch0001:abc">abc</h5>'≡1⊃html
+ →PassesIf'<p class="small">Instance</p>'≡2⊃html
+ →PassesIf'<a name="Shared_Method" />'≡4⊃html
+ →PassesIf'<h4 id="ch0001:sharedmethods">Shared Method</h4>'≡5⊃html
+ →PassesIf'<a name="topmost"></a><div class="goto">Go to: <a href="#verytop">top</a>'≡6⊃html
+ list←(⎕UCS 13)#.APLTreeUtils.Split 3⊃html
+ expected←'<div' '<p' '<p' '<p' '<ul' '<li' '<li' '<li' '</ul'
+ →PassesIf expected≡{⍵↑⍨⌊/⍵⍳'> '}¨list
+
+ R←∆OK

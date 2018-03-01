@@ -1,0 +1,18 @@
+:Class BaseClass
+
+    ∇ make
+      :Access Public
+      :Implements Constructor
+    ∇
+
+    ∇ r←fns1
+      :Access Public Overridable
+      r←'fns1, Base Class'
+    ∇
+
+    ∇ r←callFns1
+      :Access Public
+      r←fns1
+    ∇
+
+:EndClass

@@ -1,0 +1,21 @@
+ R←Test_Browse_02(stopFlag batchFlag);newdoc;buffer;flag;p;sep;⎕TRAP
+⍝ `Browse` ADOC itself.
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ :If batchFlag
+     R←∆NoBatchTest
+ :Else
+     ⎕←(⎕PW-1)⍴'-'
+     ⎕←'This test needs the user - please check the top part for proper markup!'
+     ⎕←'Press <enter> to continue'
+     {}⍞
+     ##.ADOC.RestoreDefaults
+     p←⎕NS''
+     p.Title←'Check all the mark-up'
+     p ##.ADOC.Browse ##.ADOC
+     ##.ADOC.RestoreDefaults
+
+     R←~∆YesOrNo'Is the markup okay?'
+
+ :EndIf

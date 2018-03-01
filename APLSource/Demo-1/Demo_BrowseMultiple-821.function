@@ -1,0 +1,4 @@
+ Demo_BrowseMultiple
+ ⎕←'⍝ The following is equivalent to:  ]ADoc #.OS #.FilesAndDirs '
+ ⎕←'⍝ Note that the sequence of classes is preserved'
+ ##.ADOC.Browse #.OS #.FilesAndDirs

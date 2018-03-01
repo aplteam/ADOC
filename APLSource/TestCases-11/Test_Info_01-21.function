@@ -1,0 +1,29 @@
+ R←Test_Info_01(stopFlag batchFlag);newdoc;flag;buffer;sep;show;_;⎕TRAP
+⍝ Exercise the "Info" method on an interface
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ newdoc←##.ADOC.Info testinterface
+ sep←⎕UCS 13
+ show←batchFlag∘{⍺:⍬ ⋄ ⎕←⍵ ⋄ ⍬}
+ ##.ADOC.RestoreDefaults
+
+ :If Correct_testinterface_002≢newdoc
+     _←show'   --- ',0⊃⎕SI
+     flag←0
+     :If ~0∊⍴buffer←↑{⍺/⍨~⍺∊⍵}/{⍵⊂⍨sep=⍵}¨Correct_testinterface_002 newdoc
+         _←show'  Should be contained but isn''t:'
+         _←show buffer
+         flag←1
+     :EndIf
+     :If ~0∊⍴buffer←↑{⍺/⍨~⍺∊⍵}/{⍵⊂⍨sep=⍵}¨newdoc Correct_testinterface_002
+         _←show'  Should not be contained but is:'
+         _←show buffer
+         flag←1
+     :EndIf
+     :If ~flag
+         _←show'    Contents matches, sequence doesn''t!'
+         R←∆OK ⍝ Because that's acceptable
+     :EndIf
+     →FailsIf flag∧stopFlag
+ :EndIf
+ R←∆OK

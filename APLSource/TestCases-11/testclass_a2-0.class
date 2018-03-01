@@ -1,0 +1,41 @@
+:Class testclass_a2 : testclass_a1
+⍝ Class that derives from testclass_a1!
+
+    :field  Public Shared MySharedField1←'b'
+    :field  Public InstancE MyInstanceField1←'b'
+    :field  Private MyPrivateField
+
+    :Property MyPublicSharedProp2
+    :Access Public Shared
+        ∇ r←get arg
+          r←1
+        ∇
+    :EndProperty
+
+    :Property MyInstanceProp2
+    :Access  Public
+        ∇ r←get arg
+          r←1
+        ∇
+        ∇ set arg
+        ∇
+    :EndProperty
+
+    ∇ r←MySharedFns1
+      :Access Public Shared
+      r←'shared1 a2'
+    ∇
+
+    ∇ r←MyInstanceFns1
+      :Access Public
+      r←'Instance1 a2'
+    ∇
+
+    ∇ r←MyInstanceFns2Overridable
+      :Access Public Override
+      r←'Instance2 a2'
+    ∇
+
+    rtb←{⍵↓⍨+/∧\' '=⍵}
+
+:EndClass

@@ -1,0 +1,10 @@
+ Initial
+ ⎕IO←0
+ #.FilesAndDirs.PolishCurrentDir
+ #.Tester.EstablishHelpersIn ⍬
+ Globals←⎕NS''
+ Globals.saveBrowser←##.ADOC.BrowserName
+ Globals.saveInherit←##.ADOC.Inherit
+ A←#.APLTreeUtils
+ ##.ADOC.RestoreDefaults
+ MarkAPL←#.MarkAPL

@@ -1,0 +1,55 @@
+:Interface testinterface
+⍝<h2>Test Support</h2>
+⍝ This is a test interface definition useful to check
+⍝ the result returned by the ADOC class
+⍝ For Interface, there is a special class: "testclass"
+
+    ∇ r←NiladicWithResult
+    ⍝ Niladic function, returns a result
+    ∇
+
+    ∇ r←MonadicWithResult y
+    ⍝ Monadic function, returns a result
+    ∇
+
+    ∇ r←x DyadicWithResult y
+    ⍝ Dyadic function, returns a result
+    ∇
+
+    ∇ r←AmbiWithResult x
+    ⍝ Ambivalent function, returns a result
+    ∇
+
+    ∇ {r}←NiladicWithShyResult
+    ⍝ Niladic function, returns a shy result
+    ∇
+
+    ∇ {r}←MonadicWithShyResult y
+    ⍝ Monadic function, returns a shy result
+    ∇
+
+    ∇ {r}←x DyadicWithShyResult y
+    ⍝ Dyadic function, returns a shy result
+    ∇
+
+    ∇ {r}←AmbiWithShyResult x
+    ⍝ Ambivalent function, returns a shy result
+    ∇
+
+    ∇ Niladic
+    ⍝ Niladic function, no result
+    ∇
+
+    ∇ Monadic y
+    ⍝ Monadic function, no result
+    ∇
+
+    ∇ x Dyadic y
+    ⍝ Dyadic function, no result
+    ∇
+
+    ∇ {x}Ambi y
+    ⍝ Ambivalent function, no result
+    ∇
+
+:EndInterface

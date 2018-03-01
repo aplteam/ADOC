@@ -1,0 +1,5 @@
+ Cleanup
+ ##.ADOC.RestoreDefaults
+ ##.ADOC.BrowserName←Globals.saveBrowser
+ ##.ADOC.Inherit←Globals.saveInherit
+ ⎕EX'Globals'

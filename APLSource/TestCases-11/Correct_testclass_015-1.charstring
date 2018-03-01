@@ -1,0 +1,168 @@
+*** testclass_a3 (Class) ***
+
+Instance Methods:
+  fns01_a
+  fns01_b
+  fns01_c
+  fns01_d
+  fns01_e
+  r ← fns02_a
+  r ← fns02_b
+  r ← fns02_c
+  r ← fns02_d
+  r ← fns02_e
+  {r} ← fns03_a
+  {r} ← fns03_b
+  {r} ← fns03_c
+  {r} ← fns03_d
+  {r} ← fns03_e
+  {(r1 r2)} ← fns04_a
+  {(r1 r2)} ← fns05_b
+  {(r1 r2)} ← fns05_c
+  {(r1 r2)} ← fns05_d
+  {(r1 r2)} ← fns05_e
+  fns11_a y
+  fns11_b y
+  fns11_c y
+  fns11_d y
+  fns11_e y
+  r ← fns12_a y
+  r ← fns12_b y
+  r ← fns12_c y
+  r ← fns12_d y
+  r ← fns12_e y
+  {r} ← fns13_a y
+  {r} ← fns13_b y
+  {r} ← fns13_c y
+  {r} ← fns13_d y
+  {r} ← fns13_e y
+  {(r1 r2)} ← fns14_a y
+  {(r1 r2)} ← fns14_b y
+  {(r1 r2)} ← fns14_c y
+  {(r1 r2)} ← fns14_d y
+  {(r1 r2)} ← fns14_e y
+  fns21_a(y1 y2)
+  fns21_b(y1 y2)
+  fns21_c(y1 y2)
+  fns21_d(y1 y2)
+  fns21_e(y1 y2)
+  r ← fns22_a(y1 y2)
+  r ← fns22_b(y1 y2)
+  r ← fns22_c(y1 y2)
+  r ← fns22_d(y1 y2)
+  r ← fns22_e(y1 y2)
+  {r} ← fns24_a(y1 y2)
+  {r} ← fns24_b(y1 y2)
+  {r} ← fns24_c(y1 y2)
+  {r} ← fns24_d(y1 y2)
+  {r} ← fns24_e(y1 y2)
+  {(r1 r2)} ← fns25_a(y1 y2)
+  {(r1 r2)} ← fns25_b(y1 y2)
+  {(r1 r2)} ← fns25_c(y1 y2)
+  {(r1 r2)} ← fns25_d(y1 y2)
+  {(r1 r2)} ← fns25_e(y1 y2)
+  (r1 r2) ← fns26_a(y1 y2)
+  (r1 r2) ← fns26_b(y1 y2)
+  (r1 r2) ← fns26_c(y1 y2)
+  (r1 r2) ← fns26_d(y1 y2)
+  (r1 r2) ← fns26_e(y1 y2)
+  x fns31_a(y1 y2)
+  x fns31_b(y1 y2)
+  x fns31_c(y1 y2)
+  x fns31_d(y1 y2)
+  x fns31_e(y1 y2)
+  r ← x fns32_a(y1 y2)
+  r ← x fns32_b(y1 y2)
+  r ← x fns32_c(y1 y2)
+  r ← x fns32_d(y1 y2)
+  r ← x fns32_e(y1 y2)
+  {r} ← x fns33_a(y1 y2)
+  {r} ← x fns33_b(y1 y2)
+  {r} ← x fns33_c(y1 y2)
+  {r} ← x fns33_d(y1 y2)
+  {r} ← x fns33_e(y1 y2)
+  {(r1 r2)} ← x fns34_a(y1 y2)
+  {(r1 r2)} ← x fns34_b(y1 y2)
+  {(r1 r2)} ← x fns34_c(y1 y2)
+  {(r1 r2)} ← x fns34_d(y1 y2)
+  {(r1 r2)} ← x fns34_e(y1 y2)
+  (r1 r2) ← x fns35_a(y1 y2)
+  (r1 r2) ← x fns35_b(y1 y2)
+  (r1 r2) ← x fns35_c(y1 y2)
+  (r1 r2) ← x fns35_d(y1 y2)
+  (r1 r2) ← x fns35_e(y1 y2)
+  {x} fns41_a y
+  {x} fns41_b y
+  {x} fns41_c y
+  {x} fns41_d y
+  {x} fns41_e y
+  r ← {x} fns42_a y
+  r ← {x} fns42_b y
+  r ← {x} fns42_c y
+  r ← {x} fns42_d y
+  r ← {x} fns42_e y
+  {r} ← {x} fns43_a y
+  {r} ← {x} fns43_b y
+  {r} ← {x} fns43_c y
+  {r} ← {x} fns43_d y
+  {r} ← {x} fns43_e y
+  {(r1 r2)} ← {x} fns44_a y
+  {(r1 r2)} ← {x} fns44_b y
+  {(r1 r2)} ← {x} fns44_c y
+  {(r1 r2)} ← {x} fns44_d y
+  {(r1 r2)} ← {x} fns44_e y
+  (r1 r2) ← {x} fns45_a y
+  (r1 r2) ← {x} fns45_b y
+  (r1 r2) ← {x} fns45_c y
+  (r1 r2) ← {x} fns45_d y
+  (r1 r2) ← {x} fns45_e y
+  {x} fns51_a(y1 y2)
+  {x} fns51_b(y1 y2)
+  {x} fns51_c(y1 y2)
+  {x} fns51_d(y1 y2)
+  {x} fns51_e(y1 y2)
+  r ← {x} fns52_a(y1 y2)
+  r ← {x} fns52_b(y1 y2)
+  r ← {x} fns52_c(y1 y2)
+  r ← {x} fns52_d(y1 y2)
+  r ← {x} fns52_e(y1 y2)
+  {r} ← {x} fns53_a(y1 y2)
+  {r} ← {x} fns53_b(y1 y2)
+  {r} ← {x} fns53_c(y1 y2)
+  {r} ← {x} fns53_d(y1 y2)
+  {r} ← {x} fns53_e(y1 y2)
+  {(r1 r2)} ← {x} fns54_a(y1 y2)
+  {(r1 r2)} ← {x} fns54_b(y1 y2)
+  {(r1 r2)} ← {x} fns54_c(y1 y2)
+  {(r1 r2)} ← {x} fns54_d(y1 y2)
+  {(r1 r2)} ← {x} fns54_e(y1 y2)
+  (r1 r2) ← {x} fns55_a(y1 y2)
+  (r1 r2) ← {x} fns55_b(y1 y2)
+  (r1 r2) ← {x} fns55_c(y1 y2)
+  (r1 r2) ← {x} fns55_d(y1 y2)
+  (r1 r2) ← {x} fns55_e(y1 y2)
+  x fns91_a y
+  x fns91_b y
+  x fns91_c y
+  x fns91_d y
+  x fns91_e y
+  r ← x fns92_a y
+  r ← x fns92_b y
+  r ← x fns92_c y
+  r ← x fns92_d y
+  r ← x fns92_e y
+  {r} ← x fns93_a y
+  {r} ← x fns93_b y
+  {r} ← x fns93_c y
+  {r} ← x fns93_d y
+  {r} ← x fns93_e y
+  {(r1 r2)} ← x fns94_a y
+  {(r1 r2)} ← x fns94_b y
+  {(r1 r2)} ← x fns94_c y
+  {(r1 r2)} ← x fns94_d y
+  {(r1 r2)} ← x fns94_e y
+  (r1 r2) ← x fns95_a y
+  (r1 r2) ← x fns95_b y
+  (r1 r2) ← x fns95_c y
+  (r1 r2) ← x fns95_d y
+  (r1 r2) ← x fns95_e y

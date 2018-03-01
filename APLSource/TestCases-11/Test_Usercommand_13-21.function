@@ -1,0 +1,11 @@
+ R←Test_Usercommand_13(stopFlag batchFlag);⎕TRAP;html;expected;list
+⍝ Test the ADOC user command "info" and the -full switch.
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ list←⎕SE.UCMD'Adoc #._ADOC.ADOC -summary=full'
+ expected←'Constructors:' 'Instance Properties:' 'Shared Properties:' 'Shared Fields:' 'Instance Methods:' 'Shared Methods:'
+ →PassesIf((⍴expected)⍴1)≡+/¨expected⍷¨⊂list
+ →PassesIf∧/'{}←'∊list
+
+ R←∆OK

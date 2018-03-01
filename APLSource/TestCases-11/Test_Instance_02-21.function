@@ -1,0 +1,16 @@
+ R←Test_Instance_02(stopFlag batchFlag);newdoc;buffer;flag;MyADOC;⎕TRAP
+⍝ Create an instance and then analyze an embedded class
+ R←∆Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ ##.ADOC.RestoreDefaults
+ MyADOC←⎕NEW ##.ADOC
+ (MyADOC.ReportEmbeddedClasses Pepper)MyADOC.Analyze Pepper
+ newdoc←MyADOC.Meta
+ →FailsIf 3≠⍴newdoc             ⍝ contains 3 embedded classes
+ →FailsIf'Registry' 'Files' 'Process'≢0⊃¨newdoc ⍝ names of the embedded classes
+ →FailsIf 2≠⍴4⊃0⊃newdoc         ⍝ The "Registry" class contains 2 public methods
+ →FailsIf 9≠⍴4⊃1⊃newdoc         ⍝ The "Files" class contains 9 public methods
+ →FailsIf 1≠⍴4⊃2⊃newdoc         ⍝ The "Process" class contains  public methods
+
+ R←∆OK

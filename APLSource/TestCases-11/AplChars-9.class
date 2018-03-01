@@ -1,0 +1,9 @@
+:Class AplChars
+⍝ This class serves only one purpose:
+⍝ To check if APL characters are displayed correctly
+⍝ Embedded code: Prim←{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}
+⍝ As pre:
+⍝ <pre>
+⍝ Prim←{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}
+⍝ </pre>
+:EndClass

@@ -1,0 +1,33 @@
+:Class Kai
+⍝ == Automated Documentation Generation
+⍝ * First bulleted list item
+⍝ * Second item
+⍝   # Number 1
+⍝   # Number 2
+⍝ * this and that
+⍝   * sub 1
+⍝   * sub 2
+⍝ * The very last one
+⍝ Normal paragraph
+⍝ # Number 1
+⍝ # Number 2
+⍝ # Number 3
+⍝   # Bullet 1
+⍝   # Bullet 2
+⍝   # Bullet 3
+
+    ∇ r←Hello
+      :Access Public Shared
+⍝ * First bulleted list item
+⍝ * Second item
+⍝   # Number 1
+⍝   # Number 2
+⍝ * this and that
+⍝   * sub 1
+⍝   * sub 2
+⍝ * The very last one
+      r←'Universe'
+    ∇
+
+
+:EndClass

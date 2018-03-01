@@ -1,0 +1,23 @@
+ R←Test_Browse_11(stopFlag batchFlag);⎕TRAP;buffer;ps;filename;html
+⍝ `Browse` a class that has `Version`, `Copyright` and `History` in it.
+ R←∆Failed
+
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ 'VersionCopyrightHistory'#.Temp.⎕CY'Tests\TestData'
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.VersionCopyrightHistory
+ ##.ADOC.RestoreDefaults
+ html←#.APLTreeUtils.ReadUtf8File filename
+ #.FilesAndDirs.DeleteFile filename
+ html←1↓⊃,/(⎕UCS 13),¨∆RemoveCSS html
+ →PassesIf 1=+/'>Version</h'⍷html
+ →PassesIf 1=+/'>History</h'⍷html
+ →PassesIf 1=+/'>Copyright</h'⍷html
+
+ R←∆OK
