@@ -83,4 +83,4 @@ and then manipulate the `HTML` property which holds that code.
 
 Author: Kai Jaeger ⋄ APL Team Ltd ⋄ <http://aplteam.com>
 
-Homepage: <http://aplwiki.com/ADOC>
+Homepage: <https://github.com/aplteam/ADOC>

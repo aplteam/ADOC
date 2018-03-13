@@ -199,19 +199,23 @@
 ⍝
 ⍝ Homepage: <https://github.com/aplteam/ADOC
 
-    :Include APLTreeUtils
+    :Include ##.APLTreeUtils
 
     ⎕IO←1 ⋄ ⎕ML←3
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.4.0' '2018-03-01'
+      r←(⍕⎕THIS)'6.4.1' '2018-03-13'
     ∇
 
-    ∇ History
+    ∇ History    
       :Access Public Shared
+      ⍝ * 6.4.1
+      ⍝   * :Include statement was faulty.
+      ⍝   * In case a class contained exactly one property ADOC crashed.
+      ⍝   * Several references to the APL wiki replaced by references to ADOC on GitHub.
       ⍝ * 6.4.0:
-      ⍝   * ADOC got converted from the APL wiki to GitHub. The software as such remains unchanged
+      ⍝   * ADOC got converted from the APL wiki to GitHub. The software as such remains unchanged.
       ⍝ * 6.3.2:
       ⍝   * Bug fixes
       ⍝     * A setter or getter that listed more than one name was not correctly added to the TOC.
@@ -1408,7 +1412,7 @@
               noOf←+/bool←type∘≡¨Get data
           :ElseIf 'Property'≡type
               bool←type∘≡¨Get data
-              noOf←⍴↑,/{','∊⍵:','Split ⍵ ⋄ ⊂⍵}¨'name'Get bool/data
+              noOf←⍴↑,/{','∊⍵:','Split ⍵ ⋄ ⊂⍵}¨⊃'name'Get bool/data
           :ElseIf 'Interface Method'≡type
               noOf←+/bool←('Interface Method'∘≡¨Get data)
           :Else
@@ -1419,7 +1423,7 @@
           :Else
               :If ~0∊⍴list←'name'Get bool/data
               :AndIf ~0∊⍴list←(0<↑∘⍴¨list)/list
-                  list2←↑,/{','∊⍵:','Split ⍵ ⋄ ⊂⍵}¨list
+                  list2←,↑,/{','∊⍵:','Split ⍵ ⋄ ⊂⍵}¨list
                   list2←{⍵↑⍨¯1+⍵⍳'←'}¨list2
                   list2←list2[SortAlphabet⍋⊃list2]
                   :If 4≥⍴list2
