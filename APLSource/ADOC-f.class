@@ -205,29 +205,19 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.4.1' '2018-03-13'
+      r←(⍕⎕THIS)'6.4.2' '2018-03-20'
     ∇
 
-    ∇ History    
+    ∇ History
       :Access Public Shared
+      ⍝ * 6.4.2
+      ⍝   * In case and ordinary namespace contains variables an unwanted line was added to the documentation
+      ⍝     which is created by the SALT `Save` command. In that context anything that looks like a leading 
+      ⍝     comment is not useful and therefore needs to be removed.
       ⍝ * 6.4.1
       ⍝   * :Include statement was faulty.
-      ⍝   * In case a class contained exactly one property ADOC crashed.
-      ⍝   * Several references to the APL wiki replaced by references to ADOC on GitHub.
       ⍝ * 6.4.0:
-      ⍝   * ADOC got converted from the APL wiki to GitHub. The software as such remains unchanged.
-      ⍝ * 6.3.2:
-      ⍝   * Bug fixes
-      ⍝     * A setter or getter that listed more than one name was not correctly added to the TOC.
-      ⍝     * In case there weren't any leadinbg comments special functions (`Version`, `History`, `Copyright`
-      ⍝       were ignored.
-      ⍝     * In case `History` did exist but did not return a result and was part of a class it was ignored.
-      ⍝     * CSS improved.
-      ⍝     * Styling of headers within leading comments of functions and operator improved.
-      ⍝ * 6.3.1:
-      ⍝   * Bug fixes
-      ⍝     * Under some circumstances ADOC produced an unnecessary WS FULL.
-      ⍝     * Variables did not honour the result of a `Public` function and were therefore always public.
+      ⍝   * ADOC got converted from the APL wiki to GitHub. The software as such remains unchanged
     ∇
 
     ∇ vs←CreateBody(vs chapterNo);tail;type;name;flag
@@ -839,7 +829,7 @@
               (∆EM←'This syntax is retired; set "embeddedClassesFlag" in a parameter space instead')⎕SIGNAL 11
           :EndIf
       :EndIf
-
+     
       :If 0∊⍴scriptRef
           :If _htmlFinalised
               tempFilename←GetTempFileName
@@ -848,9 +838,9 @@
           :EndIf
       :Else
           'Right argument must be a reference pointing to a class, namespace or interface'⎕SIGNAL 11/⍨~∧/(⎕NC¨⊂∘⍕¨scriptRef)∊9.1 9.4 9.5
-
+     
           Fill_META scriptRef     ⍝ ←←← The work horse!
-
+     
           :If ~0∊⍴_META
               _WithRunningNumbers←{¯1=⍵:1<⍴_META ⋄ ⍵}_WithRunningNumbers
               cs←⎕NS''
@@ -1412,7 +1402,7 @@
               noOf←+/bool←type∘≡¨Get data
           :ElseIf 'Property'≡type
               bool←type∘≡¨Get data
-              noOf←⍴↑,/{','∊⍵:','Split ⍵ ⋄ ⊂⍵}¨⊃'name'Get bool/data
+              noOf←⍴↑,/{','∊⍵:','Split ⍵ ⋄ ⊂⍵}¨'name'Get bool/data
           :ElseIf 'Interface Method'≡type
               noOf←+/bool←('Interface Method'∘≡¨Get data)
           :Else
@@ -1423,7 +1413,7 @@
           :Else
               :If ~0∊⍴list←'name'Get bool/data
               :AndIf ~0∊⍴list←(0<↑∘⍴¨list)/list
-                  list2←,↑,/{','∊⍵:','Split ⍵ ⋄ ⊂⍵}¨list
+                  list2←↑,/{','∊⍵:','Split ⍵ ⋄ ⊂⍵}¨list
                   list2←{⍵↑⍨¯1+⍵⍳'←'}¨list2
                   list2←list2[SortAlphabet⍋⊃list2]
                   :If 4≥⍴list2
@@ -1855,6 +1845,7 @@
               '#.ADOC_Source'scriptRef.⎕NS↓scriptRef.⎕NL 2 3 4
               scriptRef←ConvertOrdinaryNamespace2Scripted #.ADOC_Source
               vs.origSource←{⍵↓⍨+/∧/' '=⍵}¨⎕SRC scriptRef
+              vs.origSource/⍨←1,~∧\'⍝'=↑¨1↓vs.origSource    ⍝ Get rid of any leading comments as they are not meaningful in this context.
           :Else
               (∆EM←'Invalid right argument')⎕SIGNAL 11
           :EndIf
@@ -2335,7 +2326,7 @@
       ⍝ If we got to this stage, it is obviously an ordinary namespace
       :If 9≠ref.⎕NC⍕name
           999 ⎕SIGNAL⍨∆EM←'"',(⍕ref),'.',name,'" is not a namespace or does not exist'
-      :ElseIf ref.{0::0 ⋄`⊣⎕SRC⍎⍵}⍕name
+      :ElseIf ref.{0::0 ⋄ `⊣⎕SRC⍎⍵}⍕name
           . ⍝ ???
       :Else
           :With ⍎(⍕ref),'.',⍕name
@@ -2396,7 +2387,7 @@
 
     ∇ noOf←type CalcNoOfListItems data_
      ⍝ Find out how many items belong to a particular list.
-
+     
      ⍝ Note that lists may be nested (one level only) which
      ⍝ means that an ordered list can live inside an unordered
      ⍝ one and vice versa.
@@ -2407,7 +2398,7 @@
       :Else
           . ⍝ Huuh?!
       :EndIf
-
+     
     ∇
 
     ∇ r←CompressList vtv;buffer;sep;noOf;bool;lc;noOf
