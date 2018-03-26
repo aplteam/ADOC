@@ -131,13 +131,23 @@
 ⍝ ADOC will process leading comment lines in a scripted namespace in the same way
 ⍝ it does with classes and interfaces.\\
 ⍝ However, in ordinary namespaces their cannot be any "leading" comments. As a substitute you may
-⍝ define a function `ADOC_Doc` that carries nothing but comments. If such a function exists
-⍝ then these comment lines will be treated as the "leading comments". The function itself will not
-⍝ be listed, not even when it is mentioned by `Public`.\\
-⍝ Note that by definition the first line of the comments becomes the title.\\
-⍝ This is an example:
+⍝ either create a variable (a vector of text vectors) or define a function `ADOC_Doc` that carries 
+⍝ nothing but comments (deprecated since version 6.5.0).\\
+⍝ The variable can hold the Markdown as is, without the leading `⍝` symbol; that makes editing easier.
+⍝ If it is a function then it must carry nothing but comment lines. These comment lines will be treated
+⍝ as the "leading comments". The function itself will not be listed, not even when it is mentioned by `Public`.\\
+⍝ These are two examples:
 ⍝
 ⍝ ~~~
+⍝ ⍝ Variable
+⍝ 'Temp'#.⎕NS''
+⍝ #.Temp.ADOC_Doc←'My comment from line 1' '' '* This' '* That'
+⍝ #.Temp.⎕FX'r←Hello' 'r←''Word'''
+⍝ ]ADoc #.Temp.Doc
+⍝ ~~~
+⍝
+⍝ ~~~
+⍝ ⍝ Function
 ⍝ 'Temp'#.⎕NS''
 ⍝ #.Temp.⎕FX 'ADOC_Doc' '⍝ My comment from line 1' '⍝ ' '⍝ * This' '⍝ * That'
 ⍝ #.Temp.⎕FX'r←Hello' 'r←''Word'''
@@ -205,19 +215,23 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.4.2' '2018-03-20'
+      r←(⍕⎕THIS)'6.5.0' '2018-03-26'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 6.5.0
+      ⍝   * `ADOC_Doc` may now be a vector of text vectors instead of a function carrying comment lines.
+      ⍝   * Some minor improvements made to the mark-up.
+      ⍝   * Some superfluous code removed.
       ⍝ * 6.4.2
       ⍝   * In case and ordinary namespace contains variables an unwanted line was added to the documentation
-      ⍝     which is created by the SALT `Save` command. In that context anything that looks like a leading 
+      ⍝     which is created by the SALT `Save` command. In that context anything that looks like a leading
       ⍝     comment is not useful and therefore needs to be removed.
       ⍝ * 6.4.1
       ⍝   * :Include statement was faulty.
       ⍝ * 6.4.0:
-      ⍝   * ADOC got converted from the APL wiki to GitHub. The software as such remains unchanged
+      ⍝   * ADOC got converted from the APL wiki to GitHub. The software as such remains unchanged.
     ∇
 
     ∇ vs←CreateBody(vs chapterNo);tail;type;name;flag
@@ -273,11 +287,6 @@
                   Analyze scriptRef
               :Else
                   _embeddedClassNames Analyze scriptRef
-              :EndIf
-          :ElseIf 1=≡this                       ⍝ is it function call?
-          :AndIf 3=⎕NC this                     ⍝ ... delivers the information we need?
-              :If Analyze_ADOC_Doc this
-                  11 ⎕SIGNAL⍨∆EM←'Invalid right argument'
               :EndIf
           :Else
               ⎕←'Huuh?! What''s that: ',this
@@ -1003,8 +1012,6 @@
       isRef←{⍵≢⍕⍵}y
       :If isRef
           Analyze y
-      :ElseIf 3=⎕NC y
-          Analyze_ADOC_Doc y
       :Else
           (∆EM←'Invalid right argument')⎕SIGNAL 11
       :EndIf
@@ -1370,7 +1377,7 @@
           Body,←(MakeBookmark'Included'),('h4 id="',GetChapterNo,':incl"')tag'Included'
           firstIncludes←0
           buffer←'name'∘GetSingle¨{⍵↑⍨+/∧\{'Include'≡↑⍵[1;2]}¨⍵}vs.publicStuff
-          Body,←nl,('ul'tag 1↓↑,/nl∘,¨'li'∘tag¨buffer),nl
+          Body,←nl,('ul'tag 1↓↑,/nl∘,¨'li'∘tag¨'code'∘tag¨ buffer),nl
       :EndIf
       vs.Body,←Body
       vs.firstIncludes←firstIncludes
@@ -1893,6 +1900,8 @@
           vs←GetPublicDefinitionFrom_NS scriptRef vs
           :If 3=scriptRef.⎕NC'ADOC_Doc'
               vs.origSource←vs.origSource[1],(dlb 1↓scriptRef.⎕NR'ADOC_Doc'),1↓vs.origSource
+          :ElseIf 2=scriptRef.⎕NC'ADOC_Doc'
+              vs.origSource←vs.origSource[1],('⍝ '∘,¨scriptRef⍎'ADOC_Doc'),1↓vs.origSource
           :EndIf
       :EndIf
       vs.origSource←1↓¯1↓vs.origSource
@@ -2326,7 +2335,7 @@
       ⍝ If we got to this stage, it is obviously an ordinary namespace
       :If 9≠ref.⎕NC⍕name
           999 ⎕SIGNAL⍨∆EM←'"',(⍕ref),'.',name,'" is not a namespace or does not exist'
-      :ElseIf ref.{0::0 ⋄ `⊣⎕SRC⍎⍵}⍕name
+      :ElseIf ref.{0::0 ⋄`⊣⎕SRC⍎⍵}⍕name
           . ⍝ ???
       :Else
           :With ⍎(⍕ref),'.',⍕name
@@ -2585,23 +2594,6 @@
           :ElseIf 0<+/R=⎕UCS 10
               R←(⎕UCS 10)Split R
           :EndIf
-      :EndIf
-    ∇
-
-    ∇ {ok}←Analyze_ADOC_Doc scriptRef;headerDoc;publishedStuff;name;ref
-      headerDoc←1↓scriptRef.⎕NR'ADOC_Doc'           ⍝ Execute that function
-      :If ~ok←{2≠≡⍵:1 ⋄ ~∧/↑¨' '=¨1↑¨0⍴¨⍵}headerDoc ⍝ ... returns a vector of string?
-          headerDoc←{⍵↓⍨+/∧\' '=⍵}¨headerDoc        ⍝ remove leading blanks, if any
-          headerDoc←('⍝'=↑¨headerDoc)/headerDoc     ⍝ Only lines starting with "⍝" do survive
-          ref←⍎{⍵↓⍨-'.'⍳⍨⌽⍵}fnsName
-          headerDoc←AnalyzeHeader(ref headerDoc)
-          :If 0∊⍴headerDoc
-              name←''
-          :Else
-              name←dlb{⍵↓⍨+/∧\'='=⍵}1 2 1⊃headerDoc
-          :EndIf
-          publishedStuff←''
-          _META,←,⊂name'Container' ''headerDoc publishedStuff''
       :EndIf
     ∇
 
