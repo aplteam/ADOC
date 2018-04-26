@@ -131,7 +131,7 @@
 ⍝ ADOC will process leading comment lines in a scripted namespace in the same way
 ⍝ it does with classes and interfaces.\\
 ⍝ However, in ordinary namespaces their cannot be any "leading" comments. As a substitute you may
-⍝ either create a variable (a vector of text vectors) or define a function `ADOC_Doc` that carries 
+⍝ either create a variable (a vector of text vectors) or define a function `ADOC_Doc` that carries
 ⍝ nothing but comments (deprecated since version 6.5.0).\\
 ⍝ The variable can hold the Markdown as is, without the leading `⍝` symbol; that makes editing easier.
 ⍝ If it is a function then it must carry nothing but comment lines. These comment lines will be treated
@@ -215,11 +215,13 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.5.0' '2018-03-26'
+      r←(⍕⎕THIS)'6.6.0' '2018-04-26'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 6.6.0
+      ⍝   * This versions supports the multi-line definitions of local vars introduced in version 17.0 of Dyalog APL.
       ⍝ * 6.5.0
       ⍝   * `ADOC_Doc` may now be a vector of text vectors instead of a function carrying comment lines.
       ⍝   * Some minor improvements made to the mark-up.
@@ -1377,7 +1379,7 @@
           Body,←(MakeBookmark'Included'),('h4 id="',GetChapterNo,':incl"')tag'Included'
           firstIncludes←0
           buffer←'name'∘GetSingle¨{⍵↑⍨+/∧\{'Include'≡↑⍵[1;2]}¨⍵}vs.publicStuff
-          Body,←nl,('ul'tag 1↓↑,/nl∘,¨'li'∘tag¨'code'∘tag¨ buffer),nl
+          Body,←nl,('ul'tag 1↓↑,/nl∘,¨'li'∘tag¨'code'∘tag¨buffer),nl
       :EndIf
       vs.Body,←Body
       vs.firstIncludes←firstIncludes
@@ -1653,6 +1655,7 @@
           :EndIf
       :EndIf
       remarks←''
+      noOf←⍴source←RemoveMultiLocalLines source
       :If ~0∊⍴{⍵/⍨'⍝'=↑¨⍵}buffer←1↓noOf↑source ⍝ remarks
           buffer/⍨←{~∨/∨/¨':access' ':implements'{⍺≡Lowercase(⍴⍺)↑⍵}¨⊂⍵}∘dlb¨buffer
           buffer↓¨⍨←{+/∧\' '=⍵}¨buffer
@@ -2335,7 +2338,7 @@
       ⍝ If we got to this stage, it is obviously an ordinary namespace
       :If 9≠ref.⎕NC⍕name
           999 ⎕SIGNAL⍨∆EM←'"',(⍕ref),'.',name,'" is not a namespace or does not exist'
-      :ElseIf ref.{0::0 ⋄`⊣⎕SRC⍎⍵}⍕name
+      :ElseIf ref.{0::0 ⋄ `⊣⎕SRC⍎⍵}⍕name
           . ⍝ ???
       :Else
           :With ⍎(⍕ref),'.',⍕name
@@ -2669,6 +2672,11 @@
           w←⍵
           (b/w)←that
           w
+      }
+
+      RemoveMultiLocalLines←{
+          ~17≤↑(//)⎕VFI{⍵/⍨2>+\⍵='.'}2⊃'#'⎕WG'APLVersion':⍵
+          ⍵[1],{⍵↓⍨+/∧\';'=↑¨⍵}1↓⍵
       }
 
     :Class Demo
