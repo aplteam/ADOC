@@ -1,4 +1,4 @@
-﻿:Class  ADOC ⍝ V2.38
+﻿:Class  ADOC ⍝ V2.39
 ⍝ User Command script for "ADOC".
 ⍝ Expects the WS ADOC.dws to be a sibling of this script.
 ⍝
@@ -12,6 +12,8 @@
 ⍝ 2017 06 22 KaiJ: Bug fix regarding Caption/Title + make it compatible with pre-16.0 versions.
 ⍝ 2017 06 26 KaiJ: Documentation shortened. Sub-folder ADOC introduced. CSS for print improved.
 ⍝ 2017 06 27 KaiJ: Sub-folder removed.
+⍝ 2018 04 18 Adam: ]??cmd → ]cmd -??
+
     ⎕IO←⎕ML←1
 
     ∇ r←List
@@ -69,8 +71,8 @@
           LoadAdoc ##.##.c
           r←⊂'HTML page saved as ',⎕SE.ADOC.ADOC.ShowDocumentation ⍬
       :EndSelect
-      r,←(l≠1)/⊂']??',Cmd,'   ⍝ for syntax details'
-      r,←(l≤1)/⊂']???',Cmd,'  ⍝ to view the complete ADoc documentation in a browser window'
+      r,←(l≠1)/⊂']',Cmd,' -??  ⍝ for syntax details'
+      r,←(l≤1)/⊂']',Cmd,' -??? ⍝ to view the complete ADoc documentation in a browser window'
     ∇
 
       Split←{
