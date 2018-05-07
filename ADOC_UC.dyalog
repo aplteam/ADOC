@@ -1,4 +1,4 @@
-﻿:Class  ADOC ⍝ V2.39
+﻿:Class  ADOC ⍝ V2.391
 ⍝ User Command script for "ADOC".
 ⍝ Expects the WS ADOC.dws to be a sibling of this script.
 ⍝
@@ -13,6 +13,7 @@
 ⍝ 2017 06 26 KaiJ: Documentation shortened. Sub-folder ADOC introduced. CSS for print improved.
 ⍝ 2017 06 27 KaiJ: Sub-folder removed.
 ⍝ 2018 04 18 Adam: ]??cmd → ]cmd -??
+⍝ 2018 05 01 Adam: Add SVN tag
 
     ⎕IO←⎕ML←1
 
@@ -158,4 +159,4 @@
       :EndTrap
     ∇
 
-:EndClass
+:EndClass ⍝ ADOC  $Revision$
