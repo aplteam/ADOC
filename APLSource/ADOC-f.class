@@ -459,6 +459,14 @@
         ∇
     :EndProperty
 
+    :Section SpecialFunctions
+    
+    ⍝ Any of the following three properties might cause a VALUE ERROR when called in a certain context.
+    ⍝ It happens when `Initial_HTML` was not executed and the property is therefore not available.
+    ⍝ We do not really need anything here but those 3 properties, so we make them default to 0.
+    ⍝ That's a bit messy, yes, but far easier than any "correct" approach. If this starts to hurt
+    ⍝ we need to call `Initial_HTML` instead, and clean up the mess, but I doubt that will ever happen.
+
     :Property ignoreCopyright
     :Access Public Shared
     ⍝ Defaults to 1: If there is a niladic function `Copyright` (public shared) the result is processed,
@@ -467,11 +475,6 @@
           :If 2=⎕NC'_ignoreCopyright'
               r←_ignoreCopyright
           :Else
-              ⍝ This means `Initial_HTML` was not executed and the property is therefore not available.
-              ⍝ What do not really need anything here but `_ignoreCopyright`, so we make it default to 0.
-              ⍝ That's a bit messy, yes, but far easier than any "correct" approach. If this starts to
-              ⍝ hurt we need to call `Initial_HTML` instead, and clean up the mess, but I doubt that will
-              ⍝ ever happen.
               r←0
           :EndIf
         ∇
@@ -489,12 +492,6 @@
           :If 2=⎕NC'_ignoreHistory'
               r←_ignoreHistory
           :Else
-              ⍝ This means `Initial_HTML` was not executed and the property is therefore not available.
-              ⍝ What do not really need anything here but `_ignoreHistory`, so we make it default to 0.
-              ⍝ That's a bit messy, yes, but far easier than any "correct" approach. If this starts to
-              ⍝ hurt we need to call `Initial_HTML` instead, and clean up the mess, but I doubt that will
-              ⍝ ever happen.
-
               r←0
           :EndIf
         ∇
@@ -512,11 +509,6 @@
           :If 2=⎕NC'_ignoreVersion'
               r←_ignoreVersion
           :Else
-              ⍝ This means `Initial_HTML` was not executed and the property is therefore not available.
-              ⍝ What do not really need anything here but `_ignoreVersion`, so we make it default to 0.
-              ⍝ That's a bit messy, yes, but far easier than any "correct" approach. If this starts to
-              ⍝ hurt we need to call `Initial_HTML` instead, and clean up the mess, but I doubt that will
-              ⍝ ever happen.
               r←0
           :EndIf
         ∇
@@ -525,6 +517,8 @@
           _ignoreVersion←arg.NewValue
         ∇
     :EndProperty
+
+    :EndSection
 
     :Property view
     :Access Public Shared

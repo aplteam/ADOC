@@ -1,18 +1,17 @@
- R←Test_Usercommand_02(stopFlag batchFlag);newdoc;buffer;flag;p;sep;⎕TRAP;filename;html;expected
-⍝ Test the ADOC user command with "browse" and -title.
+ R←Test_Usercommand_02(stopFlag batchFlag);⎕TRAP;inCurrentDir;folders;files;executed
+⍝ Test whether the user command executed is what we have in the current directory.
+⍝ If this fails you might well execute something you don't really wanna execute!
  R←∆Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- :If batchFlag
-     R←∆NoBatchTest
- :Else
-     ⎕←(⎕PW-1)⍴'-'
-     ⎕←'This test needs you! ADOC will show itself in the default browser'
-     ⎕←'with the title "APL is great!"'
-     ⎕←''
-     0/⍞,0/⎕←'Press <enter> to contiue;'
-     ⎕SE.UCMD'ADoc #._ADOC.ADOC -title="APL is great!"'
+ inCurrentDir←#.APLTreeUtils.ReadUtf8File'ADOC_UC.dyalog'
+ folders←⎕SE.UCMD'Settings cmddir'
+ (('∘'=folders)/folders)←';'
+ folders←';'#.APLTreeUtils.Split folders
+ files←folders,¨⊂'\ADOC_UC.dyalog'
+ files←(#.FilesAndDirs.IsFile files)/files
+ →FailsIf 0∊⍴files
+ executed←#.APLTreeUtils.ReadUtf8File⊃files
+ →PassesIf executed≡inCurrentDir
 
-     R←~∆YesOrNo'Did ADOC show up in your default browser with the title "APL is great?"'
-
- :EndIf
+ R←∆OK

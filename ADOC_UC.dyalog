@@ -7,40 +7,50 @@
 ⍝ 2017 06 14 Adam: ]browse → ]TOOLS.adoc; -help → ]???adoc; ]info [-full] → ]adoc -info[=full]
 ⍝ 2017 06 14 Adam: args are now separated with space instead of commas; -info handles multiple names and includes -title
 ⍝ 2017 05 15 KaiJ: -caption → -title
-⍝ 2017 06 13 KaiJ:  -params and ]CreateParms removed; help fixed; documentation updated.
+⍝ 2017 06 13 KaiJ: -params and ]CreateParms removed; help fixed; documentation updated.
 ⍝ 2017 06 15 Adam: -info → -summary, now accepts relative refs, help tweak, removed error trapping
 ⍝ 2017 06 22 KaiJ: Bug fix regarding Caption/Title + make it compatible with pre-16.0 versions.
 ⍝ 2017 06 26 KaiJ: Documentation shortened. Sub-folder ADOC introduced. CSS for print improved.
 ⍝ 2017 06 27 KaiJ: Sub-folder removed.
 ⍝ 2018 04 18 Adam: ]??cmd → ]cmd -??
 ⍝ 2018 05 01 Adam: Add SVN tag
-⍝ 2018 08 11 KaiJ: Help improved
+⍝ 2018 08 11 KaiJ: Help improved and -version flag introduced.
 
     ⎕IO←⎕ML←1
 
     ∇ r←List
       :Access Shared Public
       r←⎕NS''
-      r.(Group Name Parse)←'TOOLS' 'ADoc' '-title= -browser= -summary[=]full'
+      r.Group←'TOOLS'
+      r.Name←'ADoc'
+      r.Parse←'-title= -browser= -summary[=]full -version'
       r.Desc←'Automated documentation generation'
     ∇
 
     ∇ r←Run(Cmd Args);bool;calledFrom
       :Access Shared Public
       ⍝ We now create a namespace ⎕SE.ADOC but keep it local to this function!
+     
+      ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
       ⍝ This code CANNOT run in a sub-function!
       ⎕SE.⎕SHADOW'ADOC'
       ⎕SE.⎕EX'ADOC'
       'ADOC'⎕SE.⎕NS''
+      ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+     
       LoadAdoc ##.SourceFile
-      :If ∨/bool←'##.'∘{⍺≡(⍴⍺)↑⍵}¨Args.Arguments
-          calledFrom←{⊃⍵↓⍨'⎕SE'{+/∧\⍺∘≡¨(⍴⍺)↑¨⍵}⍵}⎕NSI
-          (bool/Args.Arguments)←calledFrom∘{⍺,'.',⍵}¨bool/Args.Arguments
-      :EndIf
-      :If 0≢Args.summary
-          r←AdocInfo Args
+      :If Args.Switch'version'
+          r←{⍵↓⍨+/∧\' '=⍵}⍕1↓⎕SE.ADOC.ADOC.Version
       :Else
-          r←AdocBrowse Args
+          :If ∨/bool←'##.'∘{⍺≡(⍴⍺)↑⍵}¨Args.Arguments
+              calledFrom←{⊃⍵↓⍨'⎕SE'{+/∧\⍺∘≡¨(⍴⍺)↑¨⍵}⍵}⎕NSI
+              (bool/Args.Arguments)←calledFrom∘{⍺,'.',⍵}¨bool/Args.Arguments
+          :EndIf
+          :If 0≢Args.summary
+              r←AdocInfo Args
+          :Else
+              r←AdocBrowse Args
+          :EndIf
       :EndIf
     ∇
 
@@ -57,6 +67,7 @@
           r,←⊂' -title={text}    Add a custom title with the content {text}'
           r,←⊂' -browser={path}  Use the non-default browser specified'
           r,←⊂' -summary[=full]  Return summarized information about the object members (optionally including full functions headers)'
+          r,←⊂' -version         Returns the version number of ADOC used. If specified everythings else is ignored'
           r,←⊂''
           r,←⊂'Examples:'
           r,←⊂'    ]',Cmd,' MyClass                              ⍝ single class'
@@ -66,7 +77,7 @@
           r,←⊂'    ]',Cmd,' MyClass -summary                     ⍝ basic info'
           r,←⊂'    ]',Cmd,' MyClass -summary=full                ⍝ more detailed info'
           r,←⊂''
-      :case 2
+      :Case 2
           ⎕SE.⎕SHADOW'ADOC'
           ⎕SE.⎕EX'ADOC'
           'ADOC'⎕SE.⎕NS''
@@ -103,7 +114,7 @@
 
     ∇ r←AdocBrowse Args;title;ref;cs;browser;params
       title←''Args.Switch'title' ⍝ default is empty
-      browser←''Args.Switch'browser' ⍝ default is empty      
+      browser←''Args.Switch'browser' ⍝ default is empty
       params←⍎'⎕SE.ADOC.ADOC.CreateBrowseDefaults'Args.Switch'params'
       :If ~0∊⍴browser
           params.BrowserPath←browser
