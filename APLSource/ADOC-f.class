@@ -215,11 +215,14 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.6.0' '2018-04-26'
+      r←(⍕⎕THIS)'6.6.1' '2018-08-11'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 6.6.1
+      ⍝   * Bug fix: multi-line definitions of local variables may contain empty lines as well as comment lines.
+      ⍝     This was not honoured in 6.6.0 because the documentation did not tell.
       ⍝ * 6.6.0
       ⍝   * This versions supports the multi-line definitions of local vars introduced in version 17.0 of Dyalog APL.
       ⍝ * 6.5.0
@@ -461,7 +464,16 @@
     ⍝ Defaults to 1: If there is a niladic function `Copyright` (public shared) the result is processed,
     ⍝ otherwise ignore that functions, if there is any.
         ∇ r←get
-          r←_ignoreCopyright
+          :If 2=⎕NC'_ignoreCopyright'
+              r←_ignoreCopyright
+          :Else
+              ⍝ This means `Initial_HTML` was not executed and the property is therefore not available.
+              ⍝ What do not really need anything here but `_ignoreCopyright`, so we make it default to 0.
+              ⍝ That's a bit messy, yes, but far easier than any "correct" approach. If this starts to
+              ⍝ hurt we need to call `Initial_HTML` instead, and clean up the mess, but I doubt that will
+              ⍝ ever happen.
+              r←0
+          :EndIf
         ∇
         ∇ set arg
           (∆EM←'"ignoreCopyright" Must be a Boolean')⎕SIGNAL 11/⍨~arg.NewValue∊0 1
@@ -474,7 +486,17 @@
     ⍝ Defaults to 1: If there is a niladic function `History` (public shared) the result is processed,
     ⍝ otherwise ignore that functions, if there is any.
         ∇ r←get
-          r←_ignoreHistory
+          :If 2=⎕NC'_ignoreHistory'
+              r←_ignoreHistory
+          :Else
+              ⍝ This means `Initial_HTML` was not executed and the property is therefore not available.
+              ⍝ What do not really need anything here but `_ignoreHistory`, so we make it default to 0.
+              ⍝ That's a bit messy, yes, but far easier than any "correct" approach. If this starts to
+              ⍝ hurt we need to call `Initial_HTML` instead, and clean up the mess, but I doubt that will
+              ⍝ ever happen.
+
+              r←0
+          :EndIf
         ∇
         ∇ set arg
           (∆EM←'"ignoreHistory" must be a Boolean')⎕SIGNAL 11/⍨~arg.NewValue∊0 1
@@ -487,7 +509,16 @@
     ⍝ Defaults to 1: If there is a niladic function `Version` (public shared), the result is processed,
     ⍝ otherwise ignore that functions, if there is any.
         ∇ r←get
-          r←_ignoreVersion
+          :If 2=⎕NC'_ignoreVersion'
+              r←_ignoreVersion
+          :Else
+              ⍝ This means `Initial_HTML` was not executed and the property is therefore not available.
+              ⍝ What do not really need anything here but `_ignoreVersion`, so we make it default to 0.
+              ⍝ That's a bit messy, yes, but far easier than any "correct" approach. If this starts to
+              ⍝ hurt we need to call `Initial_HTML` instead, and clean up the mess, but I doubt that will
+              ⍝ ever happen.
+              r←0
+          :EndIf
         ∇
         ∇ set arg
           (∆EM←'"ignoreVersion" must be a Boolean')⎕SIGNAL 11/⍨~arg.NewValue∊0 1
@@ -1122,7 +1153,7 @@
 
     ∇ r←ListVariables(scriptRef whatsPublic);list
     ⍝ `whatsPublic` is empty in case it is not a namespace. Otherwise it is a list of names
-    ⍝ that are considered public in that namespace. Variables not liested are therefore private.
+    ⍝ that are considered public in that namespace. Variables not listed are therefore private.
       r←''
       :If ~0∊⍴whatsPublic
       :AndIf ~0∊⍴list←' '~¨⍨↓scriptRef.⎕NL 2
@@ -2675,8 +2706,14 @@
       }
 
       RemoveMultiLocalLines←{
+      ⍝ With version 17.0 the possibility of spreading the definition of what variables are local
+      ⍝ has been extended to several lines. To make things worse between those lines, which must
+      ⍝ start with a semicolon, may be interrupted by blank lines and/or comment lines
           ~17≤↑(//)⎕VFI{⍵/⍨2>+\⍵='.'}2⊃'#'⎕WG'APLVersion':⍵
-          ⍵[1],{⍵↓⍨+/∧\';'=↑¨⍵}1↓⍵
+          candidates←(¯1+⍴⍵)-+/∧\~⌽{';'=↑¨⍵}1↓⍵ ⍝ The last line that starts with a ";" dictates the max number of lines
+          buff←↑¨candidates↑1↓⍵
+          ((buff∊' ⍝')/buff)←';'                ⍝ Replace space and "⍝" by a ";"
+          ⍵[1],(+/∧\';'=buff)↓1↓⍵
       }
 
     :Class Demo

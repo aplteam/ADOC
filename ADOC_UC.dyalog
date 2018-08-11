@@ -14,6 +14,7 @@
 ⍝ 2017 06 27 KaiJ: Sub-folder removed.
 ⍝ 2018 04 18 Adam: ]??cmd → ]cmd -??
 ⍝ 2018 05 01 Adam: Add SVN tag
+⍝ 2018 08 11 KaiJ: Help improved
 
     ⎕IO←⎕ML←1
 
@@ -65,15 +66,15 @@
           r,←⊂'    ]',Cmd,' MyClass -summary                     ⍝ basic info'
           r,←⊂'    ]',Cmd,' MyClass -summary=full                ⍝ more detailed info'
           r,←⊂''
-      :Else
+      :case 2
           ⎕SE.⎕SHADOW'ADOC'
           ⎕SE.⎕EX'ADOC'
           'ADOC'⎕SE.⎕NS''
           LoadAdoc ##.##.c
           r←⊂'HTML page saved as ',⎕SE.ADOC.ADOC.ShowDocumentation ⍬
       :EndSelect
-      r,←(l≠1)/⊂']',Cmd,' -??  ⍝ for syntax details'
-      r,←(l≤1)/⊂']',Cmd,' -??? ⍝ to view the complete ADoc documentation in a browser window'
+      r,←(l=0)/⊂']',Cmd,' -??  ⍝ for syntax details'
+      r,←(l∊0 1)/⊂']',Cmd,' -??? ⍝ to view the complete ADoc documentation in a browser window'
     ∇
 
       Split←{

@@ -1,5 +1,5 @@
- R←Test_Misc_03(stopFlag batchFlag);⎕TRAP;parms;filename;html
-⍝ Test for function that carries multiple lines of local vars definitions.
+ R←Test_Misc_06(stopFlag batchFlag);⎕TRAP;body;parms;filename;html
+⍝ Test for multiple lines of local vars definitions including a blank line between them in a class script.
 ⍝ R gets one of: 0=Okay, 1=test case failed, ¯1=test case was not executed due to the "batchFlag"
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
@@ -12,14 +12,14 @@
 
  #.⎕SHADOW'TestHelp'
  'TestHelp'#.⎕NS''
- #.TestHelp.⎕FX'r←Hello;a;b;c' ';d;e' ';f;g' '⍝ This is a leading comment' 'a←1' 'b←2' 'r←a+b'
- #.TestHelp.⎕FX'r←Public' 'r←,⊂''Hello'''
+ body←':Class Foo' '∇r←Hello;a' '' ';d;e' ';f;g' ':Access Public Shared' '⍝ Leading comment' 'r←1' '∇' ':EndClass'
+ #.TestHelp.⎕FIX body
 
  parms←##.ADOC.CreateBrowseDefaults
  parms.view←0
- filename←parms ##.ADOC.Browse #.TestHelp
+ filename←parms ##.ADOC.Browse #.TestHelp.Foo
  html←'flat'##.APLTreeUtils.ReadUtf8File filename
- →GoToTidyUp 0=+/'<p>This is a leading comment</p>'⍷html
+ →GoToTidyUp 0=+/'<p>Leading comment</p>'⍷html
 
  R←∆OK
 

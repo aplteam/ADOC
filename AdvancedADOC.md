@@ -55,9 +55,9 @@ My.IgnorePattern←'_'
 
 Note that for the time being that can only be a string. This restriction may be lifted in a later version, for example by allowing a regular expression.
 
-## Prevent Browse from putting the HTML on display
+## Prevent `Browse` from displaying the HTML
 
-`Browse` is perfect for creating and displaying information regarding a particular script or namespace, but sometimes you might want to create permanent HTML files and collect them for other purposes than to look at them. `Browse` returns the name of the file created as a shy result, but you might also want to prevent `Browse` from putting that page on display.
+`Browse` is perfect for creating and displaying information regarding a particular script or namespace, but sometimes you might want to create permanent HTML files and collect them for other purposes than to view them. `Browse` returns the name of the file created as a shy result, but you might also want to prevent `Browse` from putting that page on display.
 
 You can achieve that by setting the `view` parameter to 0.
 
