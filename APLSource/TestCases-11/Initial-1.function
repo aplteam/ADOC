@@ -1,5 +1,9 @@
  Initial
  ⎕IO←0
+ ∆WX←⎕WX
+ ⎕WX←0
+ ∆ObjSyntax←⎕SE.mb.options.ObjSyntax.root.Checked
+ ⎕SE.mb.options.ObjSyntax.root.Checked←0
  #.FilesAndDirs.PolishCurrentDir
  #.Tester.EstablishHelpersIn ⍬
  Globals←⎕NS''

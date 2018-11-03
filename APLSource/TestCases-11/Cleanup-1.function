@@ -3,3 +3,7 @@
  ##.ADOC.BrowserName←Globals.saveBrowser
  ##.ADOC.Inherit←Globals.saveInherit
  ⎕EX'Globals'
+ ⎕WX←∆WX
+ ⎕SE.mb.options.ObjSyntax.root.Checked←∆ObjSyntax
+ ⎕EX¨'∆WX' '∆ObjSyntax'
+⍝Done

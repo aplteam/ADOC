@@ -20,6 +20,10 @@
 ⍝ all "leading comments" are treated as special information. One can use Markdown
 ⍝ to format the documentation. See [Markup syntax](#) for details of how to do the mark-up.
 ⍝
+⍝ Note that ADOC can process sub classes. For example, ADOC itself comes with a sub class
+⍝ `Demo`. Therefore both `Browse` and `List` can process ADOC.Demo.\\
+⍝ (Note that you cannot make use of ADOC.Demo when it is executed as a user command)
+⍝
 ⍝ ### ADOC as a user command
 ⍝ This documentation refers to ADOC being used as a user command. You can also use
 ⍝ advanced features but for that you have to load or copy ADOC into your workspace.
@@ -215,28 +219,21 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.6.1.3' '2018-08-11'
+      r←(⍕⎕THIS)'6.6.2.10' '2018-11-03'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 6.6.2
+      ⍝   * Bug fixes:
+      ⍝     * ADOC relied on exposed root properties.
+      ⍝     * An invalid check prevented sub classes from being analyzed. This bug made in appearance in both,
+      ⍝       `Browse` and `List`.
       ⍝ * 6.6.1
       ⍝   * Bug fix: multi-line definitions of local variables may contain empty lines as well as comment lines.
       ⍝     This was not honoured in 6.6.0 because the documentation did not tell.
       ⍝ * 6.6.0
       ⍝   * This versions supports the multi-line definitions of local vars introduced in version 17.0 of Dyalog APL.
-      ⍝ * 6.5.0
-      ⍝   * `ADOC_Doc` may now be a vector of text vectors instead of a function carrying comment lines.
-      ⍝   * Some minor improvements made to the mark-up.
-      ⍝   * Some superfluous code removed.
-      ⍝ * 6.4.2
-      ⍝   * In case and ordinary namespace contains variables an unwanted line was added to the documentation
-      ⍝     which is created by the SALT `Save` command. In that context anything that looks like a leading
-      ⍝     comment is not useful and therefore needs to be removed.
-      ⍝ * 6.4.1
-      ⍝   * :Include statement was faulty.
-      ⍝ * 6.4.0:
-      ⍝   * ADOC got converted from the APL wiki to GitHub. The software as such remains unchanged.
     ∇
 
     ∇ vs←CreateBody(vs chapterNo);tail;type;name;flag
@@ -460,7 +457,7 @@
     :EndProperty
 
     :Section SpecialFunctions
-    
+
     ⍝ Any of the following three properties might cause a VALUE ERROR when called in a certain context.
     ⍝ It happens when `Initial_HTML` was not executed and the property is therefore not available.
     ⍝ We do not really need anything here but those 3 properties, so we make them default to 0.
@@ -866,14 +863,14 @@
           :EndIf
       :EndIf
      
-      :If 0∊⍴scriptRef
+      :If 0=≢scriptRef
           :If _htmlFinalised
               tempFilename←GetTempFileName
           :Else
               11 ⎕SIGNAL⍨∆EM←'I''m afraid, there is no HTML ready for being displayed'
           :EndIf
       :Else
-          'Right argument must be a reference pointing to a class, namespace or interface'⎕SIGNAL 11/⍨~∧/(⎕NC¨⊂∘⍕¨scriptRef)∊9.1 9.4 9.5
+          'Right argument must be a reference pointing to a class, namespace or interface'⎕SIGNAL 11/⍨~∧/(|⎕NC¨⊂∘⍕¨scriptRef)∊9.1 9.4 9.5
      
           Fill_META scriptRef     ⍝ ←←← The work horse!
      
@@ -914,7 +911,7 @@
       r←''
       verbose←{2=⎕NC ⍵:⍎⍵ ⋄ 0}'verbose'
       verbose←{IsChar ⍵:'full'≡Lowercase ⍵ ⋄ (,1)≡,⍵}verbose
-      :If 9.5 9.4 9.1∊⍨(⍎1⊃⎕NSI){⍺.⎕NC ⍵}⊂⍕scriptName
+      :If 9.5 9.4 9.1∊⍨(⍎1⊃⎕NSI){|⍺.⎕NC ⍵}⊂⍕scriptName
           my←⎕NEW ⎕THIS          ⍝ We need to instantiate ADOC for this kind of thing
           my.Analyze scriptName
           data←5⊃1⊃my.Meta
@@ -924,6 +921,8 @@
           :Else
               r,←verbose ListNonNamespaces data
           :EndIf
+      :Else
+          'Right argument must be a reference pointing to a class, namespace or interface'⎕SIGNAL 11
       :EndIf
     ∇
 
