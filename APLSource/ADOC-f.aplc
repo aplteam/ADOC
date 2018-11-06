@@ -219,11 +219,13 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.6.2.10' '2018-11-03'
+      r←(⍕⎕THIS)'6.6.3.14' '2018-11-06'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 6.6.3
+      ⍝   * Bug fix: the user command script depended also on root properties being exposed. No other changes.
       ⍝ * 6.6.2
       ⍝   * Bug fixes:
       ⍝     * ADOC relied on exposed root properties.

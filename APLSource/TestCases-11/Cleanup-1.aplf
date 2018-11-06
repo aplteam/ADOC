@@ -4,6 +4,6 @@
  ##.ADOC.Inherit←Globals.saveInherit
  ⎕EX'Globals'
  ⎕WX←∆WX
- ⎕SE.mb.options.ObjSyntax.root.Checked←∆ObjSyntax
+ {}2401⌶∆ObjSyntax  ⍝ Restore original settings for exposed root properties
  ⎕EX¨'∆WX' '∆ObjSyntax'
 ⍝Done

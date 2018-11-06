@@ -15,6 +15,7 @@
 ⍝ 2018 04 18 Adam: ]??cmd → ]cmd -??
 ⍝ 2018 05 01 Adam: Add SVN tag
 ⍝ 2018 08 11 KaiJ: Help improved and -version flag introduced.
+⍝ 2018 11 05 KaiJ: ADOC user command script relied on exposed properties
 
     ⎕IO←⎕ML←1
 
@@ -143,7 +144,7 @@
           r,←nl nl nl,⍨'─'⊣¨Args.title
       :EndIf
       :For ref :In Args.Arguments
-          :If 16>{⍎⍵/⍨1≥+\⍵='.'}(1+⎕IO)⊃#.APLVersion
+          :If 16>{⍎⍵/⍨1≥+\⍵='.'}(1+⎕IO)⊃# ⎕WG 'APLVersion'
               parent←(⎕SI⍳⊂'UCMD')⊃⎕RSI
               r,←nl nl nl,⍨full ⎕SE.ADOC.ADOC.Info parent⍎ref
           :Else
