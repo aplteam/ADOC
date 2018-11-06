@@ -44,7 +44,8 @@ Script location: ...
 
       ]???ADoc
 
-⍝ Shows extensive information about ADOC in your default browser.
+⍝ Shows extensive information about ADOC in your default browser. 
+⍝ Note that this is produced by ADOC processing itself.
 ```
 
 ## ADOC as a User Command
