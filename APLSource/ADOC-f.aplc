@@ -226,16 +226,8 @@
       :Access Public Shared
       ⍝ * 6.6.3
       ⍝   * Bug fix: the user command script depended also on root properties being exposed. No other changes.
-      ⍝ * 6.6.2
-      ⍝   * Bug fixes:
-      ⍝     * ADOC relied on exposed root properties.
-      ⍝     * An invalid check prevented sub classes from being analyzed. This bug made in appearance in both,
-      ⍝       `Browse` and `List`.
-      ⍝ * 6.6.1
-      ⍝   * Bug fix: multi-line definitions of local variables may contain empty lines as well as comment lines.
-      ⍝     This was not honoured in 6.6.0 because the documentation did not tell.
-      ⍝ * 6.6.0
-      ⍝   * This versions supports the multi-line definitions of local vars introduced in version 17.0 of Dyalog APL.
+      ⍝\\
+      ⍝ For information regarding older versions see <https://github.com/aplteam/Meddy/releases>
     ∇
 
     ∇ vs←CreateBody(vs chapterNo);tail;type;name;flag
