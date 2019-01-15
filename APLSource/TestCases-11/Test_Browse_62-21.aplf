@@ -19,7 +19,7 @@
  allFns←' '~¨⍨#.Temp.OrdinaryNS.⎕NL-3
  public←#.Temp.OrdinaryNS.Public
 
- →PassesIf((⍴public)⍴4)≡+/¨public⍷¨⊂html
+ →PassesIf((⍴public)⍴6)≡+/¨public⍷¨⊂html
  →PassesIf'Copyright' 'History' 'Version'≡(∨/¨(allFns~public)⍷¨⊂html)/allFns~public
 
  R←∆OK

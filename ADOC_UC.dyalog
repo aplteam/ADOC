@@ -16,6 +16,7 @@
 ⍝ 2018 05 01 Adam: Add SVN tag
 ⍝ 2018 08 11 KaiJ: Help improved and -version flag introduced.
 ⍝ 2018 11 05 KaiJ: ADOC user command script relied on exposed properties
+⍝ 2019 01 15 KaiJ: In case nothing was provided as argument an error is thrown
 
     ⎕IO←⎕ML←1
 
@@ -123,6 +124,7 @@
       :If ~0∊⍴title
           params.Title←title
       :EndIf
+      'Nothing to process?!'⎕SIGNAL 6/⍨0=≢Args.Arguments
       ref←CheckRefs¨Args.Arguments
       :If ∨/⍬∘≡¨ref
           r←'Invalid right argument'
@@ -144,7 +146,7 @@
           r,←nl nl nl,⍨'─'⊣¨Args.title
       :EndIf
       :For ref :In Args.Arguments
-          :If 16>{⍎⍵/⍨1≥+\⍵='.'}(1+⎕IO)⊃# ⎕WG 'APLVersion'
+          :If 16>{⍎⍵/⍨1≥+\⍵='.'}(1+⎕IO)⊃# ⎕WG'APLVersion'
               parent←(⎕SI⍳⊂'UCMD')⊃⎕RSI
               r,←nl nl nl,⍨full ⎕SE.ADOC.ADOC.Info parent⍎ref
           :Else

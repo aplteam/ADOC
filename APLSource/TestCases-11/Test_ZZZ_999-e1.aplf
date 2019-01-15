@@ -1,5 +1,5 @@
  R←Test_ZZZ_999(stopFlag batchFlag);v;n;d;xml;rf;f1;f2;⎕TRAP
- ⍝ Check the "Version" function and publish.config.
+⍝ Check the "Version" function and publish.config.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  R←∆Failed
 

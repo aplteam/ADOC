@@ -17,21 +17,23 @@
 ⍝
 ⍝ The first one is by far the most powerful and popular option since it allows
 ⍝ one to add additional information to scripts and also ordinary namespaces:
-⍝ all "leading comments" are treated as special information. One can use Markdown
-⍝ to format the documentation. See [Markup syntax](#) for details of how to do the mark-up.
+⍝ all "leading comments" are treated as special information.\\
+⍝ One can use Markdown to format the documentation. See [Markup syntax](#) for details 
+⍝ of how to do the mark-up.
 ⍝
-⍝ Note that ADOC can process sub classes. For example, ADOC itself comes with a sub class
-⍝ `Demo`. Therefore both `Browse` and `List` can process ADOC.Demo.\\
-⍝ (Note that you cannot make use of ADOC.Demo when it is executed as a user command)
+⍝ Note that `ADOC` can process sub classes. For example, `ADOC` itself comes with a sub class
+⍝ `Demo`. Therefore both `Browse` and `List` will process `ADOC.Demo`. However, you cannot 
+⍝ make use of `ADOC.Demo` when it is executed as a user command.
 ⍝
-⍝ ### ADOC as a user command
-⍝ This documentation refers to ADOC being used as a user command. You can also use
-⍝ advanced features but for that you have to load or copy ADOC into your workspace.
-⍝ The features and how to take advantages of them are documented in AdvancedADOC.html,
-⍝ a document that is a sibling of the ADOC.dws workspace which you will find in the
-⍝ user command folder you've installed ADOC into.
+⍝ ### `ADOC` as a user command
+⍝ You can use advanced features but for that you have to load or copy `ADOC` into your workspace.\\
+⍝ The features and how to take advantage of them are documented in AdvancedADOC.html,
+⍝ a document that is a sibling of the `ADOC.dws` workspace which you will find in the
+⍝ user command folder you've installed `ADOC` into or (since version 16.0 of Dyalog APL) in the
+⍝ standard user command folder of your version of Dyalog APL.\\
+⍝ The reference part however documents all methods, shared **and** instance.
 ⍝
-⍝ The following examples assume that you have `MyClass`, `MyInterface` and `MyNamepsace`
+⍝ The following examples assume that you have `MyClass`, `MyInterface` and `MyNamespace`
 ⍝ in your workspace.
 ⍝
 ⍝ ~~~
@@ -48,10 +50,10 @@
 ⍝       ]ADoc MyClass
 ⍝
 ⍝ ⍝ Same but for several objects:
-⍝       ]ADoc MyClass MyInterface MyNamepsace
+⍝       ]ADoc MyClass MyInterface MyNamespace
 ⍝ ~~~
 ⍝
-⍝ ### What ADOC considers as documentation
+⍝ ### What `ADOC` considers to be documentation
 ⍝ Note that comments are recognized only if and as long as they are following
 ⍝ the "header": the top of a script, functions and operators, headers and field
 ⍝ definitions **after** the removal of empty lines and any
@@ -78,16 +80,16 @@
 ⍝
 ⍝ ### :Require
 ⍝ With version 15.0 Dyalog has introduced the `:Require` keyword for defining
-⍝ dependencies. Since this keyword lives outside classes and namespaces while
-⍝ the older synonym `⍝∇:require` lives inside classes and namespaces we have a
-⍝ conflict here: `ADOC` cannot report what's not in the source code; as a
-⍝ consequence it can only report on `⍝∇:require` but not on `:Require`.
+⍝ dependencies.\\
+⍝ Since this keyword lives outside classes and namespaces while the older synonym `⍝∇:require` 
+⍝ lives inside classes and namespaces we have a conflict here: `ADOC` cannot report what's not
+⍝ in the source code; as a consequence it can only report on `⍝∇:require` but not on `:Require`.
 ⍝
 ⍝ ### Markup syntax
 ⍝
 ⍝ One can use Markdown, a simplified markup language, within the comment sections
 ⍝ of public functions and the so-called leading comments of scripts. `ADOC`
-⍝ itself can be used as an example: it makes use of all markups available:
+⍝ itself can be used as an example: it makes use of all markups available, most importantly:
 ⍝
 ⍝ * Headers
 ⍝ * Lists
@@ -98,20 +100,19 @@
 ⍝   * APL code blocks
 ⍝ * Tables
 ⍝ * Paragraphs
-⍝ * Misc
-⍝
-⍝ ADOC uses the APLTree class `MarkAPL` for converting the Markdown to HTML. Therefore
+⍝ 
+⍝ But there is no limitation: every feature that is available in MarkAPL can be used and will
+⍝ be processed by `ADOC`.\\
+⍝ `ADOC` uses the APLTree class `MarkAPL` for converting the Markdown to HTML. Therefore
 ⍝ you can read up on how to do the mark up in the
 ⍝ [MarkAPL cheat sheet](http://download.aplteam.com/MarkAPL_CheatSheet.html) or in the laborious
 ⍝ [full MarkAPL documentation](http://download.aplteam.com/MarkAPL.html).\\
-⍝ There is however one difference and one addition:
-⍝ * In ADOC you can insert a line break (`<br />`) by having a `\` character at the end of a line.
-⍝   You can enforce a new paragraph by adding two backslashes at the end of a line.
-⍝
+⍝ There are however two additional features available:
+⍝ 1. You can insert a line break (`<br />`) by having a single backslash character (`\`) at the 
+⍝    end of a line.
+⍝ 1. You can enforce a new paragraph by adding two backslashes at the end of a line.\\
 ⍝   This can be useful when you need to document plenty of method calls etc in order to avoid
 ⍝   a large number of empty lines.
-⍝ * Code blocks must be fenced with three `~` characters; the use of back-ticks for code-fencing
-⍝   is **not** supported by ADOC.
 ⍝
 ⍝ #### Leading comments in functions and operators
 ⍝ Headers within the leading comments in public functions and operators are limited to level six.
@@ -121,34 +122,35 @@
 ⍝ ### Namespaces
 ⍝
 ⍝ #### Overview
-⍝ Since version 6.0 ADOC supports not only scripted namespaces but also ordinary namespaces.
-⍝ ADOC can process any namespace that can be saved with SALT's `Save` command.\\
+⍝ Since version 6.0 `ADOC` supports not only scripted namespaces but also ordinary namespaces.
+⍝ `ADOC` can process any namespace that can be saved with SALT's `Save` command.\\
 ⍝
 ⍝ #### Public & private functions, operators & variables
 ⍝ By default all functions, operators and variables are public.\\
-⍝ In namespaces ADOC looks for a function `Public`.\\
+⍝ In namespaces `ADOC` looks for a function `Public`.\\
 ⍝ If such a function exists it will be expected to return a vector of text vectors.
 ⍝ Those are interpreted as the names of all public functions, operators and variables.\\
 ⍝ That means that by implementing this function you can define what's public and what's not.
 ⍝
 ⍝ #### Scripted versus ordinary namespaces
-⍝ ADOC will process leading comment lines in a scripted namespace in the same way
+⍝ `ADOC` will process leading comment lines in a scripted namespace in the same way
 ⍝ it does with classes and interfaces.\\
 ⍝ However, in ordinary namespaces their cannot be any "leading" comments. As a substitute you may
 ⍝ either create a variable (a vector of text vectors) or define a function `ADOC_Doc` that carries
 ⍝ nothing but comments (deprecated since version 6.5.0).\\
 ⍝ The variable can hold the Markdown as is, without the leading `⍝` symbol; that makes editing easier.
 ⍝ If it is a function then it must carry nothing but comment lines. These comment lines will be treated
-⍝ as the "leading comments". The function itself will not be listed, not even when it is mentioned by `Public`.\\
+⍝ as the "leading comments". The function itself will not be listed, not even when it is mentioned by 
+⍝ `Public`.\\
 ⍝ These are two examples:
 ⍝
-⍝ ~~~
+⍝ ```
 ⍝ ⍝ Variable
 ⍝ 'Temp'#.⎕NS''
 ⍝ #.Temp.ADOC_Doc←'My comment from line 1' '' '* This' '* That'
 ⍝ #.Temp.⎕FX'r←Hello' 'r←''Word'''
 ⍝ ]ADoc #.Temp.Doc
-⍝ ~~~
+⍝ ```
 ⍝
 ⍝ ~~~
 ⍝ ⍝ Function
@@ -160,8 +162,8 @@
 ⍝
 ⍝ Prior to version 6.0 `Browse` accepted the name of a function within an ordinary namespace;
 ⍝ this is not supported any more. If you've used this feature: just rename your function to
-⍝ `ADOC_Doc` and create a function `Public` so that it returns an empty vector (=no public stuff whatsoever)
-⍝ and you get exactly the same behaviour.
+⍝ `ADOC_Doc` and create a function `Public` so that it returns an empty vector (=no public stuff
+⍝ whatsoever) and you get exactly the same behaviour.
 ⍝
 ⍝ ### Reserved names
 ⍝ Since version 3.0 `ADOC` looks for a number of fixed names. If there
@@ -183,14 +185,15 @@
 ⍝
 ⍝ #### History
 ⍝ If this function exists then it must be one of:
-⍝ * A niladic function that returns either a simple text vector or a vector of text vectors (now deprecated).
-⍝ * A niladic function that returns **not** result and carries Markdown as comments.
+⍝ * Function that returns either a simple text vector or a vector of text vectors 
+⍝   (now deprecated).
+⍝ * Function that returns **no** result and carries Markdown as comments.
 ⍝
 ⍝ #### Version
 ⍝ Must return a vector of length three:
 ⍝
 ⍝ 1. The name, for example `ADOC`
-⍝ 1. A string with version information, for example "1.2.3"
+⍝ 1. A string with version information, for example "1.2.3" or "17.0.1.13245"
 ⍝ 1. A string representing a date, for example "2009-01-01"
 ⍝
 ⍝ Example: A function returning this:
@@ -211,7 +214,7 @@
 ⍝
 ⍝ Author: Kai Jaeger ⋄ APL Team Ltd ⋄ <http://aplteam.com>
 ⍝
-⍝ Homepage: <https://github.com/aplteam/ADOC
+⍝ Homepage: <https://github.com/aplteam/ADOC>
 
     :Include ##.APLTreeUtils
 
@@ -219,13 +222,18 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.6.3.14' '2018-11-06'
+      r←(⍕⎕THIS)'6.7.0.39' '2019-01-15'
     ∇
 
     ∇ History
       :Access Public Shared
-      ⍝ * 6.6.3
-      ⍝   * Bug fix: the user command script depended also on root properties being exposed. No other changes.
+      ⍝ * 6.7.0 
+      ⍝   * Restriction removed: code block can now be marked with three back-ticks as well.
+      ⍝   * Documentation polished.
+      ⍝   * Bug fix: if both shared and instance methods are to be listed then only a TOC for
+      ⍝     shared methods was provided, and the methods apparently were not sorted alphabetically.
+      ⍝   * The properties `BrowserName` and `MaxWidthInChars` --- which has been marked as deprecated 
+      ⍝     for a long time --- were removed from ADOC.
       ⍝\\
       ⍝ For information regarding older versions see <https://github.com/aplteam/Meddy/releases>
     ∇
@@ -257,15 +265,15 @@
       }
 
     ∇ {r}←Fill_META list;this;isRef;scriptRef
-    ⍝ Runs a loop on all items in `list` wich can be a single ref or the fully qualified name of a
-    ⍝ function or a vector (and mixture) of both. Refs are pointing to classes, interfaces or namespaces
-    ⍝ while fully qualified names are special cases were a single function in an ordinary namespace is
-    ⍝ expected to carry comments that represent the documentation.
+    ⍝ Runs a loop on all items in `list` wich can be a single ref or the fully qualified name 
+    ⍝ of a function or a vector (and mixture) of both. Refs are pointing to classes, interfaces 
+    ⍝ or namespaces while fully qualified names are special cases were a single function in an 
+    ⍝ ordinary namespace is expected to carry comments that represent the documentation.
     ⍝
-    ⍝ This function (and its sub-functions) assemble a variable _META with contains for every single
-    ⍝ "thing" (method, field, function, operator, variable, depending on the source to be investigated)
-    ⍝ all information ADOC is supposed to show in one way or another. Later from this a list (`Info`)
-    ⍝ or HTML output (`Browse`) is generated
+    ⍝ This function (and its sub-functions) assemble a variable _META with contains for every 
+    ⍝ single "thing" (method, field, function, operator, variable, depending on the source to be 
+    ⍝ investigated) all information ADOC is supposed to show in one way or another. Later from 
+    ⍝ this a list (`Info`) or HTML output (`Browse`) is generated
       r←⍬
       isRef←{⍵≢⍕⍵}
       :If 2>≡list
@@ -295,10 +303,8 @@
     :Field Public Shared nl←⎕UCS 13 10  ⍝ By default CR+LF
     :Field Public Shared InLineCodePadding←5  ⍝ Left & right padding for inline APL code in px. Will be reset by calling `RestoreDefaults`.
     :Field Public Shared InLineCodeColor←'#961c1c' ⍝ The color used for APL inline code. Will be reset by calling `RestoreDefaults`.
-    :Field Public Shared MaxWidthInChars←0 ⍝ **Deprecated** and not used any more
 
     :Field Private Shared _BrowserPath←''
-    :Field Private Shared _BrowserName←''
     :Field Private Shared _Title←''   ⍝ Top-level caption; empty=ignored.
     :Field Private Shared _Inherit←1
     :Field Private Shared _IgnorePattern←''
@@ -321,7 +327,7 @@
 
     :Property Inherit
     :Access Public Shared
-    ⍝ Defaults to 1. To suppress inheritance, set this to 0
+    ⍝ Defaults to 1. To suppress inheritance, set this to 0.
         ∇ r←get
           r←_Inherit
         ∇
@@ -334,7 +340,7 @@
     :Property IgnorePattern
     :Access Public Shared
     ⍝ Defaults to an empty vector. If this is set, all members with names starting
-    ⍝ with {IgnorePattern} will be ignored by ADOC.
+    ⍝ with `IgnorePattern` will be ignored by ADOC.
         ∇ r←get
           r←_IgnorePattern
         ∇
@@ -345,24 +351,11 @@
         ∇
     :EndProperty
 
-    :Property  BrowserName
-    ⍝ By definition any HTML file is displayed with the default browser of by the
-    ⍝ browser defined by the `BrowserPath` property, see there for details.
-    ⍝ The property "BrowserName" is deprecated now.
-    :Access Public shared
-        ∇ r←get
-          r←''
-        ∇
-        ∇ set arg
-        ∇
-    :EndProperty
-
     :Property  BrowserPath
     ⍝ By definition any HTML file is displayed with the default browser.\\
     ⍝ If you want to display an HTML page with a different browser you must provide the
     ⍝ full path name including the name of the EXE.\\
-    ⍝ This property was temporarily inactive but was brought back to life with
-    ⍝ version 3.4.0
+    ⍝ This property replaced `BrowserName` which was finally removed in 6.7.0.
     :Access Public shared
         ∇ r←get
           r←''
@@ -373,7 +366,7 @@
 
     :Property  htmlFinalised
     ⍝ HTML cannot be written to disk if this is not 1.
-    ⍝ Calling method `FinaliseHtml` will do this, while method `Reset` sets it to 0.
+    ⍝ Calling the method `FinaliseHtml` will do this, while the method `Reset` sets it to 0.
     :Access Public Instance
         ∇ r←get
           r←_htmlFinalised
@@ -381,7 +374,7 @@
     :EndProperty
 
     :Property WithRunningNumbers
-    ⍝ Add a running number to the class title if true and more than one class got processed.
+    ⍝ Add a running number to the class title if true and more than one class is provided.
     :Access Public Instance
         ∇ r←get
           r←_WithRunningNumbers
@@ -393,7 +386,7 @@
 
     :Property FullDocName
     ⍝ Can be set by calling the appropriate constructor or by direct setting;
-    ⍝ `ProcessAsHtml` will assign the second parameter to FullDocName
+    ⍝ `ProcessAsHtml` will assign the second parameter to `FullDocName`.
     :Access Public instance
         ∇ r←get
           r←_FULL_DOC_NAME
@@ -405,7 +398,7 @@
 
     :Property Creator
     ⍝ The `Creator` is put into the footer.
-    ⍝ Defaults to `⎕AN`. Is ignored if empty
+    ⍝ Defaults to `⎕AN`. Is ignored if empty.
     :Access Public instance
         ∇ r←get
           r←_Creator
@@ -438,8 +431,8 @@
     :EndProperty
 
     :Property OutputType
-    ⍝ Can be either "Web" or "Doc". "Doc" means that all links like "Goto class|top"
-    ⍝ as well as sub-listings for field, properties and methods are removed. Default="Web".
+    ⍝ Can be either "Web" or "Doc". "Doc" means that all links like "Goto class\|top"
+    ⍝ as well as sub-listings for field, properties and methods are removed. Default is "Web".
     :Access Public instance
         ∇ r←get
           r←_OutputType
@@ -461,7 +454,7 @@
     :Property ignoreCopyright
     :Access Public Shared
     ⍝ Defaults to 1: If there is a niladic function `Copyright` (public shared) the result is processed,
-    ⍝ otherwise ignore that functions, if there is any.
+    ⍝ otherwise ignore that function, if there is any.
         ∇ r←get
           :If 2=⎕NC'_ignoreCopyright'
               r←_ignoreCopyright
@@ -478,7 +471,7 @@
     :Property ignoreHistory
     :Access Public Shared
     ⍝ Defaults to 1: If there is a niladic function `History` (public shared) the result is processed,
-    ⍝ otherwise ignore that functions, if there is any.
+    ⍝ otherwise ignore that function, if there is any.
         ∇ r←get
           :If 2=⎕NC'_ignoreHistory'
               r←_ignoreHistory
@@ -495,7 +488,7 @@
     :Property ignoreVersion
     :Access Public Shared
     ⍝ Defaults to 1: If there is a niladic function `Version` (public shared), the result is processed,
-    ⍝ otherwise ignore that functions, if there is any.
+    ⍝ otherwise ignore that function, if there is any.
         ∇ r←get
           :If 2=⎕NC'_ignoreVersion'
               r←_ignoreVersion
@@ -570,7 +563,6 @@
       _BrowserPath←''
       _OutputType←'Web'
       _IncludeCss←1
-      _BrowserName←''
       _CssPath←''
       _ignoreCopyright←0
       _ignoreVersion←0
@@ -587,7 +579,6 @@
       :Access Public Shared
     ⍝ Restore default values for all fields and properties.
       _BrowserPath←''
-      _BrowserName←'IE'
       _Inherit←1
       _IgnorePattern←''
       CssScreen←'screen'
@@ -597,7 +588,7 @@
       view←1
     ∇
     ∇ {filename}←SaveHtml2File filename;head;html;⎕WX
-      ⍝ Save the HTML into "filename".
+      ⍝ Save the HTML into `filename`.
       :Access public instance
       ⎕WX←1
       :If _htmlFinalised
@@ -615,7 +606,7 @@
     ∇
 
     ∇ r←ReportEmbeddedClasses refToClass;html;source;where;bool;buffer
-    ⍝ Looks for classes embedded into `refToClass` and returns a vtv with names.
+    ⍝ Looks for classes embedded into `refToClass` and returns a vector of character vectors with names.
       :Access Public Shared
       r←''
       source←{↓⍵⌽⍨+/∧\' '=⍵}⊃⎕SRC refToClass
@@ -715,7 +706,7 @@
           :For chapterNo :In ⍳⍴_META
               vs←vs CreateUpperPartOfHTML_Page chapterNo
               vs.(firstIncludes firstConstructor firstDestructor firstProperty firstField firstInterface)←1
-              vs.(firstMethod firstInterfaceMethod firstOpr firstVars)←1
+              vs.(firstInstanceMethod firstSharedMethod firstInterfaceMethod firstOpr firstVars)←1
               vs.methodType←''                     ⍝ Will become either "Instance" or "Shared"
               vs←vs LoopOverPublicStuff chapterNo
               _DOCS,←⊂vs.formattedScriptName
@@ -799,6 +790,8 @@
     ∇
 
     ∇ {tempFilename}←{x}Browse scriptRef;PathToExe;browserPath;bool;allowed;cs;Note;⎕TRAP
+         ⍝ This is the main method when ADOC is used without creating an instance and the documentation
+         ⍝ is supposed to be beautified and displayed in a browser.\\
          ⍝ By default, the default browser is used to display the result. The exception is that when
          ⍝ the current session is connected to Ride, then the Ride browser is used.\\
          ⍝ You can change this by setting `BrowserPath` to the full path pointing
@@ -830,8 +823,8 @@
          ⍝ If `scriptRef` is empty, the formerly created HTML is displayed.\\
          ⍝ Note that in this case any formerly created HTML remains
          ⍝ untouched. Therefore it can still be used for other purposes.\\
-         ⍝ You can pass the name of one or more embedded classes (classes locally defined
-         ⍝ within a class script - see `ADOC` itself as an example) or embedded namespaces.
+         ⍝ You can pass the name of one or more embedded classes --- classes locally defined
+         ⍝ within a class script; see `ADOC` itself as an example --- or embedded namespaces.
          ⍝ You get then a document which contains only these embedded
          ⍝ class(es)/namespace(s).\\
          ⍝ Note that this syntax is available only when a single
@@ -899,7 +892,8 @@
     ∇ r←{verbose}Info scriptName;data;my;nl;keywords
        ⍝ Prints the most important facts about the given script to the session window.\\
        ⍝ By default only the names of functions are reported. To get syntax information,
-       ⍝ pass either a 1 or "full" as left argument.
+       ⍝ pass either a 1 or `'full'` as left argument.\\
+       ⍝ Together with `Browse` this is the second major shared method.
       :Access Public Shared
       (∆EM←'Please pass references only!')⎕SIGNAL 11/⍨{⍵≡⍕¨⍵}scriptName
       r←''
@@ -1007,7 +1001,7 @@
     ∇
 
     ∇ ps←CreateBrowseDefaults
-    ⍝ Creates a namespace and populates it with defaults values for the `Browse` method.
+    ⍝ Creates a namespace and populates it with default values for the `Browse` method.
     ⍝ The result namespace can then be passed as left argument to `ADOC.Browse`.
       :Access Public Shared
       ps←⎕NS''
@@ -1324,23 +1318,32 @@
       vs.firstField←firstField
     ∇
 
-    ∇ vs←vs CreateHTML_ForMethodAndFunction(data chapterNo);Body;firstMethod;methodType;pluralS;type
+    ∇ vs←vs CreateHTML_ForMethodAndFunction(data chapterNo);Body;firstInstanceMethod;methodType;pluralS;type;firstSharedMethod
       Body←''
-      firstMethod←vs.firstMethod
+      firstInstanceMethod←vs.firstInstanceMethod
+      firstSharedMethod←vs.firstSharedMethod
       methodType←'access'GetSingle data
-      :If firstMethod                                                     ⍝ this catches the first one. Further group changes are identified by a type change because these are sorted
-          pluralS←(1<{+/⍵[1]≡¨⍵}GetSingle¨vs.publicStuff)/'s'
-          type←(GetSingle data),pluralS
-          Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}methodType,' ',type
-          Body,←PrepareSubLinks vs.publicStuff methodType vs.formattedScriptName
-          firstMethod←0
-      :ElseIf methodType≢'access'GetSingle data
-          :If 'Public'≡'access'GetSingle data                             ⍝ these are interface methods
-              Body,←({(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}('Method',(1<+/('Public'∘≡¨'access'Get vs.publicStuff)∧~(Get vs.publicStuff)∊'Constructor' 'Interface Method')/'s'),' from Interface')
+      :If 'Instance'≡methodType
+          :If firstInstanceMethod
+              pluralS←(1<{+/⍵[1]≡¨⍵}GetSingle¨vs.publicStuff)/'s'
+              type←(GetSingle data),pluralS
+              Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}methodType,' ',type
+              Body,←PrepareSubLinks vs.publicStuff methodType vs.formattedScriptName
+              firstInstanceMethod←0
           :Else
-              Body,←({(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}('access'GetSingle data),(' Method',(1<+/'Method'∘≡¨↑¨Get vs.publicStuff)/'s'))
+              Body,←({(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}('Method',(1<+/('Public'∘≡¨'access'Get vs.publicStuff)∧~(Get vs.publicStuff)∊'Constructor' 'Interface Method')/'s'),' from Interface')
           :EndIf
-          Body,←PrepareSubLinks vs.publicStuff methodType vs.formattedScriptName
+      :EndIf
+      :If 'Shared'≡methodType
+          :If firstSharedMethod
+              pluralS←(1<{+/⍵[1]≡¨⍵}GetSingle¨vs.publicStuff)/'s'
+              type←(GetSingle data),pluralS
+              Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}methodType,' ',type
+              Body,←PrepareSubLinks vs.publicStuff methodType vs.formattedScriptName
+              firstSharedMethod←0
+          :ElseIf methodType≢'access'GetSingle data
+              Body,←({(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}('Method',(1<+/('Public'∘≡¨'access'Get vs.publicStuff)∧~(Get vs.publicStuff)∊'Constructor' 'Interface Method')/'s'),' from Interface')
+          :EndIf
       :EndIf
       Body,←vs.topRef,({(MakeBookmark ⍵),('h5 class="aplname" id="',GetChapterNo,':',('name'GetSingle data),'"')tag ⍵}('name'GetSingle data))
       Body,←SyntaxHelper'syntax'GetSingle data
@@ -1351,7 +1354,8 @@
           Body,←1 PolishComments('comments'GetSingle data)0 0 chapterNo
       :EndIf
       vs.Body,←Body
-      vs.firstMethod←firstMethod
+      vs.firstInstanceMethod←firstInstanceMethod
+      vs.firstSharedMethod←firstSharedMethod
     ∇
 
     ∇ vs←vs CreateHTML_ForProperty(data chapterNo);firstProperty;Body
@@ -1433,7 +1437,7 @@
           :ElseIf 'Interface Method'≡type
               noOf←+/bool←('Interface Method'∘≡¨Get data)
           :Else
-              noOf←+/bool←('Method'∘≡¨Get data)∧type∘≡¨'access'Get data
+              noOf←+/bool←((Get data)∊'Method' 'Function')∧type∘≡¨'access'Get data
           :EndIf
           :If 2≥noOf
               r←''
@@ -1541,7 +1545,7 @@
     ∇ r←{convertHeader}PolishComments(markdown hasContainers isContainer chapterNo);ns;parms
     ⍝ Interprets the "leading" comments as extended Markdown.
     ⍝ Via the (optional) left argument one can force any headers in `markdown` to be converted to <h6>.
-    ⍝ This makes sense in case it id a function/operator.
+    ⍝ This makes sense in case it is a function/operator.
       :If 0∊⍴∊markdown
           r←''
       :Else
@@ -1858,7 +1862,7 @@
     ∇ {r}←{embeddedClassNames}Analyze_ scriptRef;vs;buffer;bool;tmpFilename;source
       ⍝ Analyzes a particular script and appends the result to the _META array.
       ⍝ If the left argument is specified, only that (or these) embedded class(es) gets analyzed.
-      ⍝ Returns either an empty vector or a vtv with the name(s) of any embedded classes.
+      ⍝ Returns either an empty vector or a vector of character vectors with the name(s) of any embedded classes.
       r←⍬
       vs←⎕NS''
       vs.publishedStuff←vs.inheritsFrom←''
@@ -2033,7 +2037,8 @@
               vs.topRef,←'div class="goto"'tag'Go to: ',('a href="#verytop"')tag'top'
           :EndIf
           vs.topLinks←0 2⍴''
-          :If 5<+/bool←2=↑∘⍴∘⍴¨vs.publicStuff
+          :If 0<≢vs.publicStuff
+              bool←2=↑∘⍴∘⍴¨vs.publicStuff
               types←Get bool/vs.publicStuff
               :If types∊⍨⊂'Constructor'
                   vs.topLinks⍪←'ctor'(('a href="#',GetChapterNo,':ctor"')tag'Constructors')
@@ -2356,7 +2361,7 @@
       ⍝ If we got to this stage, it is obviously an ordinary namespace
       :If 9≠ref.⎕NC⍕name
           999 ⎕SIGNAL⍨∆EM←'"',(⍕ref),'.',name,'" is not a namespace or does not exist'
-      :ElseIf ref.{0::0 ⋄ `⊣⎕SRC⍎⍵}⍕name
+      :ElseIf ref.{0::0 ⋄`⊣⎕SRC⍎⍵}⍕name
           . ⍝ ???
       :Else
           :With ⍎(⍕ref),'.',⍕name
@@ -2432,8 +2437,8 @@
     ∇
 
     ∇ r←CompressList vtv;buffer;sep;noOf;bool;lc;noOf
-      ⍝ Take a vtv which is supposed to be a list (ordered or not) and
-      ⍝ put lines together that are not separated by a blank line.
+      ⍝ Takes a vector of character vectors which is supposed to be a list (ordered or not) and
+      ⍝ puts lines together that are not separated by a blank line.
       lc←⌊/+/∧\' '=⊃vtv         ⍝ Leading chars
       :If '*'∧.=↑¨lc
           r←vtv
@@ -2627,7 +2632,7 @@
     ∇
 
     ∇ r←Compress vtv;b;noOf;buffer
-    ⍝ Put together those items in vtv which end with a " _"
+    ⍝ Put together those items in vector of character vectors which end with a " _"
       r←''
       :While ~0∊⍴vtv
           b←'_'=↑¨¯1↑¨vtv

@@ -3,7 +3,7 @@ Advanced ADOC
 
 This document addresses the advanced features of ADOC which can only be used when ADOC it loaded into a workspace; these features are **not** available when ADOC is used as a user command.
 
-In order to use the advanced features of ADOC you must either load `ADOC.dws` or coy `ADOC` from this workspace. You find it in a folder ADOC\ which is a sibling of where you've installed the ADOC user command.
+In order to use the advanced features of ADOC you must either load `ADOC.dws` or coy `ADOC` from this workspace. You find it in the folder where you've installed the ADOC user command.
 
 
 ## Main method
@@ -18,24 +18,23 @@ The funcion returns the filename of the HTML file as a shy result.
 Parameter space
 ---------------
 
-A parameter space is by definition a namespace that carries variables recognized by `ADOC` as parameters. Such a namespace can be created by `⎕NS` and then populated with variables.
+A parameter space is by definition a namespace that carries variables recognized by `ADOC` as parameters. 
 
-However, it is recommended to call `ADOC.CreateBrowseDefaults` which returns such a namespace populated with all the variables `ADOC` would recognize with
-reasonable defaults which you change in order to make them suit your needs. Such a namespace can then be passed as left argument to the `Browse` method.
+Such a namespace can be created by `⎕NS` and then populated with variables. However, it is recommended to call `ADOC.CreateBrowseDefaults` which returns such a namespace populated with all the variables `ADOC` would recognize with reasonable defaults which you change in order to make them suit your needs. 
+
+Such a namespace can then be passed as left argument to the `Browse` method.
 
 
 ### Reserved names
 Since version 3.0 `ADOC` looks for a number of fixed names. If there is a function with such a name to be found that function is executed and the
 result returned by that function is taken into account. The reserved names are `Version`, `History` and `Copyright`.
 
-In case there happens to be a function in a class that has other purposes than delivering information for ADOC then you cen set the `ignoreCopyright`, `ignoreHistory` and `ignoreVersion` parameters to 1. That prevent `ADOC` from treating those functions as outlined earlier.
+In case there happens to be a function in a class that has other purposes than delivering information for ADOC then you can set the `ignoreCopyright`, `ignoreHistory` and `ignoreVersion` parameters to 1. That prevent `ADOC` from treating those functions as outlined earlier.
 
 
 ### Embedded classes
 If you would like to create an HTML report on embedded classes within a host
 class you can do this by setting `embeddedClassesFlag←1` within a [parameter space](#Parameter space).
-
-Note that this feature is currently not available when ADOC is used as a user command.
 
 
 ### CSS Style sheets
@@ -44,8 +43,9 @@ creates its own style sheets dynamically.
 
 
 ### Friendly Classes
-Friendly classes are classes which can see each other's private members. For the time being they are not available in Dyalog. However, depending on the application
-friendly classes might be indispensable. As circumvention one can use naming conventions to achieve this. For example, you could define that all methods, fields and properties with names starting with an underscore are "friendly".
+Friendly classes are classes which can see each other's private members. For the time being they are not available in Dyalog. 
+
+However, depending on the application friendly classes might be indispensable. As circumvention one can use naming conventions to achieve this. For example, you could define that all methods, fields and properties with names starting with an underscore are "friendly".
 
 You can tell `ADOC` to suppress all members with such a pattern by defining:
 
