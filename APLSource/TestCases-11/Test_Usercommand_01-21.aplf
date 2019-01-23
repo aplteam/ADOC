@@ -5,6 +5,6 @@
 
  shouldBe←#.APLTreeUtils.dlb⍕1↓##.ADOC.Version
  itIs←⎕SE.UCMD'ADOC -version'
- →PassesIf shouldBe≡itIs
+ →PassesIf≡/{⍵/⍨3>+\'.'=⍵}¨shouldBe itIs
 
  R←∆OK

@@ -222,20 +222,16 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.7.0.39' '2019-01-15'
+      r←(⍕⎕THIS)'6.7.1.43' '2019-01-23'
     ∇
 
     ∇ History
       :Access Public Shared
-      ⍝ * 6.7.0 
-      ⍝   * Restriction removed: code block can now be marked with three back-ticks as well.
-      ⍝   * Documentation polished.
-      ⍝   * Bug fix: if both shared and instance methods are to be listed then only a TOC for
-      ⍝     shared methods was provided, and the methods apparently were not sorted alphabetically.
-      ⍝   * The properties `BrowserName` and `MaxWidthInChars` --- which has been marked as deprecated 
-      ⍝     for a long time --- were removed from ADOC.
+      ⍝ * 6.7.1\\
+      ⍝   The formatting of code blocks, inline and block, have been changed from font-weight:bold 
+      ⍝   to normal in order to avoid a problem with aligning characters.
       ⍝\\
-      ⍝ For information regarding older versions see <https://github.com/aplteam/Meddy/releases>
+      ⍝ For information regarding older versions see <https://github.com/aplteam/ADOC/releases>
     ∇
 
     ∇ vs←CreateBody(vs chapterNo);tail;type;name;flag
@@ -2238,10 +2234,10 @@
       r,←⊂'.goto, .sublinks {display:none;}'
       r,←⊂'code, .aplinlinecode {font-family:"APL385 Unicode";}'
       r,←⊂'#sep {padding-left:4em;}'
-      r,←⊂'pre {font-family:"APL385 Unicode"; margin: 6pt 0 6pt 8pt; padding:0; line-height:1.2; font-weight:bold; border: 1pt dotted silver; padding:6pt; background-color: #f0f0f0;}'
+      r,←⊂'pre {font-family:"APL385 Unicode"; margin: 6pt 0 6pt 8pt; padding:0; line-height:1.2; border: 1pt dotted silver; padding:6pt; background-color: #f0f0f0;}'
       r,←⊂'li > pre {margin-left: 0;}'
       r,←⊂'div.aplcode {font-family:"APL385 Unicode"; font-size:120%; padding:3pt 0 3pt 7pt; margin:0;}'
-      r,←⊂'code {font-family:"APL385 Unicode", "Courier New", monospace; margin:0; padding:0; font-size:100%; display:inline; font-weight:bold; color: #950000;}'
+      r,←⊂'code {font-family:"APL385 Unicode", "Courier New", monospace; margin:0; padding:0; font-size:100%; display:inline; color: #950000;}'
       r,←⊂'pre > code {padding: 0; background-color: #f0f0f0;}'
       r,←⊂'p.small {padding:0; margin:0 0 0 2em; font-size:7pt;}'
       r,←⊂'li > p {margin:8pt 0;}'
@@ -2287,8 +2283,8 @@
       r,←⊂'p {margin: 8px; font-size: medium; line-height: 1.2;}'
       r,←⊂'p.aplname {font-family: "APL385 Unicode"; font-size: small; }'
       r,←⊂'div.goto {float: right; margin:0; padding:0 0 0 1em; }'
-      r,←⊂'span.aplinlinecode, span.aplinlinecode a {font-family: "APL385 Unicode"; font-size: medium; font-weight: bolder; color: ',InLineCodeColor,'; padding-left:',(⍕InLineCodePadding),'px;padding-right:',(⍕InLineCodePadding),'px;}'
-      r,←⊂'text.aplinlinecode {font-family: "APL385 Unicode"; font-size: medium; font-weight: bolder; color: inherent;}'
+      r,←⊂'span.aplinlinecode, span.aplinlinecode a {font-family: "APL385 Unicode"; font-size: medium; color: ',InLineCodeColor,'; padding-left:',(⍕InLineCodePadding),'px;padding-right:',(⍕InLineCodePadding),'px;}'
+      r,←⊂'text.aplinlinecode {font-family: "APL385 Unicode"; font-size: medium; color: inherent;}'
       r,←⊂'#sep {padding-left: 4em; }'
       r,←⊂'pre {font-family: "APL385 Unicode"; margin: 1em 0 1em 8px; font-size:medium; padding:3px; line-height: 1.2;'
       r,←⊂'     overflow:auto; word-break:normal !important; word-wrap:normal !important; white-space: pre !important;'
@@ -2296,7 +2292,7 @@
       r,←⊂'li > pre {margin-left: 0;}'
       r,←⊂'div.aplcode {font-family: "APL385 Unicode"; font-size: 110%; padding: 2px 0px 2px 5px; color:inherent; border: 1px solid silver; '
       r,←⊂'     background-color:inherent; margin: 5px 0 0 10px; }'
-      r,←⊂'code {font-family: "APL385 Unicode", "Courier New", Monospace; margin: 0 1px; padding: 2px 2px 2px 2px; color:inherent; font-size: 100%; display:inline; color:#950000; font-weight:bold;}'
+      r,←⊂'code {font-family: "APL385 Unicode", "Courier New", Monospace; margin: 0 1px; padding: 2px 2px 2px 2px; color:inherent; font-size: 100%; display:inline; color:#950000;}'
       r,←⊂'pre > code {padding: 0;}'
       r,←⊂'p.small {padding:0; margin:0 0 0 2em; }'
       r,←⊂'li > p {margin:8px 0;}'
