@@ -222,7 +222,7 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.7.1.43' '2019-01-23'
+      r←(⍕⎕THIS)'6.7.1.45' '2019-01-23'
     ∇
 
     ∇ History
