@@ -81,6 +81,6 @@
  ss←'<h5 class="aplname" id="ch0001:Private'
  →PassesIf 0∊⍴{⍵/⍳⍴,⍵}⊃(ss∘⍷¨⊂html)
  →PassesIf 0∊⍴'<h4\b[^>]*>Shared Functions</h4>'⎕S 0⍠('Mode' 'M')('Greedy' 0)⊣html
- →PassesIf 1=⍴'<h4\b[^>]*>Shared Operator</h4>'⎕S 0⍠('Mode' 'M')('Greedy' 0)⊣html
+ →PassesIf 1=⍴'<h4\b[^>]*>Shared Operators</h4>'⎕S 0⍠('Mode' 'M')('Greedy' 0)⊣html
 
  R←∆OK

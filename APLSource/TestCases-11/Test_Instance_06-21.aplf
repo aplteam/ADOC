@@ -11,7 +11,7 @@
  #.FilesAndDirs.DeleteFile filename
  html←↑⊃,/(⎕UCS 13),¨html
  html←(⎕UCS 13)#.APLTreeUtils.Split ∆ExtractBodyFromHTML html
- expected←'<h4 id="ch0002:ctor">Constructor</h4>' '<h4 id="ch0002:instancemethods">Instance Method</h4>'
+ expected←'<h4 id="ch0002:ctor">Constructor</h4>' '<h4 id="ch0002:instancemethods">Instance Methods</h4>'
  →PassesIf∧/expected∊html
 
  R←∆OK

@@ -18,11 +18,11 @@
 ⍝ The first one is by far the most powerful and popular option since it allows
 ⍝ one to add additional information to scripts and also ordinary namespaces:
 ⍝ all "leading comments" are treated as special information.\\
-⍝ One can use Markdown to format the documentation. See [Markup syntax](#) for details 
+⍝ One can use Markdown to format the documentation. See [Markup syntax](#) for details
 ⍝ of how to do the mark-up.
 ⍝
 ⍝ Note that `ADOC` can process sub classes. For example, `ADOC` itself comes with a sub class
-⍝ `Demo`. Therefore both `Browse` and `List` will process `ADOC.Demo`. However, you cannot 
+⍝ `Demo`. Therefore both `Browse` and `List` will process `ADOC.Demo`. However, you cannot
 ⍝ make use of `ADOC.Demo` when it is executed as a user command.
 ⍝
 ⍝ ### `ADOC` as a user command
@@ -81,7 +81,7 @@
 ⍝ ### :Require
 ⍝ With version 15.0 Dyalog has introduced the `:Require` keyword for defining
 ⍝ dependencies.\\
-⍝ Since this keyword lives outside classes and namespaces while the older synonym `⍝∇:require` 
+⍝ Since this keyword lives outside classes and namespaces while the older synonym `⍝∇:require`
 ⍝ lives inside classes and namespaces we have a conflict here: `ADOC` cannot report what's not
 ⍝ in the source code; as a consequence it can only report on `⍝∇:require` but not on `:Require`.
 ⍝
@@ -100,7 +100,7 @@
 ⍝   * APL code blocks
 ⍝ * Tables
 ⍝ * Paragraphs
-⍝ 
+⍝
 ⍝ But there is no limitation: every feature that is available in MarkAPL can be used and will
 ⍝ be processed by `ADOC`.\\
 ⍝ `ADOC` uses the APLTree class `MarkAPL` for converting the Markdown to HTML. Therefore
@@ -108,7 +108,7 @@
 ⍝ [MarkAPL cheat sheet](http://download.aplteam.com/MarkAPL_CheatSheet.html) or in the laborious
 ⍝ [full MarkAPL documentation](http://download.aplteam.com/MarkAPL.html).\\
 ⍝ There are however two additional features available:
-⍝ 1. You can insert a line break (`<br />`) by having a single backslash character (`\`) at the 
+⍝ 1. You can insert a line break (`<br />`) by having a single backslash character (`\`) at the
 ⍝    end of a line.
 ⍝ 1. You can enforce a new paragraph by adding two backslashes at the end of a line.\\
 ⍝   This can be useful when you need to document plenty of method calls etc in order to avoid
@@ -140,7 +140,7 @@
 ⍝ nothing but comments (deprecated since version 6.5.0).\\
 ⍝ The variable can hold the Markdown as is, without the leading `⍝` symbol; that makes editing easier.
 ⍝ If it is a function then it must carry nothing but comment lines. These comment lines will be treated
-⍝ as the "leading comments". The function itself will not be listed, not even when it is mentioned by 
+⍝ as the "leading comments". The function itself will not be listed, not even when it is mentioned by
 ⍝ `Public`.\\
 ⍝ These are two examples:
 ⍝
@@ -185,7 +185,7 @@
 ⍝
 ⍝ #### History
 ⍝ If this function exists then it must be one of:
-⍝ * Function that returns either a simple text vector or a vector of text vectors 
+⍝ * Function that returns either a simple text vector or a vector of text vectors
 ⍝   (now deprecated).
 ⍝ * Function that returns **no** result and carries Markdown as comments.
 ⍝
@@ -222,14 +222,20 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.7.1.45' '2019-01-23'
+      r←(⍕⎕THIS)'6.8.0.54' '2019-06-05'
     ∇
 
     ∇ History
       :Access Public Shared
-      ⍝ * 6.7.1\\
-      ⍝   The formatting of code blocks, inline and block, have been changed from font-weight:bold 
-      ⍝   to normal in order to avoid a problem with aligning characters.
+      ⍝ * 6.8.0
+      ⍝   * The link lists as well as the TOC got improved.
+      ⍝   * Bug fixes:
+      ⍝     * With the possibility to document ordinary namespaces with ADOC "Shared Operators" were introduced
+      ⍝       because you can define them as public. That was not handled by ADOC properly mainly because there
+      ⍝       are no "Shared Operators" in a class by definition.
+      ⍝     * When dfns are part of an ordinary namespace and they are defined as being public then they got
+      ⍝       listed twice, once as functions and again at the end of the document.
+      ⍝     * Under some circumstances the header "Interface method" was shown over and over again.
       ⍝\\
       ⍝ For information regarding older versions see <https://github.com/aplteam/ADOC/releases>
     ∇
@@ -261,14 +267,14 @@
       }
 
     ∇ {r}←Fill_META list;this;isRef;scriptRef
-    ⍝ Runs a loop on all items in `list` wich can be a single ref or the fully qualified name 
-    ⍝ of a function or a vector (and mixture) of both. Refs are pointing to classes, interfaces 
-    ⍝ or namespaces while fully qualified names are special cases were a single function in an 
+    ⍝ Runs a loop on all items in `list` wich can be a single ref or the fully qualified name
+    ⍝ of a function or a vector (and mixture) of both. Refs are pointing to classes, interfaces
+    ⍝ or namespaces while fully qualified names are special cases were a single function in an
     ⍝ ordinary namespace is expected to carry comments that represent the documentation.
     ⍝
-    ⍝ This function (and its sub-functions) assemble a variable _META with contains for every 
-    ⍝ single "thing" (method, field, function, operator, variable, depending on the source to be 
-    ⍝ investigated) all information ADOC is supposed to show in one way or another. Later from 
+    ⍝ This function (and its sub-functions) assemble a variable _META with contains for every
+    ⍝ single "thing" (method, field, function, operator, variable, depending on the source to be
+    ⍝ investigated) all information ADOC is supposed to show in one way or another. Later from
     ⍝ this a list (`Info`) or HTML output (`Browse`) is generated
       r←⍬
       isRef←{⍵≢⍕⍵}
@@ -612,7 +618,7 @@
           buffer←(~¨':endnamespace'∘Search¨buffer)/¨buffer
           source,←⊃,/buffer
       :EndIf
-      :If ~0∊⍴where←1↓{⍵/⍳⍴,⍵}':class'Search source
+      :If 0≠≢where←1↓{⍵/⍳⍴,⍵}':class'Search source
           r←{⍵↑⍨¯1+⌊/⍵⍳' :'}¨dmb¨{(⍴':class ')↓⍵}¨source[where],¨' '
       :EndIf
     ∇
@@ -642,7 +648,7 @@
           :EndIf
           html←'div id="maintoc"'tag html
       :EndIf
-      :If ~0∊⍴_Title
+      :If 0≠≢_Title
           html←('h1 id="topmost"'tag _Title),nl,html
       :EndIf
       html←('<a id="verytop"></a>'),nl,html
@@ -656,7 +662,7 @@
       html←'<br /><br />'
       html,←'<div id="footer">',nl
       html,←'span id="createdate"'tag'Created ',FormatDateTime ⎕TS
-      :If ~0∊⍴{2=⎕NC ⍵:⍎⍵ ⋄ ⎕AN}'Creator'
+      :If 0≠≢{2=⎕NC ⍵:⍎⍵ ⋄ ⎕AN}'Creator'
           html,←'span id="createdby"'tag' by ',_Creator,' with ',{({⍵↑⍨1+-'.'⍳⍨⌽⍵}1⊃Version),' ',(2⊃⍵),' from ',3⊃⍵}3↑Version
       :EndIf
       html,←'</div>',nl
@@ -673,17 +679,17 @@
       :Access Public Instance
       embeddedFlag←0<⎕NC'embeddedClassNames'
       embeddedClassNames←{0∊⍴⍵:⍵ ⋄ 0<⎕NC ⍵:⍎⍵ ⋄ ''}'embeddedClassNames'
-      :If 0∊⍴scriptRef
+      :If 0=≢scriptRef
           list←#.⍎¨⊂[2]#.⎕NL 9.1 9.4 9.5
           list/⍨←{16::0 ⋄ tmp←⎕SRC ⍵ ⋄ 1}¨list
           Analyze_¨list
       :ElseIf 1<⍴,scriptRef
           Analyze_¨scriptRef
-      :ElseIf ~0∊⍴embeddedClassNames
+      :ElseIf 0≠≢embeddedClassNames
           embeddedClassNames←{(,∘⊂∘,⍣(0 1∊⍨≡⍵))⍵}embeddedClassNames
           embeddedClassNames Analyze_¨⊂scriptRef
       :Else
-          :If ~0∊⍴embeddedClassNames←Analyze_ scriptRef
+          :If 0≠≢embeddedClassNames←Analyze_ scriptRef
           :AndIf embeddedFlag
               embeddedClassNames Analyze_¨⊂scriptRef
           :EndIf
@@ -704,6 +710,7 @@
               vs.(firstIncludes firstConstructor firstDestructor firstProperty firstField firstInterface)←1
               vs.(firstInstanceMethod firstSharedMethod firstInterfaceMethod firstOpr firstVars)←1
               vs.methodType←''                     ⍝ Will become either "Instance" or "Shared"
+              vs.publicStuff←SortPublicStuff vs.publicStuff
               vs←vs LoopOverPublicStuff chapterNo
               _DOCS,←⊂vs.formattedScriptName
               vs.Body←'div class="content"'tag vs.Body
@@ -727,7 +734,7 @@
     ⍝ into HTML anchors. After having called this method, the HTML is ready for being saved
     ⍝ on disk. The property flag `htmlFinalised` is therefore set to 1.
       :Access Public Instance
-      :If ~0∊⍴_HTML
+      :If 0≠≢_HTML
           CreateTopOfBody ⍬
           CreateDocFooter ⍬
           :If ~_htmlFinalised
@@ -744,7 +751,7 @@
               :Else
                   head,←'title'tag{1=⍴⍵:'ADOC: ',1 1⊃⍵ ⋄ 'ADOC: ',(⍕⍴⍵),' scripts'}_META
               :EndIf
-              :If ~0∊⍴path←_CssPath
+              :If 0≠≢path←_CssPath
                   path,←'/'/⍨~(¯1↑path)∊'/\'
                   ((path='\')/path)←'/'
               :EndIf
@@ -838,7 +845,7 @@
               :EndIf
               bool←(x.⎕NL-2)∊allowed~⊂'RefToUnicodeFile'
               x.⎕EX(~bool)⌿x.⎕NL 2      ⍝ "RefToUnicodeFile" is deprecated
-          :AndIf ~0∊⍴x.⎕NL 2 9
+          :AndIf 0≠≢x.⎕NL 2 9
               ⎕SHADOW¨'_',¨x.⎕NL-2     ⍝ Keep them local - we don't want to overwrite the real fields/props
               ⍎¨GetVarsFrom x
           :Else
@@ -857,7 +864,7 @@
      
           Fill_META scriptRef     ⍝ ←←← The work horse!
      
-          :If ~0∊⍴_META
+          :If 0≠≢_META
               _WithRunningNumbers←{¯1=⍵:1<⍴_META ⋄ ⍵}_WithRunningNumbers
               cs←⎕NS''
               CreateHtml cs
@@ -870,7 +877,7 @@
               :EndIf
           :EndIf
       :EndIf
-      :If ~0∊⍴tempFilename
+      :If 0≠≢tempFilename
       :AndIf view
           View tempFilename
       :EndIf
@@ -913,7 +920,7 @@
     ∇ r←verbose ListNamespace data;nl;buffer;bool
       r←''
       nl←,⎕UCS 13
-      :If ~0∊⍴buffer←data/⍨(Get data)∊'Function' 'Operator'
+      :If 0≠≢buffer←data/⍨(Get data)∊'Function' 'Operator'
           :If 0<+/bool←'Function'∘≡¨'type'Get buffer
               r,←nl,'Functions:'
               r,←⊃,/nl,¨'  '∘,¨((1+verbose)⊃'name' 'syntax')Get bool/buffer
@@ -929,11 +936,11 @@
       r←''
       nl←,⎕UCS 13
       :If 1∊bool←'Constructor'∘≡¨Get data
-      :AndIf ~0∊⍴buffer←'syntax'Get bool/data
+      :AndIf 0≠≢buffer←'syntax'Get bool/data
           r,←nl,'Constructors:'
           r,←⊃,/nl,¨'  '∘,¨'syntax'Get bool/data
       :EndIf
-      :If ~0∊⍴buffer←('Property'∘≡¨Get data)⌿data
+      :If 0≠≢buffer←('Property'∘≡¨Get data)⌿data
           :If 0<+/bool←'Instance'∘≡¨'access'Get buffer
               r,←nl,'Instance Properties:'
               keywords←ProcessKeywords bool/buffer
@@ -945,7 +952,7 @@
               r,←⊃,/nl,¨'  '∘,¨('name'Get bool/buffer),¨keywords
           :EndIf
       :EndIf
-      :If ~0∊⍴buffer←data/⍨'Field'∘≡¨Get data
+      :If 0≠≢buffer←data/⍨'Field'∘≡¨Get data
           :If 0<+/bool←'Instance'∘≡¨'access'Get buffer
               r,←nl,'Instance Fields:'
               r,←⊃,/nl,¨'  '∘,¨{⍵↓⍨+/∧\' '=⍵}¨'readonly'∘{∨/⍺⍷Lowercase ⍵:(' (',⍺,')'),⍨⍵ ⋄ ⍵}¨'name'Get bool/buffer
@@ -955,7 +962,7 @@
               r,←⊃,/nl,¨'  '∘,¨'name'Get bool/buffer
           :EndIf
       :EndIf
-      :If ~0∊⍴buffer←data/⍨'Method'∘≡¨Get data
+      :If 0≠≢buffer←data/⍨'Method'∘≡¨Get data
           :If 0<+/bool←'Instance'∘≡¨'access'Get buffer
               r,←nl,'Instance Methods:'
               r,←⊃,/nl,¨'  '∘,¨((1+verbose)⊃'name' 'syntax')Get bool/buffer
@@ -969,7 +976,7 @@
               r,←⊃,/nl,¨'  '∘,¨((1+verbose)⊃'name' 'syntax')Get bool/buffer
           :EndIf
       :EndIf
-      :If ~0∊⍴buffer←data/⍨'Interface Method'∘≡¨Get data
+      :If 0≠≢buffer←data/⍨'Interface Method'∘≡¨Get data
           r,←nl,'Implemented Interface(s):'
           r,←⊃,/nl,¨'  '∘,¨((1+verbose)⊃'name' 'syntax')Get buffer
       :EndIf
@@ -1054,6 +1061,16 @@
       r←↑(↑⎕CLASS ⎕THIS).##
     ∇
 
+    ∇ data←SortPublicStuff data;v1;v2
+    ⍝ Needed because the types should be sorted together but with the introduction of namespaces
+    ⍝ a dfns or an operator might be in the wrong place. We enforce a proper sequence here.
+      v1←'Include' 'Constructor' 'Destructor' 'Property' 'Field' 'Variable' 'Method' 'Function' 'Operator' 'Interface Method'
+      v2←'Inc' 'Con' 'Des' 'Prp' 'Fld' 'Var' 'Met' 'Fun' 'Opr' 'Int'
+      :If 1<≢data
+          data←data[⍋v2⍳v2[v1⍳'type'Get data]]
+      :EndIf
+    ∇
+
     ∇ {ref}←ConvertOrdinaryNamespace2Scripted ref;tmpFilename;source
       tmpFilename←¯4↓GetRefToParent.FilesAndDirs.GetTempFilename''
       'Create!'GetRefToParent.FilesAndDirs.CheckPath tmpFilename
@@ -1077,15 +1094,15 @@
       vs.(Top Body)←⊂⍬
       vs←vs CreateTop(⍴_META)chapterNo
       vs←vs LoopOverHeader chapterNo
-      vs.hasLeadingComments←~0∊⍴vs.Top
+      vs.hasLeadingComments←0≠≢vs.Top
       vs←InsertChapterToc vs
       (vs)←CreateBody(vs chapterNo)
       vs.Body,←vs.Top
       :If vs.hasLeadingComments
-      :AndIf ~0∊⍴vs.publicStuff
+      :AndIf 0≠≢vs.publicStuff
           vs.Body,←vs.topRef,{(MakeBookmark ⍵),'<h3 id="',GetChapterNo,'_tocref">',⍵,'</h3>',nl}'Reference'
       :EndIf
-      :If ~0∊⍴∊vs.require
+      :If 0≠≢∊vs.require
           vs.Body,←(MakeBookmark'Requires'),('h4 id="',GetChapterNo,':require"')tag'Requires'
           vs.Body,←⊃,/{(MakeBookmark ⍵),'h5 class="aplname"'tag ⍵}¨vs.require
       :EndIf
@@ -1118,12 +1135,12 @@
     ∇
 
     ∇ vs←ListCurly(ref vs class type);list;public
-      :If ~0∊⍴list←' '~¨⍨↓ref.⎕NL class
+      :If 0≠≢list←' '~¨⍨↓ref.⎕NL class
           :If 3=ref.⎕NC'Public'
-          :AndIf ~0∊⍴public←scriptRef.Public
+          :AndIf 0≠≢public←scriptRef.Public
               list←(list∊public)/list
           :EndIf
-      :AndIf ~0∊⍴list
+      :AndIf 0≠≢list
           vs.publishedStuff,←(⊂ref type)BuildPublishMatrix¨list
       :EndIf
     ∇
@@ -1132,9 +1149,9 @@
     ⍝ `whatsPublic` is empty in case it is not a namespace. Otherwise it is a list of names
     ⍝ that are considered public in that namespace. Variables not listed are therefore private.
       r←''
-      :If ~0∊⍴whatsPublic
-      :AndIf ~0∊⍴list←' '~¨⍨↓scriptRef.⎕NL 2
-      :AndIf ~0∊⍴list←(list∊whatsPublic)/list
+      :If 0≠≢whatsPublic
+      :AndIf 0≠≢list←' '~¨⍨↓scriptRef.⎕NL 2
+      :AndIf 0≠≢list←(list∊whatsPublic)/list
           r←LoopOverVars scriptRef list
       :EndIf
     ∇
@@ -1198,7 +1215,7 @@
 
     ∇ vs←vs LoopOverPublicStuff chapterNo;thisStuff;thisType
       :For thisStuff :In vs.publicStuff
-          ⍎(1≠≡vs.Body)/'.'                                                       ⍝ Internal test case - don't remove!
+          {⍵:.}1≠≡vs.Body                                                       ⍝ Internal test case - don't remove!
           thisType←GetSingle thisStuff
           :Select thisType
           :Case 'Include'
@@ -1234,22 +1251,21 @@
       :EndIf
       Body,←vs.topRef,({(MakeBookmark ⍵),('h5 class="aplname" id="',GetChapterNo,':',('name'GetSingle data),'"')tag ⍵}('name'GetSingle data))
       Body,←SyntaxHelper'syntax'GetSingle data
-      :If ~0∊⍴'more'GetSingle data
+      :If 0≠≢'more'GetSingle data
           Body,←PolishMore'more'GetSingle data
       :EndIf
-      :If ~0∊⍴'comments'GetSingle data
+      :If 0≠≢'comments'GetSingle data
           Body,←PolishComments('comments'GetSingle data)0 0 chapterNo
       :EndIf
       vs.Body,←Body
       vs.firstInterfaceMethod←firstInterfaceMethod
     ∇
 
-    ∇ vs←vs CreateHTML_ForVars(data chapterNo);Body;firstVars;pluralS;type
+    ∇ vs←vs CreateHTML_ForVars(data chapterNo);Body;firstVars;type
       Body←''
       firstVars←vs.firstVars
       :If firstVars
-          pluralS←(1<{+/⍵[1]≡¨⍵}GetSingle¨vs.publicStuff)/'s'
-          type←(GetSingle data),pluralS
+          type←(GetSingle data),'s'
           Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':sharedvariables"')tag ⍵}'Shared',' ',type
           Body,←PrepareSubLinks vs.publicStuff'Variable'vs.formattedScriptName
           firstVars←0
@@ -1261,18 +1277,17 @@
       vs.Body,←Body
     ∇
 
-    ∇ vs←vs CreateHTML_ForOperator(data chapterNo);Body;firstOpr;methodType;pluralS;type
+    ∇ vs←vs CreateHTML_ForOperator(data chapterNo);Body;firstOpr;methodType;type
       Body←''
       firstOpr←vs.firstOpr
       methodType←'access'GetSingle data
       :If firstOpr                                                        ⍝ this catches the first one. Further group changes are identified by a type change because these are sorted
-          pluralS←(1<{+/⍵[1]≡¨⍵}Get vs.publicStuff)/'s'
-          type←(GetSingle data),pluralS
-          Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'operators"')tag ⍵}methodType,' ',type
-          Body,←PrepareSubLinks vs.publicStuff methodType vs.formattedScriptName
+          type←(GetSingle data),'s'
+          Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':','sharedoperators"')tag ⍵}'Shared Operators'
+          Body,←PrepareSubLinks vs.publicStuff type vs.formattedScriptName
           firstOpr←0
       :ElseIf methodType≢'access'GetSingle data
-          :If 'Public'≡'access'GetSingle data                             ⍝ these are interface methods
+          :If 'Public'≡'access'GetSingle data                             
               Body,←({(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'operators"')tag ⍵}('Method',(1<+/('Public'∘≡¨'access'Get vs.publicStuff)∧~(Get vs.publicStuff)∊'Constructor' 'Interface Method')/'s'),' from Interface')
           :Else
               Body,←({(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'operators"')tag ⍵}('access'GetSingle data),(' Method',(1<+/'Method'∘≡¨↑¨Get publicStuff)/'s'))
@@ -1281,14 +1296,48 @@
       :EndIf
       Body,←vs.topRef,({(MakeBookmark ⍵),('h5 class="aplname" id="',GetChapterNo,':',('name'GetSingle data),'"')tag ⍵}('name'GetSingle data))
       Body,←SyntaxHelper'syntax'GetSingle data
-      :If ~0∊⍴'more'GetSingle data
+      :If 0≠≢'more'GetSingle data
           Body,←PolishMore'more'GetSingle data
       :EndIf
-      :If ~0∊⍴'comments'GetSingle data
+      :If 0≠≢'comments'GetSingle data
           Body,←PolishComments('comments'GetSingle data)0 0 chapterNo
       :EndIf
       vs.firstOpr←firstOpr
       vs.Body,←Body
+    ∇
+
+    ∇ vs←vs CreateHTML_ForMethodAndFunction(data chapterNo);Body;firstInstanceMethod;methodType;type;firstSharedMethod
+      Body←''
+      firstInstanceMethod←vs.firstInstanceMethod
+      firstSharedMethod←vs.firstSharedMethod
+      methodType←'access'GetSingle data
+      :If 'Instance'≡methodType
+          :If firstInstanceMethod
+              type←(GetSingle data),'s'
+              Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}methodType,' ',type
+              Body,←PrepareSubLinks vs.publicStuff type vs.formattedScriptName
+              firstInstanceMethod←0
+          :EndIf
+      :EndIf
+      :If 'Shared'≡methodType
+          :If firstSharedMethod
+              type←(GetSingle data),'s'
+              Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}methodType,' ',type
+              Body,←PrepareSubLinks vs.publicStuff methodType vs.formattedScriptName
+              firstSharedMethod←0
+          :EndIf
+      :EndIf
+      Body,←vs.topRef,({(MakeBookmark ⍵),('h5 class="aplname" id="',GetChapterNo,':',('name'GetSingle data),'"')tag ⍵}('name'GetSingle data))
+      Body,←SyntaxHelper'syntax'GetSingle data
+      :If 0≠≢'more'GetSingle data
+          Body,←PolishMore'more'GetSingle data
+      :EndIf
+      :If 0≠≢'comments'GetSingle data
+          Body,←1 PolishComments('comments'GetSingle data)0 0 chapterNo
+      :EndIf
+      vs.Body,←Body
+      vs.firstInstanceMethod←firstInstanceMethod
+      vs.firstSharedMethod←firstSharedMethod
     ∇
 
     ∇ vs←vs CreateHTML_ForField(data chapterNo);Body;firstField
@@ -1301,57 +1350,17 @@
       :EndIf
       Body,←vs.topRef,{(MakeBookmark ⍵),('h5 class="aplname" id="',GetChapterNo,':',({⍵↑⍨¯1+⍵⍳'←'}'name'GetSingle data),'"')tag ⍵}{⍵↑⍨¯1+⍵⍳'←'}'name'GetSingle data
       Body,←'p class="small"'tag(('access'GetSingle data),(('readonly'GetSingle data)/', readonly'))
-      :If ~0∊⍴'more'GetSingle data
+      :If 0≠≢'more'GetSingle data
           Body,←PolishMore'more'GetSingle data
       :EndIf
-      :If ~0∊⍴'comments'GetSingle data
+      :If 0≠≢'comments'GetSingle data
           Body,←PolishComments('comments'GetSingle data)0 0 chapterNo
       :EndIf
-      :If ~0∊⍴'syntax'GetSingle data
+      :If 0≠≢'syntax'GetSingle data
           Body,←'p class="aplcode"'tag'Initialised with: ',MarkupInlineAPL_Code{'`',⍵,'`'}dmb'syntax'GetSingle data
       :EndIf
       vs.Body,←Body
       vs.firstField←firstField
-    ∇
-
-    ∇ vs←vs CreateHTML_ForMethodAndFunction(data chapterNo);Body;firstInstanceMethod;methodType;pluralS;type;firstSharedMethod
-      Body←''
-      firstInstanceMethod←vs.firstInstanceMethod
-      firstSharedMethod←vs.firstSharedMethod
-      methodType←'access'GetSingle data
-      :If 'Instance'≡methodType
-          :If firstInstanceMethod
-              pluralS←(1<{+/⍵[1]≡¨⍵}GetSingle¨vs.publicStuff)/'s'
-              type←(GetSingle data),pluralS
-              Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}methodType,' ',type
-              Body,←PrepareSubLinks vs.publicStuff methodType vs.formattedScriptName
-              firstInstanceMethod←0
-          :Else
-              Body,←({(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}('Method',(1<+/('Public'∘≡¨'access'Get vs.publicStuff)∧~(Get vs.publicStuff)∊'Constructor' 'Interface Method')/'s'),' from Interface')
-          :EndIf
-      :EndIf
-      :If 'Shared'≡methodType
-          :If firstSharedMethod
-              pluralS←(1<{+/⍵[1]≡¨⍵}GetSingle¨vs.publicStuff)/'s'
-              type←(GetSingle data),pluralS
-              Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}methodType,' ',type
-              Body,←PrepareSubLinks vs.publicStuff methodType vs.formattedScriptName
-              firstSharedMethod←0
-          :ElseIf methodType≢'access'GetSingle data
-              Body,←({(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}('Method',(1<+/('Public'∘≡¨'access'Get vs.publicStuff)∧~(Get vs.publicStuff)∊'Constructor' 'Interface Method')/'s'),' from Interface')
-          :EndIf
-      :EndIf
-      Body,←vs.topRef,({(MakeBookmark ⍵),('h5 class="aplname" id="',GetChapterNo,':',('name'GetSingle data),'"')tag ⍵}('name'GetSingle data))
-      Body,←SyntaxHelper'syntax'GetSingle data
-      :If ~0∊⍴'more'GetSingle data
-          Body,←PolishMore'more'GetSingle data
-      :EndIf
-      :If ~0∊⍴'comments'GetSingle data
-          Body,←1 PolishComments('comments'GetSingle data)0 0 chapterNo
-      :EndIf
-      vs.Body,←Body
-      vs.firstInstanceMethod←firstInstanceMethod
-      vs.firstSharedMethod←firstSharedMethod
     ∇
 
     ∇ vs←vs CreateHTML_ForProperty(data chapterNo);firstProperty;Body
@@ -1364,10 +1373,10 @@
       :EndIf
       Body,←vs.topRef,({(MakeBookmark ⍵),('h5 class="aplname" id="',GetChapterNo,':',(',_'∘Replace¨'name'GetSingle data),'"')tag ⍵}('name'GetSingle data))
       Body,←'p class="small"'tag'(',('access'GetSingle data),({0∊⍴⍵:'' ⋄ ',',⊃{⍺,', ',⍵}/⍵}('keywords'GetSingle data),('readonly'GetSingle data)/⊂'readonly'),')'
-      :If ~0∊⍴'more'GetSingle data
+      :If 0≠≢'more'GetSingle data
           Body,←PolishMore'more'GetSingle data
       :EndIf
-      :If ~0∊⍴'comments'GetSingle data
+      :If 0≠≢'comments'GetSingle data
           Body,←PolishComments('comments'GetSingle data)0 0 chapterNo
       :EndIf
       vs.Body,←Body
@@ -1383,7 +1392,7 @@
       :EndIf
       Body,←{(MakeBookmark ⍵),'h5 class="aplname"'tag ⍵}GetSingle data
       Body,←SyntaxHelper'syntax'GetSingle data
-      :If ~0∊⍴'comments'GetSingle data
+      :If 0≠≢'comments'GetSingle data
           Body,←PolishComments('comments'GetSingle data)0 0 chapterNo
       :EndIf
       vs.Body,←Body
@@ -1412,7 +1421,7 @@
       :EndIf
       Body,←{((MakeBookmark ⍵)),'h5 class="aplname"'tag ⍵}'name'GetSingle data
       Body,←SyntaxHelper'syntax'GetSingle data
-      :If ~0∊⍴2⊃data[data[;1]⍳⊂'comments';]
+      :If 0≠≢2⊃data[data[;1]⍳⊂'comments';]
           Body,←PolishComments('comments'GetSingle data)0 0 chapterNo
       :EndIf
       vs.Body,←Body
@@ -1420,8 +1429,8 @@
     ∇
 
     ∇ r←PrepareSubLinks(data type scriptName);bool;noOf;links;list;list2;buff
-      ⍝ Prepare a link list if at least 3 items are found for a given type.
-      ⍝ Make it a numbered list if more than 4 items are linked to.
+      ⍝ Prepare a link list for a given type.
+      ⍝ Make it a numbered list if there are more than 4 items.
       r←⍬
       :If 0=⎕NC'OutputType' ⍝ is it an instance?
       :OrIf OutputType≡'Web'
@@ -1432,24 +1441,25 @@
               noOf←⍴↑,/{','∊⍵:','Split ⍵ ⋄ ⊂⍵}¨'name'Get bool/data
           :ElseIf 'Interface Method'≡type
               noOf←+/bool←('Interface Method'∘≡¨Get data)
+          :ElseIf 'Operators'≡type
+              noOf←+/bool←('Operator'∘≡¨Get data)
           :Else
               noOf←+/bool←((Get data)∊'Method' 'Function')∧type∘≡¨'access'Get data
           :EndIf
-          :If 2≥noOf
-              r←''
-          :Else
-              :If ~0∊⍴list←'name'Get bool/data
-              :AndIf ~0∊⍴list←(0<↑∘⍴¨list)/list
-                  list2←↑,/{','∊⍵:','Split ⍵ ⋄ ⊂⍵}¨list
+          :If 0<+/bool
+              :If 0≠≢list←'name'Get bool/data
+              :AndIf 0≠≢list←(0<≢¨list)/list
+                  list2←,↑,/{','∊⍵:','Split ⍵ ⋄ ⊂⍵}¨list
                   list2←{⍵↑⍨¯1+⍵⍳'←'}¨list2
                   list2←list2[SortAlphabet⍋⊃list2]
+                  list←list[SortAlphabet⍋⊃list]
                   :If 4≥⍴list2
                       links←nl,⍨⊃,/{⍺,' | ',⍵}/{('a href="#',(GetChapterNo,':',⍵),'"')tag ⍵}¨list2
                       r←'div class="sublinks"'tag links
                   :Else
                       buff←↑,/{(1+','+.=⍵)⍴⊂⍵}¨list
                       buff←',_'∘Replace¨buff
-                      links←'ol'tag⊃,/'li'∘tag¨list2{('a href="#',(GetChapterNo,':',⍵),'"')tag ⍺}¨buff
+                      links←'ol class="sublinks"'tag⊃,/'li'∘tag¨list2{('a href="#',(GetChapterNo,':',⍵),'"')tag ⍺}¨buff
                       r←'div class="sublinks"'tag links
                   :EndIf
               :EndIf
@@ -1459,7 +1469,7 @@
 
     ∇ r←type SortMethods data;bool;buffer
       ⍝ Sort the methods in "data" alphabetically. "type" is one of: Instance, Shared or Public (Interface!)
-      :If ~0∊⍴r←data
+      :If 0≠≢r←data
           bool←2=↑∘⍴∘⍴¨data
       :AndIf 1∊bool←bool\'Method'∘≡¨Get bool/data
           :If 0<+/bool←bool\type∘≡¨'access'Get bool/data
@@ -1472,10 +1482,10 @@
 
     ∇ r←type Sort data;bool;buffer
       ⍝ Sort "type" in "data" alphabetically. "type" is one of: Property, Field
-      :If ~0∊⍴r←data
+      :If 0≠≢r←data
           bool←2=↑∘⍴∘⍴¨r
           bool←bool\type∘≡¨Get bool/r
-      :AndIf ~0∊⍴buffer←bool/r
+      :AndIf 0≠≢buffer←bool/r
           buffer←{⍵[SortAlphabet⍋⊃'name'Get buffer]}buffer
           (bool/r)←buffer
       :EndIf
@@ -1485,7 +1495,7 @@
      ⍝ Look for "pattern" in html and make all occurencies an anchor.
      ⍝ Typically "pattern" is something like "http://x.y.z" or "mailto:x@y.z"
      ⍝ of "file:///foo.txt"; You can prevent this from happening with a leading "!"
-      :If ~0∊⍴where←⌽{⍵/⍳⍴,⍵}pattern⍷r←html
+      :If 0≠≢where←⌽{⍵/⍳⍴,⍵}pattern⍷r←html
           :For i :In where
               :If '!'=¯1↑r←(i-1)⌽r
                   r←(-i-2)⌽¯1↓r
@@ -1526,7 +1536,7 @@
       :Else
           prop←firstLine
       :EndIf
-      :If ~0∊⍴data←({∧\'⍝'=↑⍵~' '}¨data)/data
+      :If 0≠≢data←({∧\'⍝'=↑⍵~' '}¨data)/data
           remark←{⍵/⍨0<↑∘⍴¨,¨⍵}(⊂remark),data
       :EndIf
       remark←{0 1∊⍨≡⍵:⊂⍵ ⋄ ⍵}remark
@@ -1551,7 +1561,7 @@
           :EndIf
           markdown←ReplaceDoubleBackslashByNewLine markdown
           markdown←isContainer↓,markdown
-          :If ~0∊⍴markdown←(⌊/+/¨∧\¨markdown=' ')↓¨markdown
+          :If 0≠≢markdown←(⌊/+/¨∧\¨markdown=' ')↓¨markdown
               parms←##.MarkAPL.CreateParms
               parms.verbose←0
               parms.bookmarkLink←6
@@ -1639,7 +1649,7 @@
           :If vs.isNamespace
               access←'Shared'
               type←(1+3.1=scriptRef.⎕NC⊂name)⊃'Operator' 'Function'
-              :If ~0∊⍴vs.public
+              :If 0≠≢vs.public
               :AndIf ~(⊂name)∊vs.public
                   :Return
               :EndIf
@@ -1674,12 +1684,12 @@
       :EndIf
       remarks←''
       noOf←⍴source←RemoveMultiLocalLines source
-      :If ~0∊⍴{⍵/⍨'⍝'=↑¨⍵}buffer←1↓noOf↑source ⍝ remarks
+      :If 0≠≢{⍵/⍨'⍝'=↑¨⍵}buffer←1↓noOf↑source ⍝ remarks
           buffer/⍨←{~∨/∨/¨':access' ':implements'{⍺≡Lowercase(⍴⍺)↑⍵}¨⊂⍵}∘dlb¨buffer
           buffer↓¨⍨←{+/∧\' '=⍵}¨buffer
           buffer↑⍨←+/∧\'⍝'=↑¨buffer
           buffer⌿⍨←'⍝⍝'∘≢¨2↑¨buffer
-      :AndIf ~0∊⍴buffer←1↓¨buffer
+      :AndIf 0≠≢buffer←1↓¨buffer
           buffer←(' '=↑¨buffer)↓¨buffer
           remarks←{⍵,' '/⍨' '≠↑¯1↑⍵}¨buffer
       :EndIf
@@ -1696,7 +1706,7 @@
 
     ∇ r←AnalyzeHeader(ref header);txt;cmd;noOf;bool;bool2;flags;last;body
       r←⍬
-      :If ~0∊⍴∊header
+      :If 0≠≢∊header
           :Repeat
               (cmd txt)←{⍵{a←⍵⍳' ' ⋄ (1↓(a-1)↑⍺)(a↓⍺)}⍵}1⊃header
               :If 0<noOf←+/∧\(↑¨header)∊'⍝ '
@@ -1730,7 +1740,7 @@
               :Else
                   txt←ref.Version
               :EndIf
-              :If ~0∊⍴txt
+              :If 0≠≢txt
                   txt←,/'Version ' ' from ',¨1↓txt
                   txt←(⊂'## Version'),txt
                   :If 0∊⍴r
@@ -1755,7 +1765,7 @@
           :Else
               txt←{0 1∊⍨≡⍵:,⊂⍵ ⋄ 2=⍴⍴⍵:↓⍵ ⋄ ⍵},ref.Copyright
           :EndIf
-          :If ~0∊⍴txt
+          :If 0≠≢txt
               txt←(⊂'## Copyright'),,/txt
               :If 0∊⍴r
                   r←,⊂'Txt'txt
@@ -1773,8 +1783,8 @@
       :AndIf (⊂'History')∊ref.⎕NL-3 ⍝ Is there a "History" function?
           txt←''
           :If 0=↑↑ref.⎕AT'History'
-              :If ~0∊⍴txt←dlb 1↓ref.⎕NR'History'
-              :AndIf ~0∊⍴txt←1↓¨('⍝'=↑¨txt)/txt
+              :If 0≠≢txt←dlb 1↓ref.⎕NR'History'
+              :AndIf 0≠≢txt←1↓¨('⍝'=↑¨txt)/txt
                   txt←(⌊/+/∧\' '=⊃txt)↓¨txt
               :Else
                   source←⎕SRC ref
@@ -1797,7 +1807,7 @@
                   :EndIf
               :EndTrap
           :EndIf
-          :If ~0∊⍴txt
+          :If 0≠≢txt
               :If 2=⍴⍴txt
                   txt←{'<pre>',⍵,'</pre>'}¨↓⎕FMT txt
               :EndIf
@@ -1880,7 +1890,7 @@
       :EndTrap
       vs.require←'' ⍝ GetRequireInfo vs.origSource  ⍝ ??! One day we might look into the file this source code is coming from and report :Require
       embeddedClassNames←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'embeddedClassNames'
-      :If ~0∊⍴embeddedClassNames
+      :If 0≠≢embeddedClassNames
       ⍝ User asks for a class embedded in another one. So we simply replace "origSource" by the source of the embedded class
           :If 0∊⍴buffer←1↓vs.origSource[{⍵/⍳⍴,⍵}':class'∘{⍺≡Lowercase(⍴⍺)↑⍵}¨dmb¨vs.origSource] ⍝ 1↓ for itself
               :Return
@@ -1891,7 +1901,7 @@
           buffer{(⊂¨⍵/⍺),¨⍺⊂⍨~⍵}←':class'Search dmb¨buffer
           vs.origSource←buffer⊃⍨1⍳⍨embeddedClassNames∘≡¨{{⍵↑⍨¯1+⌊/⍵⍳' :'}(⍴':class ')↓dmb ⍵}¨1⊃¨buffer
           vs.formattedScriptName←embeddedClassNames
-      :ElseIf ~0∊⍴vs.inheritsFrom←GetBase vs.origSource scriptRef
+      :ElseIf 0≠≢vs.inheritsFrom←GetBase vs.origSource scriptRef
           (∆EM←'Unknown devisor: ',⍕vs.inheritsFrom)⎕SIGNAL 11/⍨9∨.≠⎕NC⊃vs.inheritsFrom
           Analyze_∘⍎¨vs.inheritsFrom
           vs.devisorMeta←_META[(⍴vs.inheritsFrom){1+⍵-⌽⍳⍺}⍴_META]
@@ -1913,7 +1923,7 @@
       vs.isInterface←∨/':interface '⍷Lowercase vs.headerLine←1⊃vs.origSource
       vs.devisor←{0∊⍴⍵:⍵ ⋄ ⊃{⍺,', ',⍵}/⍵}vs.inheritsFrom
       vs.scriptType←'Interface' 'Namespace' 'Class'⊃⍨5 1 4⍳10×2⊃0 1⊤|#.⎕NC⊂⍕scriptRef
-      :If ~0∊⍴embeddedClassNames
+      :If 0≠≢embeddedClassNames
           vs.scriptType,←' embedded into ',⍕scriptRef
       :EndIf
       vs.public←''
@@ -1946,7 +1956,7 @@
           vs.publishedStuff←AnalyzeResult vs.publishedStuff
           _META,←⊂vs.formattedScriptName vs.scriptType vs.devisor vs.headerDoc vs.publishedStuff vs.require
       :EndIf
-      :If ~0∊⍴vs.devisorMeta
+      :If 0≠≢vs.devisorMeta
           MergeWithDevisor¨vs.devisorMeta
       :EndIf
     ∇
@@ -1966,7 +1976,7 @@
       buffer←''
       :Repeat
           noOf←1
-          :If ~0∊⍴currentline←1⊃vs.maskedSource
+          :If 0≠≢currentline←1⊃vs.maskedSource
               this←GetNameFromHeader currentline
               name←'∇'~⍨GetNameFromHeader↑vs.origSource
               :If '∇'∊this   ⍝ Is it a function, or an operator in case of a scripted namespace?
@@ -2007,7 +2017,7 @@
 
     ∇ data←AnalyzeResult data;bool
       ⍝ Re-order the array
-      :If ~0∊⍴data
+      :If 0≠≢data
           data←data[⍋'Include' 'Constructor' 'Destructor' 'Interface' 'Property' 'Field' 'Method' 'Functions' 'Operators' 'Vars'⍳Get data]
           data←'Instance'SortMethods data
           data←'Shared'SortMethods data
@@ -2065,6 +2075,9 @@
               :EndIf
               :If types∊⍨⊂'Function'
                   vs.topLinks⍪←'sharedmethods'(('a href="#',GetChapterNo,':sharedmethods"')tag'Shared Methods')
+              :EndIf
+              :If types∊⍨⊂'Operator'
+                  vs.topLinks⍪←'sharedoperators'(('a href="#',GetChapterNo,':sharedoperators"')tag'Shared Operators')
               :EndIf
               :If types∊⍨⊂'Interface Method'
                   vs.topLinks⍪←'implementedinterfacemethods'(('a href="#',GetChapterNo,':implementedinterfacemethods"')tag'Implemented Interface(s)')
@@ -2277,8 +2290,9 @@
       r,←⊂'div.sublinks{margin: 1em; }'
       r,←⊂'div.header h2, h3 {margin-top: 10px; margin-bottom: 0;}'
       r,←⊂'h2 {margin-top: 5px; margin-bottom: 0;}'
-      r,←⊂'h3 {margin-top: 5px;margin-bottom: 0;}'
-      r,←⊂'h4,h5 {margin-top: 0; margin-bottom: 0; padding-top:0;}'
+      r,←⊂'h3 {margin-top: 5px; margin-bottom: 0;}'
+      r,←⊂'h4 {margin-top: 20px; margin-bottom: 0; padding-top:0;}'
+      r,←⊂'h5 {margin-top: 0  ; margin-bottom: 0; padding-top:0;}'
       r,←⊂'h6 {margin-top: 5px; margin-bottom: -5px; padding-top:0;}'
       r,←⊂'p {margin: 8px; font-size: medium; line-height: 1.2;}'
       r,←⊂'p.aplname {font-family: "APL385 Unicode"; font-size: small; }'
@@ -2357,11 +2371,11 @@
       ⍝ If we got to this stage, it is obviously an ordinary namespace
       :If 9≠ref.⎕NC⍕name
           999 ⎕SIGNAL⍨∆EM←'"',(⍕ref),'.',name,'" is not a namespace or does not exist'
-      :ElseIf ref.{0::0 ⋄`⊣⎕SRC⍎⍵}⍕name
+      :ElseIf ref.{0::0 ⋄ `⊣⎕SRC⍎⍵}⍕name
           . ⍝ ???
       :Else
           :With ⍎(⍕ref),'.',⍕name
-              :If ~0∊⍴⎕NL 3
+              :If 0≠≢⎕NL 3
                   list←⎕NL-3
                   script←,¨⊃,/{⎕IO←1 ⋄ ⎕ML←3 ⋄ {⍵{3.2=⎕NC⊂⍺:⍵ ⋄ (''('∇',1⊃⍵)),(1↓⍵),'∇' '  '}⎕NR ⍵}⍵}¨list
               :Else
@@ -2462,12 +2476,12 @@
       r←''
       :If _Inherit
           bool←~MaskText¨headerLine
-      :AndIf ~0∊⍴where←{⍵/⍳⍴,⍵}∨/¨':Class '∘⍷¨bool\¨bool/¨headerLine
+      :AndIf 0≠≢where←{⍵/⍳⍴,⍵}∨/¨':Class '∘⍷¨bool\¨bool/¨headerLine
           buffer←(1⊃where)⊃headerLine
           buffer←(⍴':Class ')↓dmb buffer
           buffer←({~⍵∨≠\⍵}buffer='''')/buffer
           buffer↑⍨←¯1+buffer⍳'⍝'
-      :AndIf ~0∊⍴buffer←(buffer⍳':')↓buffer
+      :AndIf 0≠≢buffer←(buffer⍳':')↓buffer
           :If ','∊buffer
               r←dmb¨{⍵⊂⍨','≠⍵}buffer
           :Else
@@ -2484,7 +2498,7 @@
       scriptName←1 1⊃devisor
       type←1 2⊃devisor
       r←''
-      :If ~0∊⍴buffer←5⊃currentMeta
+      :If 0≠≢buffer←5⊃currentMeta
           nameList←'name'∘Get 5⊃currentMeta
           :For i :In ⍳⍴1 5⊃devisor
               this←i⊃1 5⊃devisor
@@ -2523,9 +2537,9 @@
      ⍝ Inserts anchors to all "leading" <h{n}> tags and prepares a table-of-contents
      ⍝ although this might be visible only if a certain number of entries is found.
      ⍝ Adds to vs.Top
-      :If ~0∊⍴vs.Top
+      :If 0≠≢vs.Top
           Toc←⊂'<div class="toctab">'
-          level1Flag←~0∊⍴'<h1\b[^>]*>'⎕S 0⍠('Mode' 'D')⊣vs.Top
+          level1Flag←0≠≢'<h1\b[^>]*>'⎕S 0⍠('Mode' 'D')⊣vs.Top
           :If 0<+/bool←(⍳⍴vs.Top)∊1+'<h[0-9]\b[^>]*>'⎕S 0⍠('Mode' 'D')⊣vs.Top
               vs.Top←(1,1↓bool){⎕ML←0 ⋄ ⍺⊂⍵}vs.Top
               (First vs.Top)←{(1⊃⍵)(1↓⍵)}vs.Top
@@ -2540,21 +2554,21 @@
                   buffer,←'<a href="#',anchor,'">',({⍵↑⍨¯1+⍵⍳'<'}{⍵↓⍨⍵⍳'>'}this),'</a>',nl,'</div>'
                   Toc,←⊂buffer,nl
               :EndFor
-              :If ~0∊⍴vs.topLinks
+              :If 0≠≢vs.topLinks
                   Toc,←'<div class="level2"><a href="#',GetChapterNo,'_tocref">Reference</a></div>'
                   Toc,←{'<div class="level3">',⍵,'</div>'}¨vs.topLinks[;2]
               :EndIf
-              Toc←{0∊⍴⍵:'' ⋄ ⊃,/⍵}Toc
-              vs.Top←(1⊃vs.Top),{0∊⍴⍵:'' ⋄ ⊃,/⍵}1↓vs.Top
+              Toc←{0=≢⍵:'' ⋄ ⊃,/⍵}Toc
+              vs.Top←(1⊃vs.Top),{0=≢⍵:'' ⋄ ⊃,/⍵}1↓vs.Top
               :If level1Flag
                   vs.Top←First,Toc,'</div>',vs.Top
               :Else
                   vs.Top←{⍵,Toc,'</div>',(⍴⍵)↓First,vs.Top}'<div class="header">'
               :EndIf
-          :ElseIf ~0∊⍴vs.topLinks
+          :ElseIf 0≠≢vs.topLinks
               Toc,←{'<div class="level2">',⍵,'</div>'}¨vs.topLinks[;2]
               Toc,←'</div>'
-              vs.Top,←'<div id="',GetChapterNo,'_toc">',(⊃{0∊⍴⍵:'' ⋄ ⊃,/⍵}Toc),'</div>'
+              vs.Top,←'<div id="',GetChapterNo,'_toc">',(⊃{0=≢⍵:'' ⋄ ⊃,/⍵}Toc),'</div>'
           :EndIf
       :EndIf
     ∇
@@ -2630,7 +2644,7 @@
     ∇ r←Compress vtv;b;noOf;buffer
     ⍝ Put together those items in vector of character vectors which end with a " _"
       r←''
-      :While ~0∊⍴vtv
+      :While 0≠≢vtv
           b←'_'=↑¨¯1↑¨vtv
           noOf←1++/∧\b
           buffer←noOf↑vtv

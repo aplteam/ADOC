@@ -42,8 +42,8 @@
  html←#.APLTreeUtils.ReadUtf8File filename
  #.FilesAndDirs.DeleteFile filename
  html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
- →PassesIf 4=+/'Private1'⍷html
- →PassesIf 4=+/'Public2'⍷html
+ →PassesIf 6=+/'Private1'⍷html
+ →PassesIf 6=+/'Public2'⍷html
  →PassesIf 0=+/'Public4'⍷html
 
  R←∆OK
