@@ -149,7 +149,7 @@
 ⍝ 'Temp'#.⎕NS''
 ⍝ #.Temp.ADOC_Doc←'My comment from line 1' '' '* This' '* That'
 ⍝ #.Temp.⎕FX'r←Hello' 'r←''Word'''
-⍝ ]ADoc #.Temp.Doc
+⍝ ]ADoc #.Temp
 ⍝ ```
 ⍝
 ⍝ ~~~
@@ -157,7 +157,7 @@
 ⍝ 'Temp'#.⎕NS''
 ⍝ #.Temp.⎕FX 'ADOC_Doc' '⍝ My comment from line 1' '⍝ ' '⍝ * This' '⍝ * That'
 ⍝ #.Temp.⎕FX'r←Hello' 'r←''Word'''
-⍝ ]ADoc #.Temp.Doc
+⍝ ]ADoc #.Temp
 ⍝ ~~~
 ⍝
 ⍝ Prior to version 6.0 `Browse` accepted the name of a function within an ordinary namespace;
@@ -222,20 +222,13 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.8.0.54' '2019-06-05'
+      r←(⍕⎕THIS)'6.8.1.56' '2019-06-17'
     ∇
 
     ∇ History
       :Access Public Shared
-      ⍝ * 6.8.0
-      ⍝   * The link lists as well as the TOC got improved.
-      ⍝   * Bug fixes:
-      ⍝     * With the possibility to document ordinary namespaces with ADOC "Shared Operators" were introduced
-      ⍝       because you can define them as public. That was not handled by ADOC properly mainly because there
-      ⍝       are no "Shared Operators" in a class by definition.
-      ⍝     * When dfns are part of an ordinary namespace and they are defined as being public then they got
-      ⍝       listed twice, once as functions and again at the end of the document.
-      ⍝     * Under some circumstances the header "Interface method" was shown over and over again.
+      ⍝ * 6.8.1
+      ⍝   * Bug fix: the documentation came with an invalid example for ordinary namespaces.
       ⍝\\
       ⍝ For information regarding older versions see <https://github.com/aplteam/ADOC/releases>
     ∇
