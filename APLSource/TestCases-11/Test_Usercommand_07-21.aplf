@@ -13,6 +13,6 @@
      0/⍞,0/⎕←'Press <enter> to contiue;'
      ⎕SE.UCMD'ADoc #._ADOC.ADOC -title="APL is great!"'
 
-     R←~∆YesOrNo'Did ADOC show up in your default browser with the title "APL is great?"'
+     R←~1 ∆YesOrNo'Did ADOC show up in your default browser with the title "APL is great?"'
 
  :EndIf

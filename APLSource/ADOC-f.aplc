@@ -222,13 +222,16 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.8.1.56' '2019-06-17'
+      r←(⍕⎕THIS)'6.8.2.60' '2019-08-02'
     ∇
 
     ∇ History
       :Access Public Shared
-      ⍝ * 6.8.1
-      ⍝   * Bug fix: the documentation came with an invalid example for ordinary namespaces.
+      ⍝ * 6.8.2
+      ⍝   * A sub toc is not created any more for stuff like properties, functions etc. when there is just one item anyway.
+      ⍝   * Bug fixes:
+      ⍝     * For shared as well as instance methods not sub toc was created any more. This bug was introduced with 6.8.0
+      ⍝     * The documentation came with an invalid example for ordinary namespaces.
       ⍝\\
       ⍝ For information regarding older versions see <https://github.com/aplteam/ADOC/releases>
     ∇
@@ -1280,7 +1283,7 @@
           Body,←PrepareSubLinks vs.publicStuff type vs.formattedScriptName
           firstOpr←0
       :ElseIf methodType≢'access'GetSingle data
-          :If 'Public'≡'access'GetSingle data                             
+          :If 'Public'≡'access'GetSingle data
               Body,←({(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'operators"')tag ⍵}('Method',(1<+/('Public'∘≡¨'access'Get vs.publicStuff)∧~(Get vs.publicStuff)∊'Constructor' 'Interface Method')/'s'),' from Interface')
           :Else
               Body,←({(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'operators"')tag ⍵}('access'GetSingle data),(' Method',(1<+/'Method'∘≡¨↑¨Get publicStuff)/'s'))
@@ -1308,15 +1311,14 @@
           :If firstInstanceMethod
               type←(GetSingle data),'s'
               Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}methodType,' ',type
-              Body,←PrepareSubLinks vs.publicStuff type vs.formattedScriptName
+              Body,←methodType PrepareSubLinks vs.publicStuff type vs.formattedScriptName
               firstInstanceMethod←0
           :EndIf
-      :EndIf
-      :If 'Shared'≡methodType
+      :ElseIf 'Shared'≡methodType
           :If firstSharedMethod
               type←(GetSingle data),'s'
               Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}methodType,' ',type
-              Body,←PrepareSubLinks vs.publicStuff methodType vs.formattedScriptName
+              Body,←methodType PrepareSubLinks vs.publicStuff methodType vs.formattedScriptName
               firstSharedMethod←0
           :EndIf
       :EndIf
@@ -1421,7 +1423,7 @@
       vs.firstConstructor←firstConstructor
     ∇
 
-    ∇ r←PrepareSubLinks(data type scriptName);bool;noOf;links;list;list2;buff
+    ∇ r←{methodType}PrepareSubLinks(data type scriptName);bool;noOf;links;list;list2;buff
       ⍝ Prepare a link list for a given type.
       ⍝ Make it a numbered list if there are more than 4 items.
       r←⍬
@@ -1437,7 +1439,7 @@
           :ElseIf 'Operators'≡type
               noOf←+/bool←('Operator'∘≡¨Get data)
           :Else
-              noOf←+/bool←((Get data)∊'Method' 'Function')∧type∘≡¨'access'Get data
+              noOf←+/bool←((Get data)∊'Method' 'Function')∧methodType∘≡¨ 'access'Get data
           :EndIf
           :If 0<+/bool
               :If 0≠≢list←'name'Get bool/data
@@ -1446,14 +1448,16 @@
                   list2←{⍵↑⍨¯1+⍵⍳'←'}¨list2
                   list2←list2[SortAlphabet⍋⊃list2]
                   list←list[SortAlphabet⍋⊃list]
-                  :If 4≥⍴list2
-                      links←nl,⍨⊃,/{⍺,' | ',⍵}/{('a href="#',(GetChapterNo,':',⍵),'"')tag ⍵}¨list2
-                      r←'div class="sublinks"'tag links
-                  :Else
-                      buff←↑,/{(1+','+.=⍵)⍴⊂⍵}¨list
-                      buff←',_'∘Replace¨buff
-                      links←'ol class="sublinks"'tag⊃,/'li'∘tag¨list2{('a href="#',(GetChapterNo,':',⍵),'"')tag ⍺}¨buff
-                      r←'div class="sublinks"'tag links
+                  :If 1<≢list2
+                      :If 4≥≢list2
+                          links←nl,⍨⊃,/{⍺,' | ',⍵}/{('a href="#',(GetChapterNo,':',⍵),'"')tag ⍵}¨list2
+                          r←'div class="sublinks"'tag links
+                      :Else
+                          buff←↑,/{(1+','+.=⍵)⍴⊂⍵}¨list
+                          buff←',_'∘Replace¨buff
+                          links←'ol class="sublinks"'tag⊃,/'li'∘tag¨list2{('a href="#',(GetChapterNo,':',⍵),'"')tag ⍺}¨buff
+                          r←'div class="sublinks"'tag links
+                      :EndIf
                   :EndIf
               :EndIf
           :EndIf

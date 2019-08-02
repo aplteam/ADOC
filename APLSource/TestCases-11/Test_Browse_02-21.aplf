@@ -16,6 +16,6 @@
      p ##.ADOC.Browse ##.ADOC
      ##.ADOC.RestoreDefaults
 
-     R←~∆YesOrNo'Is the markup okay?'
+     R←~1 ∆YesOrNo'Is the markup okay?'
 
  :EndIf

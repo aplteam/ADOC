@@ -13,6 +13,6 @@
      0/⍞,0/⎕←'Press <enter> to contiue;'
      ⎕SE.UCMD'???Adoc'
 
-     R←~∆YesOrNo'Did ADOC show up in your default browser?'
+     R←~1 ∆YesOrNo'Did ADOC show up in your default browser?'
 
  :EndIf
