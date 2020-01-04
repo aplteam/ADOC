@@ -1,0 +1,21 @@
+ R←Test_Browse_64(stopFlag batchFlag);⎕TRAP;buffer;ps;filename;html;allVars
+⍝ `Browse` a non-scripted (ordinary) namespace embedded into another one with variables having comments.
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ 'OrdinaryNS'#.Temp.⎕CY'Tests\TestData'
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.OrdinaryNS.EXIT
+ ##.ADOC.RestoreDefaults
+ html←##.APLTreeUtils.ReadUtf8File filename
+ ##.FilesAndDirs.DeleteFile filename
+ html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
+ allVars←' '~¨⍨↓#.Temp.OrdinaryNS.EXIT.⎕NL 2
+ →T.PassesIf(⍴allVars)=+/↑∨/('>',¨allVars,¨⊂'</h5>')⍷¨⊂html
+
+ R←T._OK

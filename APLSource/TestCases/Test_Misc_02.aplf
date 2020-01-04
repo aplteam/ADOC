@@ -1,0 +1,13 @@
+ R←Test_Misc_02(stopFlag batchFlag);⎕TRAP
+⍝ Test for a WS FULL (was once the case due to stupid handling)
+⍝ R gets one of: 0=Okay, 1=test case failed, ¯1=test case was not executed due to the "batchFlag"
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TestHelp'
+ 'TestHelp'#.⎕NS''
+ #.TestHelp.⎕FIX':Class Foo'(100000⍴'⍝'),(3000⍴'⍝'),⊂':EndClass'
+
+ ##.ADOC.Browse #.TestHelp.Foo
+
+ R←T._OK

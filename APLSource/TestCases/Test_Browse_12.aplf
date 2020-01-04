@@ -1,0 +1,21 @@
+ R←Test_Browse_12(stopFlag batchFlag);⎕TRAP
+⍝ Exercise the "Browse" method with an invalid right argument
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ :Trap 11
+     {}##.ADOC.Browse'#.Temp.OrdinaryNS.Doc'
+     →T.FailsIf 1
+ :Else
+     →T.FailsIf'Right argument must be a reference pointing to a class, namespace or interface'≢⊃⎕DM
+ :EndTrap
+
+ :Trap 11
+     {}##.ADOC.Browse 1
+     →T.FailsIf 1
+ :Else
+     →T.FailsIf'Right argument must be a reference pointing to a class, namespace or interface'≢⊃⎕DM
+ :EndTrap
+
+ R←T._OK

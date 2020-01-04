@@ -1,0 +1,18 @@
+ R←Test_Usercommand_10(stopFlag batchFlag);⎕TRAP
+⍝ Test the ADOC user command with a ??? help request
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ :If batchFlag
+     R←∆NoBatchTest
+ :Else
+     ⎕←(⎕PW-1)⍴'-'
+     ⎕←'This test needs you! ADOC will show itself in the default browser.'
+     ⎕←'It''s called as a user command here!'
+     ⎕←''
+     0/⍞,0/⎕←'Press <enter> to contiue;'
+     ⎕SE.UCMD'???Adoc'
+
+     R←~1 ∆YesOrNo'Did ADOC show up in your default browser?'
+
+ :EndIf

@@ -1,0 +1,10 @@
+ R←Test_Usercommand_12(stopFlag batchFlag);⎕TRAP;html;expected;list
+⍝ Test the ADOC user command "info".
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ list←⎕SE.UCMD'Adoc #.ADOC.ADOC -summary'
+ expected←'Constructors:' 'Instance Properties:' 'Shared Properties:' 'Shared Fields:' 'Instance Methods:' 'Shared Methods:'
+ →T.PassesIf((⍴expected)⍴1)≡+/¨expected⍷¨⊂list
+
+ R←T._OK

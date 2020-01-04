@@ -1,0 +1,12 @@
+ Initial
+ ⎕IO←0
+ ∆WX←⎕WX
+ ⎕WX←0
+ ∆ObjSyntax←2401⌶0  ⍝ Switch off exposed root properties for the tests
+ ⎕SE.mb.options.ObjSyntax.root.Checked←0
+ ##.FilesAndDirs.PolishCurrentDir
+ Globals←⎕NS''
+ Globals.saveInherit←##.ADOC.Inherit
+ A←##.APLTreeUtils
+ ##.ADOC.RestoreDefaults
+ MarkAPL←##.MarkAPL

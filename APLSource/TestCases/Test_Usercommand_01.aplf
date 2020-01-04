@@ -1,0 +1,10 @@
+ R←Test_Usercommand_01(stopFlag batchFlag);⎕TRAP;shouldBe;itIs
+⍝ Test whether the -version flag works and is in line with the user command script in the current dir
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ shouldBe←##.APLTreeUtils.dlb⍕1↓##.ADOC.Version
+ itIs←⎕SE.UCMD'ADOC -version'
+ →T.PassesIf≡/{⍵/⍨3>+\'.'=⍵}¨shouldBe itIs
+
+ R←T._OK

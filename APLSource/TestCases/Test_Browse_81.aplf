@@ -1,0 +1,25 @@
+ R←Test_Browse_81(stopFlag batchFlag);body;htmlFilename;parms;⎕TRAP;myAdoc;expected;html;buff
+⍝ `Browse` an ordinary namespace with no public interface at all.
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ 'Sub'#.Temp.⎕NS''
+ #.Temp.Sub.Hello1←'World'
+ #.Temp.Sub.⎕FX'r←Hello2' 'r←''World'''
+ #.Temp.ADOC_Doc←'First comment\\' 'Second comment\\' 'Third comment'
+
+ parms←##.ADOC.CreateBrowseDefaults
+ parms.view←0
+ myAdoc←⎕NEW ##.ADOC
+ htmlFilename←myAdoc.Make #.Temp
+ html←##.APLTreeUtils.ReadUtf8File htmlFilename
+ html←⊃,/∆RemoveCSS html
+ →T.PassesIf 0=+/'Reference'⍷html  ⍝ There should be no "Rerefence" section at all
+ →T.PassesIf 0=+/'ADOC_Doc'⍷html  ⍝ There should be no "ADOC_Doc" section at all
+
+ R←T._OK
+⍝Done

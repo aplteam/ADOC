@@ -1,0 +1,30 @@
+ R←Test_Info_05(stopFlag batchFlag);newdoc;buffer;flag;sep;show;_;⎕TRAP
+⍝ Exercise the shared "Info" method
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ sep←⎕UCS 13
+ show←batchFlag∘{⍺:⍬ ⋄ ⎕←⍵ ⋄ ⍬}
+ ##.ADOC.RestoreDefaults
+
+ newdoc←'Full'##.ADOC.Info testclass_a3
+ :If Correct_testclass_015≢newdoc
+     _←show'   --- ',0⊃⎕SI
+     flag←0
+     :If ~0∊⍴buffer←↑{⍺/⍨~⍺∊⍵}/{⍵⊂⍨sep=⍵}¨Correct_testclass_015 newdoc
+         _←show'   ***  Should be contained but does:'
+         _←show buffer
+         flag←1
+     :EndIf
+     :If ~0∊⍴buffer←↑{⍺/⍨~⍺∊⍵}/{⍵⊂⍨sep=⍵}¨newdoc Correct_testclass_015
+         _←show'   ***  Should not be contained but does anyway:'
+         _←show buffer
+         flag←1
+     :EndIf
+     :If ~flag
+         _←show'   *** Contents matches, sequence doesn''t!'
+         R←T._OK ⍝ Because that's acceptable
+     :EndIf
+     →T.FailsIf flag∧stopFlag
+ :EndIf
+
+ R←T._OK

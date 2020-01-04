@@ -1,0 +1,9 @@
+ R←Test_Usercommand_04(stopFlag batchFlag);newdoc;buffer;flag;p;sep;⎕TRAP;filename;html;expected;more
+⍝ Test the ADOC user command on "browse" with simple help request
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ more←⎕SE.UCMD'?Adoc'
+ →T.PassesIf 5<(⎕UCS 13)+.=more
+
+ R←T._OK

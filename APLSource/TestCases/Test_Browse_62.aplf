@@ -1,0 +1,25 @@
+ R←Test_Browse_62(stopFlag batchFlag);⎕TRAP;buffer;ps;filename;html;allFns;public
+⍝ `Browse` a non-scripted (ordinary) namespace. Has `Version`, `Copyright`, `History`.
+ R←T._Failed
+
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ 'OrdinaryNS'#.Temp.⎕CY'Tests\TestData'
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.OrdinaryNS
+ ##.ADOC.RestoreDefaults
+ html←##.APLTreeUtils.ReadUtf8File filename
+ ##.FilesAndDirs.DeleteFile filename
+ html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
+ allFns←' '~¨⍨#.Temp.OrdinaryNS.⎕NL-3
+ public←#.Temp.OrdinaryNS.Public
+
+ →T.PassesIf((⍴public)⍴6)≡+/¨public⍷¨⊂html
+ →T.PassesIf'Copyright' 'History' 'Version'≡(∨/¨(allFns~public)⍷¨⊂html)/allFns~public
+
+ R←T._OK

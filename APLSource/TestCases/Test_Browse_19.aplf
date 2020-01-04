@@ -1,0 +1,15 @@
+ R←Test_Browse_19(stopFlag batchFlag);⎕TRAP;ps;filename;html;expected;body
+⍝ `Browse` a class that is a sub class of another class (was once a bug).
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse ##.ADOC.Demo
+ html←##.APLTreeUtils.ReadUtf8File filename
+ ##.FilesAndDirs.DeleteFile filename
+ html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html
+ →T.PassesIf∨/'<a name="Hello" />'⍷html
+
+ R←T._OK

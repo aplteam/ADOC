@@ -1,0 +1,57 @@
+ R←Test_Browse_67(stopFlag batchFlag);newdoc;buffer;flag;sep;⎕TRAP;code;html;filename;list;ps
+⍝ `Browse` a scripted namespace that has `Version`, `Copyright` and `History` plus two fns and one opr but no `Public`.
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+
+ code←''
+ code,←⊂':Namespace ScriptedNamespace'
+ code,←⊂'⍝ This namespace script is used in the test for how ADOC processes namespace scripts.'
+ code,←⊂''
+ code,←⊂'    ∇ r←Copyright'
+ code,←⊂'      r←''APL Team Ltd'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ r←Version'
+ code,←⊂'      r←''Test'' ''1.2.3'' ''2017-04-10'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇History'
+ code,←⊂'     ⍝ * 1.0.0'
+ code,←⊂'     ⍝   * Bug fixes'
+ code,←⊂'     ⍝    * Fix 1'
+ code,←⊂'     ⍝    * Fix 2'
+ code,←⊂'     ⍝    * Fix 3'
+ code,←⊂'    ∇'
+ code,←⊂'    ∇r←Hello'
+ code,←⊂'     r←''World'''
+ code,←⊂'    ∇'
+ code,←⊂'    '
+ code,←⊂'    Hello2←{'
+ code,←⊂'    ''Universe'''
+ code,←⊂'    }'
+ code,←⊂'    '
+ code,←⊂'   ∇r←(fns Hello3) arg'
+ code,←⊂'    r←fns arg'
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂':EndNamespace'
+
+ #.Temp.⎕FIX code
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.ScriptedNamespace
+ ##.ADOC.RestoreDefaults
+ html←##.APLTreeUtils.ReadUtf8File filename
+ html←∆RemoveCSS html
+ ##.FilesAndDirs.DeleteFile filename
+ →T.PassesIf 3=+/∨/¨'class="aplname"'∘⍷¨html   ⍝ Two functions and one operator, dfns and tfn
+ →T.PassesIf 1=+/∨/¨' id="Version"'∘⍷¨html     ⍝ The special "Version" function
+ →T.PassesIf 1=+/∨/¨' id="Copyright"'∘⍷¨html   ⍝ The special "copyright" function
+ →T.PassesIf 1=+/∨/¨' id="History"'∘⍷¨html     ⍝ The special "History" function
+
+ R←T._OK

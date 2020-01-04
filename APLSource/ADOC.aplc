@@ -1,0 +1,2699 @@
+:Class ADOC
+⍝ Automated Documentation Generation
+⍝ ----------------------------------
+⍝ ### Overview
+⍝ This class is useful for analysing one or more scripts or/and namespaces for
+⍝ documentation purposes. Note that the documentation is meant to be useful for
+⍝ the **user** of a class, not the designer/programmer of a class.\\
+⍝ There are three different ways to make use of `ADOC` in order to extract
+⍝ information from a class or namespace:\\
+⍝ * Creating a single HTML page with all information available, including any
+⍝   injected documentation.
+⍝   When you read this you are looking at what `ADOC` produces when processing itself.
+⍝ * Getting a list of public methods, properties and fields (classes and interfaces)
+⍝   or functions, operators and variables (namespaces).
+⍝ * Same as before but with more detailed information.\\
+⍝ The first one is by far the most powerful and popular option since it allows
+⍝ one to add additional information to scripts and also ordinary namespaces:
+⍝ all "leading comments" are treated as special information.\\
+⍝ One can use Markdown to format the documentation. See [Mark-up syntax](#) for details
+⍝ of how to do the mark-up.
+⍝ Note that `ADOC` can process sub classes. For example, `ADOC` itself comes with a sub class
+⍝ `Demo`. Therefore both `Browse` and `List` will process `ADOC.Demo`. However, you cannot
+⍝ make use of `ADOC.Demo` when it is executed as a user command.
+⍝ ### `ADOC` as a user command
+⍝ You can use advanced features but for that you have to load or copy `ADOC` into your workspace.\\
+⍝ The features and how to take advantage of them are documented in AdvancedADOC.html,
+⍝ a document that is a sibling of the `ADOC.dws` workspace which you will find in the
+⍝ user command folder you've installed `ADOC` into or (since version 16.0 of Dyalog APL) in the
+⍝ standard user command folder of your version of Dyalog APL.\\
+⍝ The reference part however documents all methods, shared **and** instance.
+⍝ The following examples assume that you have `MyClass`, `MyInterface` and `MyNamespace`
+⍝ in your workspace.
+⍝ ~~~
+⍝ ⍝ List all methods, fields and properties
+⍝ ⍝ of the public interface:
+⍝       ]ADoc MyClass -summary
+⍝
+⍝ ⍝ Same but with more details:
+⍝       ]ADoc MyClass -summary=full
+⍝
+⍝ ⍝ Produce a full blown document with leading
+⍝ ⍝ comments and the public interface and view
+⍝ ⍝ it with your default browser:
+⍝       ]ADoc MyClass
+⍝
+⍝ ⍝ Same but for several objects:
+⍝       ]ADoc MyClass MyInterface MyNamespace
+⍝ ~~~
+⍝ ### What `ADOC` considers to be documentation
+⍝ Note that comments are recognized only if and as long as they are following
+⍝ the "header": the top of a script, functions and operators, headers and field
+⍝ definitions **after** the removal of empty lines and any
+⍝ code lines that carry an `:Access ...` statement.
+⍝ #### Special case :Field
+⍝ `:Field` is handled differently since there is no concept of a "header"; it's
+⍝ just a single line, and until version 5.3 the only thing you could do was to add
+⍝ a comment to the right of a `:Field` definition.\\
+⍝ Since 5.4 however any further comment lines are considered part of the `:Field`
+⍝ documentation until either two empty lines are discovered or anything like a  function,
+⍝ operator, property, another field definition etc. is detected.
+⍝ #### Exclude a line
+⍝ In case you want to exclude a particular line from those leading comments
+⍝ use two lamps (`⍝⍝`) at the beginning of the line. This does **not** break
+⍝ the connectionTFTFs with comments further down the line. Example:
+⍝ ~~~
+⍝ ⍝ This line shows in the `ADOC` documentation.
+⍝ ⍝⍝ This line won't show in the `ADOC` documentation.
+⍝ ⍝ This line shows in the `ADOC` documentation, too.
+⍝ ~~~
+⍝ ### :Require
+⍝ With version 15.0 Dyalog has introduced the `:Require` keyword for defining
+⍝ dependencies.\\
+⍝ Since this keyword lives outside classes and namespaces while the older synonym `⍝∇:require`
+⍝ lives inside classes and namespaces we have a conflict here: `ADOC` cannot report what's not
+⍝ in the source code; as a consequence it can only report on `⍝∇:require` but not on `:Require`.
+⍝ ### Mark-up syntax
+⍝ One can use Markdown, a simplified mark-up language, within the comment sections of public 
+⍝ functions and the so-called leading comments of scripts. `ADOC` uses the APLTree class 
+⍝ [`MarkAPL`](https://github.com/aplteam/MarkAPL "MarkAPL on GitHub") for converting the 
+⍝ Markdown to HTML.\\
+⍝ `ADOC` itself can be used as an example: it makes use of all mark-ups available, most importantly:
+⍝ * Headers
+⍝ * Lists
+⍝   1. Ordered lists
+⍝   1. Unordered lists
+⍝ * APL code
+⍝   * Inline APL code
+⍝   * APL code blocks
+⍝ * Tables
+⍝ * Paragraphs\\
+⍝ But there is no limitation: every feature that is available in MarkAPL can be used and will
+⍝ be processed by `ADOC`. Therefore you can read up on how to do the mark up in the
+⍝ [MarkAPL cheat sheet](http://download.aplteam.com/MarkAPL_CheatSheet.html) or in the laborious
+⍝ [full MarkAPL documentation](http://download.aplteam.com/MarkAPL.html).\\
+⍝ There are however two additional features available:
+⍝ 1. You can insert a line break (`<br />`) by having a single backslash character (`\`) at the
+⍝    end of a line.
+⍝ 1. You can enforce a new paragraph by adding two backslashes at the end of a line.\\
+⍝    This can be useful when you need to document plenty of method calls etc in order to avoid
+⍝    a large number of empty lines.\\
+⍝ Note that these are ADOC features, not MarkAPL features.
+⍝ #### Leading comments in functions and operators
+⍝ Headers within the leading comments in public functions and operators are limited to level six.
+⍝ However, since  all other levels are converted into level six anyway you may well use level one
+⍝ for better readability.\\
+⍝ ### Namespaces
+⍝ #### Overview
+⍝ Since version 6.0 `ADOC` supports not only scripted namespaces but also ordinary namespaces.
+⍝ `ADOC` can process any namespace that can be saved with SALT's `Save` command.\\
+⍝ #### Public & private functions, operators & variables
+⍝ By default all functions, operators and variables are public.\\
+⍝ In namespaces `ADOC` looks for a function `Public`.\\
+⍝ If such a function exists it will be expected to return a vector of text vectors.
+⍝ Those are interpreted as the names of all public functions, operators and variables.\\
+⍝ That means that by implementing this function you can define what's public and what's not.\\
+⍝ #### Scripted versus ordinary namespaces
+⍝ `ADOC` will process leading comment lines in a scripted namespace in the same way
+⍝ it does with classes and interfaces.\\
+⍝ However, in ordinary namespaces their cannot be any "leading" comments. As a substitute you may
+⍝ either create a variable (a vector of text vectors) or define a function `ADOC_Doc` that carries
+⍝ nothing but comments (deprecated since version 6.5.0).\\
+⍝ The variable can hold the Markdown as is, without the leading `⍝` symbol; that makes editing easier.
+⍝ If it is a function then it must carry nothing but comment lines. These comment lines will be treated
+⍝ as the "leading comments". The function itself will not be listed, not even when it is mentioned by
+⍝ `Public`.\\
+⍝ These are two examples:
+⍝ ```
+⍝ ⍝ Variable
+⍝ 'Temp'#.⎕NS''
+⍝ #.Temp.ADOC_Doc←'My comment from line 1' '' '* This' '* That'
+⍝ #.Temp.⎕FX'r←Hello' 'r←''Word'''
+⍝ ]ADoc #.Temp
+⍝ ```
+⍝ ~~~
+⍝ ⍝ Function
+⍝ 'Temp'#.⎕NS''
+⍝ #.Temp.⎕FX 'ADOC_Doc' '⍝ My comment from line 1' '⍝ ' '⍝ * This' '⍝ * That'
+⍝ #.Temp.⎕FX'r←Hello' 'r←''Word'''
+⍝ ]ADoc #.Temp
+⍝ ~~~
+⍝ Prior to version 6.0 `Browse` accepted the name of a function within an ordinary namespace;
+⍝ this is not supported any more. If you've used this feature: just rename your function to
+⍝ `ADOC_Doc` and create a function `Public` so that it returns an empty vector (=no public stuff
+⍝ whatsoever) and you get exactly the same behaviour.\\
+⍝ ### Reserved names
+⍝ Since version 3.0 `ADOC` looks for a number of fixed names. If there
+⍝ is a function with such a name to be found that function is executed and the
+⍝ result returned by that function is taken into account.\\
+⍝ The syntax rules are fixed: if such a function does not honor the syntax rules it will
+⍝ fail. However, since the call is trapped that won't stop `ADOC` from producing a result.\\
+⍝ All these functions must be niladic traditional functions marked as:
+⍝
+⍝ ~~~
+⍝ :Access Public Shared
+⍝ ~~~
+⍝ and they must return a result.\\
+⍝ Underneath the functions are listed which will be honoured in case they exist.\\
+⍝ #### Copyright
+⍝ Must return a vector of strings.\\
+⍝ #### History
+⍝ If this function exists then it must be one of:
+⍝ * Function that returns either a simple text vector or a vector of text vectors
+⍝   (now deprecated).
+⍝ * Function that returns **no** result and carries Markdown as comments.\\
+⍝ #### Version
+⍝ Must return a vector of length three:
+⍝ 1. The name, for example `ADOC`
+⍝ 1. A string with version information, for example "1.2.3" or "17.0.1.13245"
+⍝ 1. A string representing a date, for example "2009-01-01"\\
+⍝ Example: A function returning this:
+⍝ ~~~
+⍝ ('1.2.3' '2009-06-01') ←→ 1↓#.MyOrdNameSp.Version
+⍝ ~~~
+⍝ lets `ADOC` produce this information:
+⍝ "Version 1.2.3 from 2009-06-01"\\
+⍝ ### Specialties
+⍝ #### :Include
+⍝ Since version 1.3, `ADOC` is processing `:Include`d namespaces.\\
+⍝ This means that included stuff is "imported" in the first place, then the result
+⍝ is analyzed.\\
+⍝ Author: Kai Jaeger ⋄ APL Team Ltd ⋄ <http://aplteam.com>\\
+⍝ Homepage: <https://github.com/aplteam/ADOC>
+
+    :Include APLTreeUtils
+
+    ⎕IO←1 ⋄ ⎕ML←3
+
+    ∇ r←Version
+      :Access Public shared
+      r←(⍕⎕THIS)'6.8.3.67' '2020-01-03'
+    ∇
+
+    ∇ History
+      :Access Public Shared
+      ⍝ * 6.8.3
+      ⍝   * Bug fixes:
+      ⍝     * `ADOC_Doc` should be mentioned in the "Reference" part but is was not when `ADO_Doc` was a variable rather than a function.
+      ⍝     * When there is nothing to report in the "Reference" section it should not make it into the document.
+      ⍝     * ADOC 6.8.2 and earlier is incompatible with changes introduced by MarkAPL version 8.1 because of a bug in ADOC that made
+      ⍝       an appearance only because of those changes in MarkAPL.
+      ⍝\\
+      ⍝ For information regarding older versions see <https://github.com/aplteam/ADOC/releases>
+    ∇
+
+    ∇ vs←CreateBody(vs chapterNo);tail;type;name;flag
+      tail←vs.devisor{0=≢⍺:⍵ ⋄ ' &lt; ',⍺},{⍵/⍨⍵≢' (Container)'}' (',vs.scriptType,')'
+      _WithRunningNumbers←{¯1=⍵:1<⍴_META ⋄ ⍵}_WithRunningNumbers
+      :If _WithRunningNumbers
+          :If vs.isContainer
+              name←('. ',⍨⍕vs.subHeadingCounter),vs.formattedScriptName
+              vs.subHeadingCounter+←1
+              vs.containerCounter←1
+          :ElseIf vs.hasContainers
+              name←((⍕vs.subHeadingCounter-1),'.',(⍕vs.containerCounter),' '),vs.formattedScriptName
+              vs.containerCounter+←1
+          :Else
+              name←('. ',⍨⍕chapterNo),vs.formattedScriptName
+          :EndIf
+      :Else
+          name←vs.formattedScriptName
+      :EndIf
+      vs.Body←(MakeBookmark name),{('h1 id="',GetChapterNo,'"')tag ⍵}name,tail
+    ∇
+
+      Blank2_←{
+          w←⍵
+          ((' '=w)/w)←'_'
+          w
+      }
+
+    ∇ {r}←Fill_META list;this;isRef;scriptRef
+    ⍝ Runs a loop on all items in `list` wich can be a single ref or the fully qualified name
+    ⍝ of a function or a vector (and mixture) of both. Refs are pointing to classes, interfaces
+    ⍝ or namespaces while fully qualified names are special cases were a single function in an
+    ⍝ ordinary namespace is expected to carry comments that represent the documentation.
+    ⍝
+    ⍝ This function (and its sub-functions) assemble a variable _META with contains for every
+    ⍝ single "thing" (method, field, function, operator, variable, depending on the source to be
+    ⍝ investigated) all information ADOC is supposed to show in one way or another. Later from
+    ⍝ this a list (`Info`) or HTML output (`Browse`) is generated
+      r←⍬
+      isRef←{⍵≢⍕⍵}
+      :If 2>≡list
+      :AndIf ~isRef list
+          list←,⊂list
+      :EndIf
+      :For this :In list
+          :If isRef this
+              scriptRef←this
+              :If _embeddedClassesFlag
+              :AndIf 0=≢_embeddedClassNames
+                  _embeddedClassNames←ReportEmbeddedClasses scriptRef
+              :EndIf
+              :If 0=≢_embeddedClassNames
+                  Analyze scriptRef
+              :Else
+                  _embeddedClassNames Analyze scriptRef
+              :EndIf
+          :Else
+              ⎕←'Huuh?! What''s that: ',this
+          :EndIf
+      :EndFor
+    ∇
+
+⍝ --------------- Fields; defaults of some can be restored by calling shared method `RestoreDefaults`.
+
+    :Field Public Shared nl←⎕UCS 13 10  ⍝ By default CR+LF
+    :Field Public Shared InLineCodePadding←5  ⍝ Left & right padding for inline APL code in px. Will be reset by calling `RestoreDefaults`.
+    :Field Public Shared InLineCodeColor←'#961c1c' ⍝ The color used for APL inline code. Will be reset by calling `RestoreDefaults`.
+
+    :Field Private Shared _BrowserPath←''
+    :Field Private Shared _Title←''   ⍝ Top-level caption; empty=ignored.
+
+    :Field Private Shared _Inherit←1
+    :Field Private Shared _IgnorePattern←''
+    :Field Private Shared CssScreen←'screen'
+    :Field Private Shared CssPrint←'Print'
+
+⍝ --------------- Properties
+    :Property Title
+    :Access Public Shared
+    ⍝ There is no default (empty)
+        ∇ r←get
+          r←_Title
+        ∇
+        ∇ set arg
+          (∆EM←'"Title" must be a string')⎕SIGNAL 11/⍨~IsChar arg.NewValue
+          (∆EM←'"Title" must be simple')⎕SIGNAL 11/⍨~0 1∊⍨≡arg.NewValue
+          _Title←arg.NewValue
+        ∇
+    :EndProperty
+
+    :Property Inherit
+    :Access Public Shared
+    ⍝ Defaults to 1. To suppress inheritance, set this to 0.
+        ∇ r←get
+          r←_Inherit
+        ∇
+        ∇ set arg
+          (∆EM←'"Inherit" must be a Boolean')⎕SIGNAL 11/⍨~0 1∊⍨arg.NewValue
+          _Inherit←arg.NewValue
+        ∇
+    :EndProperty
+
+    :Property IgnorePattern
+    :Access Public Shared
+    ⍝ Defaults to an empty vector. If this is set, all members with names starting
+    ⍝ with `IgnorePattern` will be ignored by ADOC.
+        ∇ r←get
+          r←_IgnorePattern
+        ∇
+        ∇ set arg
+          (∆EM←'"IgnorePattern" must be simple')⎕SIGNAL 11/⍨~0 1∊⍨≡arg.NewValue
+          (∆EM←'"IgnorePattern" must be a string')⎕SIGNAL 11/⍨~IsChar arg.NewValue
+          _IgnorePattern←arg.NewValue
+        ∇
+    :EndProperty
+
+    :Property  BrowserPath
+    ⍝ By definition any HTML file is displayed with the default browser.\\
+    ⍝ If you want to display an HTML page with a different browser you must provide the
+    ⍝ full path name including the name of the EXE.\\
+    ⍝ This property replaced `BrowserName` which was finally removed in 6.7.0.
+    :Access Public shared
+        ∇ r←get
+          r←''
+        ∇
+        ∇ set arg
+        ∇
+    :EndProperty
+
+    :Property  htmlFinalised
+    ⍝ HTML cannot be written to disk if this is not 1.
+    ⍝ Calling the method `FinaliseHtml` will do this, while the method `Reset` sets it to 0.
+    :Access Public Instance
+        ∇ r←get
+          r←_htmlFinalised
+        ∇
+    :EndProperty
+
+    :Property WithRunningNumbers
+    ⍝ Add a running number to the class title if true and more than one class is provided.
+    :Access Public Instance
+        ∇ r←get
+          r←_WithRunningNumbers
+        ∇
+        ∇ set args
+          _WithRunningNumbers←args.NewValue
+        ∇
+    :EndProperty
+
+    :Property FullDocName
+    ⍝ Can be set by calling the appropriate constructor or by direct setting;
+    ⍝ `ProcessAsHtml` will assign the second parameter to `FullDocName`.
+    :Access Public instance
+        ∇ r←get
+          r←_FULL_DOC_NAME
+        ∇
+        ∇ set args
+          _FULL_DOC_NAME←args.NewValue
+        ∇
+    :EndProperty
+
+    :Property Creator
+    ⍝ The `Creator` is put into the footer.
+    ⍝ Defaults to `⎕AN`. Is ignored if empty.
+    :Access Public instance
+        ∇ r←get
+          r←_Creator
+        ∇
+        ∇ set args
+          _Creator←args.NewValue
+        ∇
+    :EndProperty
+
+    :Property HTML
+    ⍝ You can access the HTML via this property.\\
+    ⍝ That might be useful, for example, to modify the HTML code and then write it to a file.
+    :Access Public instance
+        ∇ r←get
+          r←_HTML
+        ∇
+        ∇ set args
+          _HTML←args.NewValue
+        ∇
+    :EndProperty
+
+    :Property Meta
+    ⍝ The `Meta` property holds the result of the `Analyze` method.
+    ⍝
+    ⍝ Every analyzed script is represented by a single item in `Meta`.
+    :Access Public instance
+        ∇ r←get
+          r←_META
+        ∇
+    :EndProperty
+
+    :Property OutputType
+    ⍝ Can be either "Web" or "Doc". "Doc" means that all links like "Goto class\|top"
+    ⍝ as well as sub-listings for field, properties and methods are removed. Default is "Web".
+    :Access Public instance
+        ∇ r←get
+          r←_OutputType
+        ∇
+        ∇ set args;buffer
+          (∆EM←'"OutputType" has invalid type; must be either "Web" or "Doc"')⎕SIGNAL 11/⍨~'web' 'doc'∊⍨buffer←⊂Lowercase args.NewValue
+          _OutputType←'Web' 'Doc'⊃⍨'web' 'doc'⍳buffer
+        ∇
+    :EndProperty
+
+    :Section SpecialFunctions
+
+    ⍝ Any of the following three properties might cause a VALUE ERROR when called in a certain context.
+    ⍝ It happens when `Initial_HTML` was not executed and the property is therefore not available.
+    ⍝ We do not really need anything here but those 3 properties, so we make them default to 0.
+    ⍝ That's a bit messy, yes, but far easier than any "correct" approach. If this starts to hurt
+    ⍝ we need to call `Initial_HTML` instead, and clean up the mess, but I doubt that will ever happen.
+
+    :Property ignoreCopyright
+    :Access Public Shared
+    ⍝ Defaults to 1: If there is a niladic function `Copyright` (public shared) the result is processed,
+    ⍝ otherwise ignore that function, if there is any.
+        ∇ r←get
+          :If 2=⎕NC'_ignoreCopyright'
+              r←_ignoreCopyright
+          :Else
+              r←0
+          :EndIf
+        ∇
+        ∇ set arg
+          (∆EM←'"ignoreCopyright" Must be a Boolean')⎕SIGNAL 11/⍨~arg.NewValue∊0 1
+          _ignoreCopyright←arg.NewValue
+        ∇
+    :EndProperty
+
+    :Property ignoreHistory
+    :Access Public Shared
+    ⍝ Defaults to 1: If there is a niladic function `History` (public shared) the result is processed,
+    ⍝ otherwise ignore that function, if there is any.
+        ∇ r←get
+          :If 2=⎕NC'_ignoreHistory'
+              r←_ignoreHistory
+          :Else
+              r←0
+          :EndIf
+        ∇
+        ∇ set arg
+          (∆EM←'"ignoreHistory" must be a Boolean')⎕SIGNAL 11/⍨~arg.NewValue∊0 1
+          _ignoreHistory←arg.NewValue
+        ∇
+    :EndProperty
+
+    :Property ignoreVersion
+    :Access Public Shared
+    ⍝ Defaults to 1: If there is a niladic function `Version` (public shared), the result is processed,
+    ⍝ otherwise ignore that function, if there is any.
+        ∇ r←get
+          :If 2=⎕NC'_ignoreVersion'
+              r←_ignoreVersion
+          :Else
+              r←0
+          :EndIf
+        ∇
+        ∇ set arg
+          (∆EM←'"ignoreVersion" must be a Boolean')⎕SIGNAL 11/⍨~arg.NewValue∊0 1
+          _ignoreVersion←arg.NewValue
+        ∇
+    :EndProperty
+
+    :EndSection
+
+    :Property view
+    :Access Public Shared
+    ⍝ Defaults to 1: show the result in a (default) browser.
+    ⍝ If set to 0 that is suppressed. Useful for test cases.
+        ∇ r←get
+          r←_view
+        ∇
+        ∇ set arg
+          (∆EM←'"view" must be a Boolean')⎕SIGNAL 11/⍨~arg.NewValue∊0 1
+          _view←arg.NewValue
+        ∇
+    :EndProperty
+
+⍝ --------------- Constructors / Destructors
+
+    ∇ make_1(fullDocName)
+      :Implements Constructor
+      :Access Public instance
+      make_0
+      _FULL_DOC_NAME←fullDocName
+    ∇
+
+    ∇ make_2(fullDocName title)
+      :Implements Constructor
+      :Access Public instance
+      make_0
+      _FULL_DOC_NAME←fullDocName
+      Title←title
+    ∇
+
+    ∇ make_0
+      :Implements Constructor
+      :Access Public instance
+      Init_HTML
+    ∇
+
+    ∇ make_all all
+      :Implements Constructor
+      :Access Public instance
+      :If 0 1∊⍨≡all
+      :AndIf IsChar all
+          Init_HTML
+          _FULL_DOC_NAME←all
+      :Else
+          11 ⎕SIGNAL⍨∆EM←'Argument is invalid!'
+      :EndIf
+    ∇
+
+    ∇ Init_HTML
+      _HTML←⍬
+      _FULL_DOC_NAME←''
+      _DOCS←⍬
+      _META←⍬
+      _htmlFinalised←0
+      _WithRunningNumbers←¯1
+      _Creator←⎕AN
+      _BrowserPath←''
+      _OutputType←'Web'
+      _IncludeCss←1
+      _CssPath←''
+      _ignoreCopyright←0
+      _ignoreVersion←0
+      _ignoreHistory←0
+      _embeddedClassesFlag←0
+      _view←1
+      ⍝
+      _embeddedClassNames←'' ⍝ Not a parameter but must be reset anyway
+      ⎕DF⍕⎕THIS
+    ∇
+
+⍝----------------------------------------------------
+    ∇ RestoreDefaults
+      :Access Public Shared
+    ⍝ Restore default values for all fields and properties.
+      _BrowserPath←''
+      _Inherit←1
+      _IgnorePattern←''
+      CssScreen←'screen'
+      CssPrint←'Print'
+      InLineCodePadding←5
+      InLineCodeColor←'#961c1c'
+      view←1
+    ∇
+    ∇ {filename}←SaveHtml2File filename;head;html;⎕WX
+      ⍝ Save the HTML into `filename`.
+      :Access public instance
+      ⎕WX←1
+      :If _htmlFinalised
+          :If 0=≢filename←{0=≢⍵:_FULL_DOC_NAME ⋄ ⍵}filename
+              11 ⎕SIGNAL⍨∆EM←'No filename specified'
+          :EndIf
+          filename,←'.html'/⍨~'.'∊filename
+          ((filename='\')/filename)←'/'
+          filename←↑,/1 ⎕NPARTS filename
+          ##.APLTreeUtils.WriteUtf8File filename _HTML
+          _FULL_DOC_NAME←filename
+      :Else
+          11 ⎕SIGNAL⍨∆EM←'HTML is not yet prepared'
+      :EndIf
+    ∇
+
+    ∇ r←ReportEmbeddedClasses refToClass;html;source;where;bool;buffer
+    ⍝ Looks for classes embedded into `refToClass` and returns a vector of character vectors with names.
+      :Access Public Shared
+      r←''
+      source←{↓⍵⌽⍨+/∧\' '=⍵}⊃⎕SRC refToClass
+      :If ∨/bool←':include'Search source
+          buffer←(⍎{⍵↓⍨-'.'⍳⍨⌽⍵}⍕refToClass).{⎕SRC⍎⍵}¨{⍵↑⍨¯1+⌊/⍵⍳' :'}¨dmb¨{(⍴':Include ')↓⍵}¨source[{⍵/⍳⍴,⍵}bool]
+          buffer←(~¨':namespace'∘Search¨buffer)/¨buffer
+          buffer←(~¨':endnamespace'∘Search¨buffer)/¨buffer
+          source,←⊃,/buffer
+      :EndIf
+      :If 0≠≢where←1↓{⍵/⍳⍴,⍵}':class'Search source
+          r←{⍵↑⍨¯1+⌊/⍵⍳' :'}¨dmb¨{(⍴':class ')↓⍵}¨source[where],¨' '
+      :EndIf
+    ∇
+
+    ∇ CreateTopOfBody dummy;html;containers;k;l;chapterNo
+    ⍝ Creates the main toc with links to all chapters and adds
+    ⍝ also the main header to the top of the document.
+      :Access Public Instance
+      html←''
+      :If 1<⍴_DOCS  ⍝ Then we have a main TOC
+          :If ∨/containers←'Container'∘≡¨2⊃¨_META
+              k←l←1
+              html,←(('h1 ',((0=≢_Title)/'id="topmost"'))tag'Table of Contents'),nl
+              :For chapterNo :In ⍳⍴containers
+                  :If chapterNo⊃containers
+                      html,←'div'tag(⍕l),' ',('a href="#',GetChapterNo,'"')tag chapterNo⊃_DOCS
+                      l←l+1
+                      k←1
+                  :Else
+                      html,←'div class="subtoc"'tag(⍕l-1),'.',(⍕k),'. ',('a href="#',GetChapterNo,'"')tag chapterNo⊃_DOCS
+                      k←k+1
+                  :EndIf
+              :EndFor
+              html,←'div'tag'&nbsp;'
+          :Else
+              html,←'<br />','ol id="toc"'tag⊃,/'li'∘tag¨_DOCS{('a href="#',⍵,'"')tag ⍺}¨'ch'∘,¨¯4↑¨'0000'∘,¨⍕¨⍳⍴_DOCS
+          :EndIf
+          html←'div id="maintoc"'tag html
+      :EndIf
+      :If 0≠≢_Title
+          html←('h1 id="topmost"'tag _Title),nl,html
+      :EndIf
+      html←('<a id="verytop"></a>'),nl,html
+      _HTML←html,_HTML
+    ∇
+
+    ∇ CreateDocFooter dummy;html
+    ⍝ Creates the footer of the document. Default for "Creator"
+    ⍝ is the current user (`⎕AN`).
+      :Access Public Instance
+      html←'<br /><br />'
+      html,←'<div id="footer">',nl
+      html,←'span id="createdate"'tag'Created ',FormatDateTime ⎕TS
+      :If 0≠≢{2=⎕NC ⍵:⍎⍵ ⋄ ⎕AN}'Creator'
+          html,←'span id="createdby"'tag' by ',_Creator,' with ',{({⍵↑⍨1+-'.'⍳⍨⌽⍵}1⊃Version),' ',(2⊃⍵),' from ',3⊃⍵}3↑Version
+      :EndIf
+      html,←'</div>',nl
+      _HTML,←html
+    ∇
+
+    ∇ r←ShowDocumentation dummy
+      :Access Public Shared
+      r←Browse ⎕THIS
+    ∇
+
+    ∇ {embeddedClassNames}Analyze scriptRef;list;embeddedFlag
+   ⍝ Analyses one or more particular script(s) and appends the result to the `Meta` property.
+      :Access Public Instance
+      embeddedFlag←0<⎕NC'embeddedClassNames'
+      embeddedClassNames←{0=≢⍵:⍵ ⋄ 0<⎕NC ⍵:⍎⍵ ⋄ ''}'embeddedClassNames'
+      :If 0=≢scriptRef
+          list←#.⍎¨⊂[2]#.⎕NL 9.1 9.4 9.5
+          list/⍨←{16::0 ⋄ tmp←⎕SRC ⍵ ⋄ 1}¨list
+          Analyze_¨list
+      :ElseIf 1<≢scriptRef
+          Analyze_¨scriptRef
+      :ElseIf 0≠≢embeddedClassNames
+          embeddedClassNames←{(,∘⊂∘,⍣(0 1∊⍨≡⍵))⍵}embeddedClassNames
+          embeddedClassNames Analyze_¨⊂scriptRef
+      :Else
+          :If 0≠≢embeddedClassNames←Analyze_ scriptRef
+          :AndIf embeddedFlag
+              embeddedClassNames Analyze_¨⊂scriptRef
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ {r}←CreateHtml parms;vs;chapterNo
+    ⍝ Create `_HTML` from `_META`.
+      r←⍬
+      :Access Public Instance
+      :If 0<≢_META
+          vs←⎕NS''
+          vs.hasContainers←∨/'Container'∘≡¨2⊃¨_META
+          vs.containerCounter←1
+          vs.subHeadingCounter←1     ⍝ In case of containers
+          :For chapterNo :In ⍳⍴_META
+              vs←vs CreateUpperPartOfHTML_Page chapterNo
+              vs.(firstIncludes firstConstructor firstDestructor firstProperty firstField firstInterface)←1
+              vs.(firstInstanceMethod firstSharedMethod firstInterfaceMethod firstOpr firstVars)←1
+              vs.methodType←''                     ⍝ Will become either "Instance" or "Shared"
+              vs.publicStuff←SortPublicStuff vs.publicStuff
+              vs←vs LoopOverPublicStuff chapterNo
+              _DOCS,←⊂vs.formattedScriptName
+              vs.Body←'div class="content"'tag vs.Body
+              _HTML,←⊂vs.Body
+          :EndFor
+      :EndIf
+    ∇
+
+    ∇ Reset
+    ⍝ Reset all internal data structures.
+    ⍝
+    ⍝ After having called this method the instance can be reused. HTML only.
+      :Access Public Instance
+      Init
+    ∇
+
+    ∇ FinaliseHtml dummy;head;html;path;screenStyles;printStyles;addExt;tmp;fn
+    ⍝ Finalise the HTML by adding header, title and meta tags.
+    ⍝
+    ⍝ It also changes any http:// as well as mailto:// and file:// references
+    ⍝ into HTML anchors. After having called this method, the HTML is ready for being saved
+    ⍝ on disk. The property flag `htmlFinalised` is therefore set to 1.
+      :Access Public Instance
+      :If 0≠≢_HTML
+          CreateTopOfBody ⍬
+          CreateDocFooter ⍬
+          :If ~_htmlFinalised
+              _HTML←∊_HTML
+              html←'body'tag _HTML
+              head←''
+              head,←'<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>',nl
+              :If 2=⎕NC'Title'
+                  :If 0=≢Title
+                      head,←'title'tag 1⊃1⊃_META
+                  :Else
+                      head,←'title'tag Title
+                  :EndIf
+              :Else
+                  head,←'title'tag{1=⍴⍵:'ADOC: ',1 1⊃⍵ ⋄ 'ADOC: ',(⍕⍴⍵),' scripts'}_META
+              :EndIf
+              :If 0≠≢path←_CssPath
+                  path,←'/'/⍨~(¯1↑path)∊'/\'
+                  ((path='\')/path)←'/'
+              :EndIf
+              addExt←{'.css'≡¯4↑Lowercase ⍵:⍵ ⋄ ⍵,'.css'}
+              :If _IncludeCss
+                  :If 0=≢path
+                      screenStyles←'style type="text/css" media="screen"'tag(⍴nl)↓∊nl∘,¨GetScreenCss
+                      printStyles←'style type="text/css" media="print"'tag(⍴nl)↓∊nl∘,¨GetPrintCss
+                  :Else
+                      :Trap 22
+                          screenStyles←'style type="text/css" media="screen"'tag(⍴nl)↓∊nl∘,¨ReadAnsiFile path,addExt CssScreen
+                      :Else
+                          screenStyles←'style type="text/css" media="screen"'tag(⍴nl)↓∊nl∘,¨GetScreenCss
+                      :EndTrap
+                      :Trap 22
+                          printStyles←'style type="text/css" media="print"'tag(⍴nl)↓∊nl∘,¨ReadAnsiFile path,addExt CssPrint
+                      :Else
+                          printStyles←'style type="text/css" media="print"'tag(⍴nl)↓∊nl∘,¨GetPrintCss
+                      :EndTrap
+                  :EndIf
+                  head,←screenStyles,printStyles
+              :Else
+                  fn←({⍵↓⍨1+-⌊/'\/'⍳⍨⌽⍵}GetTempFileName),addExt CssScreen
+                  head,←'<link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="file:///',path,fn,'" />',nl
+                  fn←({⍵↓⍨1+-⌊/'\/'⍳⍨⌽⍵}GetTempFileName),addExt CssPrint
+                  head,←'<link rel="stylesheet" type="text/css" charset="utf-8" media="print" href="file:///',path,fn,'" />',nl
+              :EndIf
+              head←'head'tag head
+              html←'html xmlns="http://www.w3.org/1999/xhtml"'tag head,html
+              html,⍨←'<?xml version="1.0" encoding="utf-8"?>',nl,'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',nl
+              _HTML←html
+              _htmlFinalised←1
+          :Else
+              11 ⎕SIGNAL⍨∆EM←'HTML is already finalised'
+          :EndIf
+      :Else
+          11 ⎕SIGNAL⍨∆EM←'No HTML found to be finalised'
+      :EndIf
+    ∇
+
+    ∇ {tempFilename}←{x}Browse scriptRef;PathToExe;browserPath;bool;allowed;cs;Note;⎕TRAP
+         ⍝ This is the main method when ADOC is used without creating an instance and the documentation
+         ⍝ is supposed to be beautified and displayed in a browser.\\
+         ⍝ By default, the default browser is used to display the result. The exception is that when
+         ⍝ the current session is connected to Ride, then the Ride browser is used.\\
+         ⍝ You can change this by setting `BrowserPath` to the full path pointing
+         ⍝ to an executable. However, this has no effect when the session is connected to Ride.\\
+         ⍝ You can set the following parameters via a parameter space; see `CreateBrowseDefaults` for
+         ⍝ how to create a parameter space with default values.\\
+         ⍝ Such a parameter space can then be passed as left argument to `Browse`:
+         ⍝
+         ⍝ * BrowserPath
+         ⍝ * Title
+         ⍝ * IgnorePattern
+         ⍝ * IncludeCss
+         ⍝ * Inherit
+         ⍝ * embeddedClassesFlag
+         ⍝ * ignoreCopyright
+         ⍝ * ignoreHistory
+         ⍝ * ignoreVersion
+         ⍝
+         ⍝ Note that specifying a parameter via a parameter space does
+         ⍝ **not** save the value permanently.\\
+         ⍝ The right argument can be a single ref pointing to a class, an interface or a
+         ⍝ namespace. It can also be a vector of such references.\\
+         ⍝ See [Reference to a script](#) for details.
+         ⍝
+         ⍝ Prior to version 6.0 of ADOC it could also be the name of a function; this is
+         ⍝ not supported any more.
+         ⍝
+         ⍝ ## Reference to a script
+         ⍝ If `scriptRef` is empty, the formerly created HTML is displayed.\\
+         ⍝ Note that in this case any formerly created HTML remains
+         ⍝ untouched. Therefore it can still be used for other purposes.\\
+         ⍝ You can pass the name of one or more embedded classes --- classes locally defined
+         ⍝ within a class script; see `ADOC` itself as an example --- or embedded namespaces.
+         ⍝ You get then a document which contains only these embedded
+         ⍝ class(es)/namespace(s).\\
+         ⍝ Note that this syntax is available only when a single
+         ⍝ script is specified in the right argument.
+      :Access Public shared
+      ⎕TRAP←(999 'E' '∆EM ⎕signal 11')((0 1000)'N')
+      tempFilename←''
+      _Title←''
+      Init_HTML
+      :If 0<⎕NC'x'
+          :If 9=⎕NC'x' ⍝ is it a parameter space?
+              allowed←CreateBrowseDefaults.∆List[;1]
+              :If 0∊bool←(x.⎕NL-2)∊allowed
+                  11 ⎕SIGNAL⍨∆EM←'Invalid: ',⊃{⍺,',',⍵}/(~bool)⌿x.⎕NL-2
+              :EndIf
+              bool←(x.⎕NL-2)∊allowed~⊂'RefToUnicodeFile'
+              x.⎕EX(~bool)⌿x.⎕NL 2      ⍝ "RefToUnicodeFile" is deprecated
+          :AndIf 0≠≢x.⎕NL 2 9
+              ⎕SHADOW¨'_',¨x.⎕NL-2     ⍝ Keep them local - we don't want to overwrite the real fields/props
+              ⍎¨GetVarsFrom x
+          :Else
+              (∆EM←'This syntax is retired; set "embeddedClassesFlag" in a parameter space instead')⎕SIGNAL 11
+          :EndIf
+      :EndIf
+     
+      :If 0=≢scriptRef
+          :If _htmlFinalised
+              tempFilename←GetTempFileName
+          :Else
+              11 ⎕SIGNAL⍨∆EM←'I''m afraid, there is no HTML ready for being displayed'
+          :EndIf
+      :Else
+          'Right argument must be a reference pointing to a class, namespace or interface'⎕SIGNAL 11/⍨~∧/(|⎕NC¨⊂∘⍕¨scriptRef)∊9.1 9.4 9.5
+     
+          Fill_META scriptRef     ⍝ ←←← The work horse!
+     
+          :If 0≠≢_META
+              _WithRunningNumbers←{¯1=⍵:1<⍴_META ⋄ ⍵}_WithRunningNumbers
+              cs←⎕NS''
+              CreateHtml cs
+              :If 0=≢_HTML
+                  ⎕←'Nothing found'
+              :Else
+                  FinaliseHtml ⍬
+                  tempFilename←{'html',⍨¯3↓⍵}GetTempFileName
+                  SaveHtml2File tempFilename
+              :EndIf
+          :EndIf
+      :EndIf
+      :If 0≠≢tempFilename
+      :AndIf view
+          View tempFilename
+      :EndIf
+      _embeddedClassName←''
+    ∇
+
+    ∇ r←{verbose}List scriptName
+      :Access Public Shared
+    ⍝ This method is deprecated in will be removed in a future version of ADOC; use `Info` instead.
+      verbose←{2=⎕NC ⍵:⍎⍵ ⋄ 0}'verbose'
+      verbose←{IsChar ⍵:'full'≡Lowercase ⍵ ⋄ (,1)≡,⍵}verbose
+      r←verbose Info scriptName
+    ∇
+
+    ∇ r←{verbose}Info scriptName;data;my;nl;keywords
+       ⍝ Prints the most important facts about the given script to the session window.\\
+       ⍝ By default only the names of functions are reported. To get syntax information,
+       ⍝ pass either a 1 or `'full'` as left argument.\\
+       ⍝ Together with `Browse` this is the second major shared method.
+      :Access Public Shared
+      (∆EM←'Please pass references only!')⎕SIGNAL 11/⍨{⍵≡⍕¨⍵}scriptName
+      r←''
+      verbose←{2=⎕NC ⍵:⍎⍵ ⋄ 0}'verbose'
+      verbose←{IsChar ⍵:'full'≡Lowercase ⍵ ⋄ (,1)≡,⍵}verbose
+      :If 9.5 9.4 9.1∊⍨(⍎1⊃⎕NSI){|⍺.⎕NC ⍵}⊂⍕scriptName
+          my←⎕NEW ⎕THIS          ⍝ We need to instantiate ADOC for this kind of thing
+          my.Analyze scriptName
+          data←5⊃1⊃my.Meta
+          r,←(⎕UCS 13),⍨'*** ',' ***',⍨⊃{0=≢3⊃⍵:{⍺,' (',⍵,')'}/⍵[1 2] ⋄ {⍺,' < ',⍵}/⍵[1 3]}3↑1⊃my.Meta
+          :If (⊂1 2⊃my.Meta)∊'ScriptedNamespace' 'Namespace'
+              r,←verbose ListNamespace data
+          :Else
+              r,←verbose ListNonNamespaces data
+          :EndIf
+      :Else
+          'Right argument must be a reference pointing to a class, namespace or interface'⎕SIGNAL 11
+      :EndIf
+    ∇
+
+    ∇ r←verbose ListNamespace data;nl;buffer;bool
+      r←''
+      nl←,⎕UCS 13
+      :If 0≠≢buffer←data/⍨(Get data)∊'Function' 'Operator'
+          :If 0<+/bool←'Function'∘≡¨'type'Get buffer
+              r,←nl,'Functions:'
+              r,←⊃,/nl,¨'  '∘,¨((1+verbose)⊃'name' 'syntax')Get bool/buffer
+          :EndIf
+          :If 0<+/bool←'Operator'∘≡¨'type'Get buffer
+              r,←nl,'Operators:'
+              r,←⊃,/nl,¨'  '∘,¨((1+verbose)⊃'name' 'syntax')Get bool/buffer
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ r←verbose ListNonNamespaces data;bool;buffer;keywords;nl
+      r←''
+      nl←,⎕UCS 13
+      :If 1∊bool←'Constructor'∘≡¨Get data
+      :AndIf 0≠≢buffer←'syntax'Get bool/data
+          r,←nl,'Constructors:'
+          r,←⊃,/nl,¨'  '∘,¨'syntax'Get bool/data
+      :EndIf
+      :If 0≠≢buffer←('Property'∘≡¨Get data)⌿data
+          :If 0<+/bool←'Instance'∘≡¨'access'Get buffer
+              r,←nl,'Instance Properties:'
+              keywords←ProcessKeywords bool/buffer
+              r,←⊃,/nl,¨'  '∘,¨('name'Get bool/buffer),¨keywords
+          :EndIf
+          :If 0<+/bool←~bool
+              r,←nl,'Shared Properties:'
+              keywords←ProcessKeywords bool/buffer
+              r,←⊃,/nl,¨'  '∘,¨('name'Get bool/buffer),¨keywords
+          :EndIf
+      :EndIf
+      :If 0≠≢buffer←data/⍨'Field'∘≡¨Get data
+          :If 0<+/bool←'Instance'∘≡¨'access'Get buffer
+              r,←nl,'Instance Fields:'
+              r,←⊃,/nl,¨'  '∘,¨{⍵↓⍨+/∧\' '=⍵}¨'readonly'∘{∨/⍺⍷Lowercase ⍵:(' (',⍺,')'),⍨⍵ ⋄ ⍵}¨'name'Get bool/buffer
+          :EndIf
+          :If 0<+/bool←~bool
+              r,←nl,'Shared Fields:'
+              r,←⊃,/nl,¨'  '∘,¨'name'Get bool/buffer
+          :EndIf
+      :EndIf
+      :If 0≠≢buffer←data/⍨'Method'∘≡¨Get data
+          :If 0<+/bool←'Instance'∘≡¨'access'Get buffer
+              r,←nl,'Instance Methods:'
+              r,←⊃,/nl,¨'  '∘,¨((1+verbose)⊃'name' 'syntax')Get bool/buffer
+          :EndIf
+          :If 0<+/bool←'Shared'∘≡¨'access'Get buffer
+              r,←nl,'Shared Methods:'
+              r,←⊃,/nl,¨'  '∘,¨((1+verbose)⊃'name' 'syntax')Get bool/buffer
+          :EndIf
+          :If 0<+/bool←'Public'∘≡¨'access'Get buffer ⍝ True if interface
+              r,←nl,'Methods (from Interface):'
+              r,←⊃,/nl,¨'  '∘,¨((1+verbose)⊃'name' 'syntax')Get bool/buffer
+          :EndIf
+      :EndIf
+      :If 0≠≢buffer←data/⍨'Interface Method'∘≡¨Get data
+          r,←nl,'Implemented Interface(s):'
+          r,←⊃,/nl,¨'  '∘,¨((1+verbose)⊃'name' 'syntax')Get buffer
+      :EndIf
+    ∇
+
+    ∇ ProcessAsHtml(scripts filename);myDoc;key;newname
+      ⍝ Process one or more scripts and write the resulting HTML into "filename"
+      ⍝ which defaults (if empty) to the script name (without `#.`) in the current directory.
+      :Access Public shared
+      (∆EM←'Please pass references only!')⎕SIGNAL 11/⍨{⍵≡⍕¨⍵}scripts
+      :If 0=≢filename
+          filename←'.html',⍨{⍵↓⍨2×'#.'≡2↑⍵}⍕scripts
+          (key newname)←FileBox''filename('Save ADOC file "',filename,'"')
+          →('OK'≢key)/0
+          filename←newname
+      :ElseIf '/\/'∊⍨¯1↑filename
+          filename,←'.html',⍨{⍵↓⍨2×'#.'≡2↑⍵}⍕scripts
+      :EndIf
+      myDoc←⎕NEW ⎕THIS
+      myDoc.FullDocName←filename
+      myDoc.Analyze scripts
+      myDoc.CreateHtml ⍬
+      myDoc.FinaliseHtml ⍬
+      myDoc.SaveHtml2File filename
+    ∇
+
+    ∇ ps←CreateBrowseDefaults
+    ⍝ Creates a namespace and populates it with default values for the `Browse` method.
+    ⍝ The result namespace can then be passed as left argument to `ADOC.Browse`.
+      :Access Public Shared
+      ps←⎕NS''
+      ps.Title←_Title
+      ps.IgnorePattern←_IgnorePattern
+      ps.embeddedClassesFlag←0
+      ps.Inherit←_Inherit
+      ps.ignoreCopyright←0
+      ps.ignoreHistory←0
+      ps.ignoreVersion←0
+      ps.BrowserPath←_BrowserPath
+      ps.IncludeCss←1
+      ps.view←1
+      ps.⎕FX'r←∆List;⎕IO' '⍝ List all variables and possible references in this namespace' '⎕IO←1' 'r←{⍵,[1.5]⍎¨⍵}⎕NL-2 9'
+    ∇
+
+    ∇ {filename}←Make y;scripts;isRef;tempFilename
+    ⍝ Instance-equivalent of `ProcessAsHtml`. After having instantiated `ADOC` you
+    ⍝ can set properties/fields to make `ADOC` fit your needs. Then you can call
+    ⍝ `Make` to create the final document without further action.
+      :Access Public Instance
+      isRef←{⍵≢⍕⍵}y
+      :If isRef
+          Analyze y
+      :Else
+          (∆EM←'Invalid right argument')⎕SIGNAL 11
+      :EndIf
+      CreateHtml ⍬
+      FinaliseHtml ⍬
+      :If 0=≢_FULL_DOC_NAME
+          tempFilename←{'html',⍨¯3↓⍵}GetTempFileName
+      :Else
+          tempFilename←_FULL_DOC_NAME
+      :EndIf
+      filename←SaveHtml2File tempFilename
+    ∇
+
+    ∇ r←Copyright;⎕IO
+    ⍝ Returns a copyright notice regarding `ADOC`.
+      :Access Public Shared
+      ⎕IO←1
+      r←''
+      r,←⊂'This source code is provided to you "as is" without warranties or '
+      r,←⊂'conditions of any kind, whether expressed or implied. Your use of '
+      r,←⊂'the source code is entirely at your own risk. Should the software '
+      r,←⊂'prove defective, you assume the entire cost of all service, repair '
+      r,←⊂'or correction.'
+      r←,[1.5]r
+    ∇
+
+⍝ --------------- Private
+
+    ∇ r←GetRefToParent
+      r←↑(↑⎕CLASS ⎕THIS).##
+    ∇
+
+    ∇ data←SortPublicStuff data;v1;v2
+    ⍝ Needed because the types should be sorted together but with the introduction of namespaces
+    ⍝ a dfns or an operator might be in the wrong place. We enforce a proper sequence here.
+      v1←'Include' 'Constructor' 'Destructor' 'Property' 'Field' 'Variable' 'Method' 'Function' 'Operator' 'Interface Method'
+      v2←'Inc' 'Con' 'Des' 'Prp' 'Fld' 'Var' 'Met' 'Fun' 'Opr' 'Int'
+      :If 1<≢data
+          data←data[⍋v2⍳v2[v1⍳'type'Get data]]
+      :EndIf
+    ∇
+
+    ∇ {ref}←ConvertOrdinaryNamespace2Scripted ref;tmpFilename;source
+      tmpFilename←¯4↓GetRefToParent.FilesAndDirs.GetTempFilename''
+      'Create!'GetRefToParent.FilesAndDirs.CheckPath tmpFilename
+      :Trap 903
+          {}⎕SE.SALT.Save ref tmpFilename ⍝,' -convert'
+      :Else
+          11 ⎕SIGNAL⍨'Unable to convert "',(⍕ref),'"'
+      :EndTrap
+      source←⎕SE.SALT.Load tmpFilename,' -source'
+      source←(~∨/¨'⍝ === End of variables definition ==='∘⍷¨source)/source  ⍝ Injected by SALT
+      source←(~∨/¨'⍝ === End of variable definition ==='∘⍷¨source)/source  ⍝ In case Dyalog fixes the typo one day
+      #.ADOC_Temp.⎕FIX source
+      ref←⍎'#.ADOC_Temp.',↑#.ADOC_Temp.⎕NL-9
+    ∇
+
+    ∇ vs←vs CreateUpperPartOfHTML_Page chapterNo
+    ⍝ Implicit argument: `_META`.
+      vs.(formattedScriptName scriptType devisor header publicStuff require)←chapterNo⊃_META
+      vs.isContainer←'Container'≡chapterNo 2⊃_META
+      :If 1=chapterNo
+          vs.TopMostRefId←vs.formattedScriptName
+      :EndIf
+      vs.(Top Body)←⊂⍬
+      vs←vs CreateTop(⍴_META)chapterNo
+      vs←vs LoopOverHeader chapterNo
+      vs.hasLeadingComments←0≠≢vs.Top
+      vs←InsertChapterToc vs
+      (vs)←CreateBody(vs chapterNo)
+      vs.Body,←vs.Top
+      :If vs.hasLeadingComments
+      :AndIf 0≠≢vs.publicStuff
+          vs.Body,←vs.topRef,{(MakeBookmark ⍵),'<h3 id="',GetChapterNo,'_tocref">',⍵,'</h3>',nl}'Reference'
+      :EndIf
+      :If 0≠≢∊vs.require
+          vs.Body,←(MakeBookmark'Requires'),('h4 id="',GetChapterNo,':require"')tag'Requires'
+          vs.Body,←⊃,/{(MakeBookmark ⍵),'h5 class="aplname"'tag ⍵}¨vs.require
+      :EndIf
+    ∇
+
+      GetVarsComment←{
+      ⍝ Gets the code of `ref` and tries to identify the assignment of a value to the
+      ⍝ variable `name`. Any comment on that veyr line is then returned.
+          (ref name)←⍵
+          body←{16::'' ⋄ ⎕SRC ⍵}ref
+          0=≢body:''  ⍝ non-scripted namespace?!
+          body←1↓↑,/(⎕UCS 13),¨body
+          ∧/bool←~MaskText body:''
+          body2←bool\bool/body
+          body←(¯1+((name,'←')⍷body2)⍳1)↓body
+          body←(body⍳⎕UCS 13)↑body
+          ~'⍝'∊body:''
+          bool←MaskText body
+          body2←body
+          (bool/body2)←' '
+          (⎕UCS 13)Split dtb dlb(body⍳'⍝')↓body
+      }
+
+    ∇ vs←vs ListDfnsAndDops scriptRef;list
+    ⍝ Looks for dfns and dops but only if its a namespace rather than a class or interface.
+      :If vs.isNamespace
+          vs←ListCurly scriptRef vs 3.2 'Function'
+          vs←ListCurly scriptRef vs 4.2 'Operator'
+      :EndIf
+    ∇
+
+    ∇ vs←ListCurly(ref vs class type);list;public
+      :If 0≠≢list←' '~¨⍨↓ref.⎕NL class
+          :If 3=ref.⎕NC'Public'
+          :AndIf 0≠≢public←scriptRef.Public
+              list←(list∊public)/list
+          :EndIf
+      :AndIf 0≠≢list
+          vs.publishedStuff,←(⊂ref type)BuildPublishMatrix¨list
+      :EndIf
+    ∇
+
+    ∇ r←ListVariables(scriptRef whatsPublic);list
+    ⍝ `whatsPublic` is empty in case it is not a namespace. Otherwise it is a list of names
+    ⍝ that are considered public in that namespace. Variables not listed are therefore private.
+      r←''
+      :If 0≠≢whatsPublic
+      :AndIf 0≠≢list←' '~¨⍨↓scriptRef.⎕NL 2
+      :AndIf 0≠≢list←(list∊whatsPublic)/list
+          r←LoopOverVars scriptRef(list~⊂'ADOC_Doc')
+      :EndIf
+    ∇
+
+      BuildPublishMatrix←{
+          (ref type)←⍺
+          name←⍵
+          buff←0 2⍴''
+          buff⍪←'type'type
+          buff⍪←'access' 'Shared'
+          buff⍪←'name'name
+          buff⍪←'syntax'((1+'Function'≡type)⊃'D-Op' 'D-Fns')
+          buff⍪←'comments'(GetDirectComment scriptRef name)
+          buff⍪←'keywords' ''
+          buff⍪←'more' ''
+          buff
+      }
+
+      GetDirectComment←{
+          (scriptRef name)←⍵
+          body←scriptRef.⎕NR name
+          1=⍴body:dlb{⍵↓⍨⍵⍳'⍝'}1⊃body    ⍝ One-liner?
+          buff←dlb 1↓body
+          bool←∧\'⍝'=↑¨buff
+          0=+/bool:{⍵↓⍨¯1+⍵⍳'⍝'}1⊃body    ⍝ No leading comments? Done!
+          ~'⍝'∊1⊃body:dlb 1↓¨bool/buff
+          (⊂dlb{⍵↓⍨⍵⍳'⍝'}1⊃body),dlb 1↓¨bool/buff
+      }
+
+    ∇ r←LoopOverVars(scriptRef list);vars;data;buf;more;buff
+      r←''
+      :For vars :In list
+          buff←0 2⍴''
+          data←scriptRef.⍎vars
+          buff⍪←'type' 'Variable'
+          buff⍪←'access' 'shared'
+          buff⍪←'name'vars
+          more←⊂'Depth=',(⍕≡data),'; rank=',(⍕⍴⍴data),'; shape=',({0=≢⍵:'empty' ⋄ ⍕⍵}⍴data),'; type=',(⍕⎕DR data)
+          :If 0=≡data  ⍝ Scalar
+              more,←⊂'Data: ',{' '=1↑0⍴⍵:'''',⍵,'''' ⋄ ⍕⍵}data
+          :ElseIf 1=⍴⍴data
+          :AndIf 1≡≡data
+              :Trap 16    ⍝ If that crashes with a NONCE ERROR then it is most likely a reference!
+                  more,←⊂'Data: ',RestrictVectorLength{' '=1↑0⍴⍵:'''',⍵,'''' ⋄ ⍕⍵}data
+              :EndTrap
+          :EndIf
+          buff⍪←'more'more
+          buff⍪←'comments'(GetVarsComment scriptRef vars)
+          r,←⊂buff
+      :EndFor
+    ∇
+
+    ∇ vs←vs LoopOverHeader chapterNo;i;cmd;txt
+      :For i :In ⍳≢vs.header
+          (cmd txt)←i⊃vs.header
+          :If 'Txt'≡cmd
+              vs.Top,←PolishComments txt vs.hasContainers vs.isContainer chapterNo
+          :EndIf
+      :EndFor
+    ∇
+
+    ∇ vs←vs LoopOverPublicStuff chapterNo;thisStuff;thisType
+      :For thisStuff :In vs.publicStuff
+          {⍵:.}1≠≡vs.Body                                                       ⍝ Internal test case - don't remove!
+          thisType←GetSingle thisStuff
+          :Select thisType
+          :Case 'Include'
+              vs←CreateHTML_ForInclude vs
+          :Case 'Constructor'
+              vs←vs CreateHTML_ForConstructor thisStuff chapterNo
+          :Case 'Destructor'
+              vs←vs CreateHTML_ForDestructor thisStuff
+          :Case 'Property'
+              vs←vs CreateHTML_ForProperty thisStuff chapterNo
+          :Case 'Field'
+              vs←vs CreateHTML_ForField thisStuff chapterNo
+          :Case 'Variable'
+              vs←vs CreateHTML_ForVars thisStuff chapterNo
+          :CaseList 'Method' 'Function'
+              vs←vs CreateHTML_ForMethodAndFunction thisStuff chapterNo
+          :Case 'Operator'
+              vs←vs CreateHTML_ForOperator thisStuff chapterNo
+          :Case 'Interface Method'                                                ⍝ implemented ones!
+              vs←vs CreateHTML_ForInterFace data
+          :EndSelect
+      :EndFor
+    ∇
+
+    ∇ vs←vs CreateHTML_ForInterface(data chapterNo);Body;firstInterfaceMethod;methodType
+      Body←''
+      firstInterfaceMethod←vs.firstInterfaceMethod
+      :If firstInterfaceMethod
+          Body,←({(MakeBookmark ⍵),('h4 id="',GetChapterNo,':','implementedinterfacemethods"')tag ⍵}('Implemented Interface Method',(1<+/'Method'∘≡¨Get vs.publicStuff)/'s'))
+          methodType←GetSingle data
+          Body,←PrepareSubLinks vs.publicStuff methodType vs.formattedScriptName
+          firstInterfaceMethod←0
+      :EndIf
+      Body,←vs.topRef,({(MakeBookmark ⍵),('h5 class="aplname" id="',GetChapterNo,':',('name'GetSingle data),'"')tag ⍵}('name'GetSingle data))
+      Body,←SyntaxHelper'syntax'GetSingle data
+      :If 0≠≢'more'GetSingle data
+          Body,←PolishMore'more'GetSingle data
+      :EndIf
+      :If 0≠≢'comments'GetSingle data
+          Body,←PolishComments('comments'GetSingle data)0 0 chapterNo
+      :EndIf
+      vs.Body,←Body
+      vs.firstInterfaceMethod←firstInterfaceMethod
+    ∇
+
+    ∇ vs←vs CreateHTML_ForVars(data chapterNo);Body;firstVars;type
+      Body←''
+      firstVars←vs.firstVars
+      :If firstVars
+          type←(GetSingle data),'s'
+          Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':sharedvariables"')tag ⍵}'Shared',' ',type
+          Body,←PrepareSubLinks vs.publicStuff'Variable'vs.formattedScriptName
+          firstVars←0
+      :EndIf
+      Body,←vs.topRef,({(MakeBookmark ⍵),('h5 class="aplname" id="',GetChapterNo,':',('name'GetSingle data),'"')tag ⍵}('name'GetSingle data)),nl
+      Body,←PolishMore'more'GetSingle data
+      Body,←PolishComments('comments'GetSingle data)0 0 chapterNo
+      vs.firstVars←firstVars
+      vs.Body,←Body
+    ∇
+
+    ∇ vs←vs CreateHTML_ForOperator(data chapterNo);Body;firstOpr;methodType;type
+      Body←''
+      firstOpr←vs.firstOpr
+      methodType←'access'GetSingle data
+      :If firstOpr                                                        ⍝ this catches the first one. Further group changes are identified by a type change because these are sorted
+          type←(GetSingle data),'s'
+          Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':','sharedoperators"')tag ⍵}'Shared Operators'
+          Body,←PrepareSubLinks vs.publicStuff type vs.formattedScriptName
+          firstOpr←0
+      :ElseIf methodType≢'access'GetSingle data
+          :If 'Public'≡'access'GetSingle data
+              Body,←({(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'operators"')tag ⍵}('Method',(1<+/('Public'∘≡¨'access'Get vs.publicStuff)∧~(Get vs.publicStuff)∊'Constructor' 'Interface Method')/'s'),' from Interface')
+          :Else
+              Body,←({(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'operators"')tag ⍵}('access'GetSingle data),(' Method',(1<+/'Method'∘≡¨↑¨Get publicStuff)/'s'))
+          :EndIf
+          Body,←PrepareSubLinks vs.publicStuff methodType vs.formattedScriptName
+      :EndIf
+      Body,←vs.topRef,({(MakeBookmark ⍵),('h5 class="aplname" id="',GetChapterNo,':',('name'GetSingle data),'"')tag ⍵}('name'GetSingle data))
+      Body,←SyntaxHelper'syntax'GetSingle data
+      :If 0≠≢'more'GetSingle data
+          Body,←PolishMore'more'GetSingle data
+      :EndIf
+      :If 0≠≢'comments'GetSingle data
+          Body,←PolishComments('comments'GetSingle data)0 0 chapterNo
+      :EndIf
+      vs.firstOpr←firstOpr
+      vs.Body,←Body
+    ∇
+
+    ∇ vs←vs CreateHTML_ForMethodAndFunction(data chapterNo);Body;firstInstanceMethod;methodType;type;firstSharedMethod
+      Body←''
+      firstInstanceMethod←vs.firstInstanceMethod
+      firstSharedMethod←vs.firstSharedMethod
+      methodType←'access'GetSingle data
+      :If 'Instance'≡methodType
+          :If firstInstanceMethod
+              type←(GetSingle data),'s'
+              Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}methodType,' ',type
+              Body,←methodType PrepareSubLinks vs.publicStuff type vs.formattedScriptName
+              firstInstanceMethod←0
+          :EndIf
+      :ElseIf 'Shared'≡methodType
+          :If firstSharedMethod
+              type←(GetSingle data),'s'
+              Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':',(Lowercase methodType),'methods"')tag ⍵}methodType,' ',type
+              Body,←methodType PrepareSubLinks vs.publicStuff methodType vs.formattedScriptName
+              firstSharedMethod←0
+          :EndIf
+      :EndIf
+      Body,←vs.topRef,({(MakeBookmark ⍵),('h5 class="aplname" id="',GetChapterNo,':',('name'GetSingle data),'"')tag ⍵}('name'GetSingle data))
+      Body,←SyntaxHelper'syntax'GetSingle data
+      :If 0≠≢'more'GetSingle data
+          Body,←PolishMore'more'GetSingle data
+      :EndIf
+      :If 0≠≢'comments'GetSingle data
+          Body,←1 PolishComments('comments'GetSingle data)0 0 chapterNo
+      :EndIf
+      vs.Body,←Body
+      vs.firstInstanceMethod←firstInstanceMethod
+      vs.firstSharedMethod←firstSharedMethod
+    ∇
+
+    ∇ vs←vs CreateHTML_ForField(data chapterNo);Body;firstField
+      Body←''
+      firstField←vs.firstField
+      :If firstField
+          Body,←((MakeBookmark'Fields'),('h4 id="',GetChapterNo,':fields"')tag'Fields')
+          Body,←PrepareSubLinks vs.publicStuff'Field'vs.formattedScriptName
+          firstField←0
+      :EndIf
+      Body,←vs.topRef,{(MakeBookmark ⍵),('h5 class="aplname" id="',GetChapterNo,':',({⍵↑⍨¯1+⍵⍳'←'}'name'GetSingle data),'"')tag ⍵}{⍵↑⍨¯1+⍵⍳'←'}'name'GetSingle data
+      Body,←'p class="small"'tag(('access'GetSingle data),(('readonly'GetSingle data)/', readonly'))
+      :If 0≠≢'more'GetSingle data
+          Body,←PolishMore'more'GetSingle data
+      :EndIf
+      :If 0≠≢'comments'GetSingle data
+          Body,←PolishComments('comments'GetSingle data)0 0 chapterNo
+      :EndIf
+      :If 0≠≢'syntax'GetSingle data
+          Body,←'p class="aplcode"'tag'Initialised with: ',MarkupInlineAPL_Code{'`',⍵,'`'}dmb'syntax'GetSingle data
+      :EndIf
+      vs.Body,←Body
+      vs.firstField←firstField
+    ∇
+
+    ∇ vs←vs CreateHTML_ForProperty(data chapterNo);firstProperty;Body
+      Body←''
+      firstProperty←vs.firstProperty
+      :If firstProperty
+          Body,←((MakeBookmark'Properties'),('h4 id="',GetChapterNo,':props"')tag'Properties')
+          Body,←PrepareSubLinks vs.publicStuff'Property'vs.formattedScriptName
+          firstProperty←0
+      :EndIf
+      Body,←vs.topRef,({(MakeBookmark ⍵),('h5 class="aplname" id="',GetChapterNo,':',(',_'∘Replace¨'name'GetSingle data),'"')tag ⍵}('name'GetSingle data))
+      Body,←'p class="small"'tag'(',('access'GetSingle data),({0=≢⍵:'' ⋄ ',',⊃{⍺,', ',⍵}/⍵}('keywords'GetSingle data),('readonly'GetSingle data)/⊂'readonly'),')'
+      :If 0≠≢'more'GetSingle data
+          Body,←PolishMore'more'GetSingle data
+      :EndIf
+      :If 0≠≢'comments'GetSingle data
+          Body,←PolishComments('comments'GetSingle data)0 0 chapterNo
+      :EndIf
+      vs.Body,←Body
+      vs.firstProperty←firstProperty
+    ∇
+
+    ∇ vs←vs CreateHTML_ForDestructor data;buffer;Body;firstDestructor
+      Body←''
+      firstDestructor←vs.firstDestructor
+      :If firstDestructor
+          Body,←vs.topRef,((MakeBookmark'Destructor'),('h4 id="',GetChapterNo,':dtor"')tag'Destructor')
+          firstDestructor←0
+      :EndIf
+      Body,←{(MakeBookmark ⍵),'h5 class="aplname"'tag ⍵}GetSingle data
+      Body,←SyntaxHelper'syntax'GetSingle data
+      :If 0≠≢'comments'GetSingle data
+          Body,←PolishComments('comments'GetSingle data)0 0 chapterNo
+      :EndIf
+      vs.Body,←Body
+      vs.firstDestructor←firstDestructor
+    ∇
+
+    ∇ vs←CreateHTML_ForInclude vs;buffer;Body;firstIncludes
+      Body←''
+      firstIncludes←vs.firstIncludes
+      :If firstIncludes
+          Body,←(MakeBookmark'Included'),('h4 id="',GetChapterNo,':incl"')tag'Included'
+          firstIncludes←0
+          buffer←'name'∘GetSingle¨{⍵↑⍨+/∧\{'Include'≡↑⍵[1;2]}¨⍵}vs.publicStuff
+          Body,←nl,('ul'tag 1↓↑,/nl∘,¨'li'∘tag¨'code'∘tag¨buffer),nl
+      :EndIf
+      vs.Body,←Body
+      vs.firstIncludes←firstIncludes
+    ∇
+
+    ∇ vs←vs CreateHTML_ForConstructor(data chapterNo);Body;firstConstructor
+      Body←''
+      firstConstructor←vs.firstConstructor
+      :If firstConstructor
+          Body,←{(MakeBookmark ⍵),('h4 id="',GetChapterNo,':ctor"')tag ⍵}'Constructor',(1<+/'Constructor'∘≡¨Get vs.publicStuff/⍨2=↑∘⍴∘⍴¨vs.publicStuff)/'s'
+          firstConstructor←0
+      :EndIf
+      Body,←{((MakeBookmark ⍵)),'h5 class="aplname"'tag ⍵}'name'GetSingle data
+      Body,←SyntaxHelper'syntax'GetSingle data
+      :If 0≠≢2⊃data[data[;1]⍳⊂'comments';]
+          Body,←PolishComments('comments'GetSingle data)0 0 chapterNo
+      :EndIf
+      vs.Body,←Body
+      vs.firstConstructor←firstConstructor
+    ∇
+
+    ∇ r←{methodType}PrepareSubLinks(data type scriptName);bool;noOf;links;list;list2;buff
+      ⍝ Prepare a link list for a given type.
+      ⍝ Make it a numbered list if there are more than 4 items.
+      r←⍬
+      :If 0=⎕NC'OutputType' ⍝ is it an instance?
+      :OrIf OutputType≡'Web'
+          :If (⊂type)∊'Field' 'Function' 'Operator' 'Variable'
+              noOf←+/bool←type∘≡¨Get data
+          :ElseIf 'Property'≡type
+              bool←type∘≡¨Get data
+              noOf←⍴↑,/{','∊⍵:','Split ⍵ ⋄ ⊂⍵}¨'name'Get bool/data
+          :ElseIf 'Interface Method'≡type
+              noOf←+/bool←('Interface Method'∘≡¨Get data)
+          :ElseIf 'Operators'≡type
+              noOf←+/bool←('Operator'∘≡¨Get data)
+          :Else
+              noOf←+/bool←((Get data)∊'Method' 'Function')∧methodType∘≡¨'access'Get data
+          :EndIf
+          :If 0<+/bool
+              :If 0≠≢list←'name'Get bool/data
+              :AndIf 0≠≢list←(0<≢¨list)/list
+                  list2←,↑,/{','∊⍵:','Split ⍵ ⋄ ⊂⍵}¨list
+                  list2←{⍵↑⍨¯1+⍵⍳'←'}¨list2
+                  list2←list2[SortAlphabet⍋⊃list2]
+                  list←list[SortAlphabet⍋⊃list]
+                  :If 1<≢list2
+                      :If 4≥≢list2
+                          links←nl,⍨⊃,/{⍺,' | ',⍵}/{('a href="#',(GetChapterNo,':',⍵),'"')tag ⍵}¨list2
+                          r←'div class="sublinks"'tag links
+                      :Else
+                          buff←↑,/{(1+','+.=⍵)⍴⊂⍵}¨list
+                          buff←',_'∘Replace¨buff
+                          links←'ol class="sublinks"'tag⊃,/'li'∘tag¨list2{('a href="#',(GetChapterNo,':',⍵),'"')tag ⍺}¨buff
+                          r←'div class="sublinks"'tag links
+                      :EndIf
+                  :EndIf
+              :EndIf
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ r←type SortMethods data;bool;buffer
+      ⍝ Sort the methods in "data" alphabetically. "type" is one of: Instance, Shared or Public (Interface!)
+      :If 0≠≢r←data
+          bool←2=↑∘⍴∘⍴¨data
+      :AndIf 1∊bool←bool\'Method'∘≡¨Get bool/data
+          :If 0<+/bool←bool\type∘≡¨'access'Get bool/data
+              buffer←bool/r
+              buffer←{⍵[SortAlphabet⍋⊃'name'Get buffer]}buffer
+              (bool/r)←buffer
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ r←type Sort data;bool;buffer
+      ⍝ Sort "type" in "data" alphabetically. "type" is one of: Property, Field
+      :If 0≠≢r←data
+          bool←2=↑∘⍴∘⍴¨r
+          bool←bool\type∘≡¨Get bool/r
+      :AndIf 0≠≢buffer←bool/r
+          buffer←{⍵[SortAlphabet⍋⊃'name'Get buffer]}buffer
+          (bool/r)←buffer
+      :EndIf
+    ∇
+
+    ∇ r←MakeAnchor(html pattern);where;i;ref
+     ⍝ Look for "pattern" in html and make all occurencies an anchor.
+     ⍝ Typically "pattern" is something like "http://x.y.z" or "mailto:x@y.z"
+     ⍝ of "file:///foo.txt"; You can prevent this from happening with a leading "!"
+      :If 0≠≢where←⌽{⍵/⍳⍴,⍵}pattern⍷r←html
+          :For i :In where
+              :If '!'=¯1↑r←(i-1)⌽r
+                  r←(-i-2)⌽¯1↓r
+              :Else
+                  ref←{⍵↑⍨¯1+⌊/⍵⍳'  <'}r
+                  r←(-i-1)⌽(('a class="externallink" href="',(ref),'"')tag ref),(⍴ref)↓r
+              :EndIf
+          :EndFor
+      :EndIf
+    ∇
+
+    ∇ r←GetRequireInfoOld txt;bool
+      ⍝ Looks for "⍝∇:require"d classes/namespaces.\\
+      ⍝ See also `GetRequireInfo` which might one day (looks) for the :Require control structure.
+      r←⍬
+      :If 0<+/bool←∨/¨'⍝∇:require'∘⍷¨Lowercase txt
+          r←' '~¨⍨{⍵↓⍨⍵⍳'='}¨bool/txt
+          r←r[SortAlphabet⍋⊃r]
+      :EndIf
+    ∇
+
+    ∇ r←GetRequireInfo txt;bool
+      ⍝ Looks for ":Require".\\
+      ⍝ See also `GetRequireInfoOld` which looks for the ⍝∇:require keyword.
+      r←⍬
+      . ⍝ Not called yet: this damn thing does not live in the WS! Shall we enhance ADOC so that it can deal with files?!
+    ∇
+
+    ∇ (prop remark)←SplitAtLamp data;bool;firstLine
+       ⍝ Split "data" not only at the lamp (easy) but takes text into account, too.
+       ⍝ So this   :'foo←''⍝''  ⍝ assign lamp<br>    is handled correctly, too.
+      remark←''
+      (firstLine data)←{(1⊃⍵)(1↓⍵)}data
+      data←(':'≠↑¨data~¨' ')/data ⍝ remove lines like ":Access" and similars
+      :If '⍝'∊firstLine/⍨bool←~MaskText firstLine
+          (prop remark)←firstLine{((⍵-1)↑⍺)({⍵↓⍨+/∧\' '=⍵}⍵↓⍺)}'⍝'⍳⍨bool\bool/firstLine
+          prop←{⍵↓⍨+/∧\' '=⍵}({⍵↓⍨⍵⍳' '}prop)
+      :Else
+          prop←firstLine
+      :EndIf
+      :If 0≠≢data←({∧\'⍝'=↑⍵~' '}¨data)/data
+          remark←{⍵/⍨0<↑∘⍴¨,¨⍵}(⊂remark),data
+      :EndIf
+      remark←{0 1∊⍨≡⍵:⊂⍵ ⋄ ⍵}remark
+      remark←{⍵↓⍨+/∧\⍵∊' ⍝'}¨remark
+    ∇
+
+    ∇ R←GetTempFileName
+    ⍝ Returns a fully qualified temporary filename
+      R←GetRefToParent.FilesAndDirs.GetTempFilename''
+    ∇
+
+    ∇ r←{convertHeader}PolishComments(markdown hasContainers isContainer chapterNo);ns;parms
+    ⍝ Interprets the "leading" comments as extended Markdown.
+    ⍝ Via the (optional) left argument one can force any headers in `markdown` to be converted to <h6>.
+    ⍝ This makes sense in case it is a function/operator.
+      :If 0=≢∊markdown
+          r←''
+      :Else
+          convertHeader←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'convertHeader'
+          :If convertHeader
+              markdown←'(^\s{0,3})#{1,5} '⎕R'\1###### '⊣markdown  ⍝ All headers are converted to level 6.
+          :EndIf
+          markdown←ReplaceDoubleBackslashByNewLine markdown
+          markdown←isContainer↓,markdown
+          :If 0≠≢markdown←(⌊/+/¨∧\¨markdown=' ')↓¨markdown
+              parms←##.MarkAPL.CreateParms
+              parms.verbose←0
+              parms.bookmarkLink←6
+              ns←##.MarkAPL.Init parms markdown
+              ns←##.MarkAPL.Process ns
+              r←'<div class="header">',(⊃,/(⎕UCS 13),¨ns.html),'</div>'
+          :Else
+              r←'<div class="header"></div>'
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ r←ReplaceDoubleBackslashByNewLine markdown;preMask;fenceMask;bool
+      preMask←~{⍵∨≠\⍵}{0<↑⍴'^<pre\b[^>]*>' '^</pre>'⎕S 0⍠('Greedy' 0)⊣⍵}¨markdown
+      fenceMask←preMask\~{⍵∨≠\⍵}{0<↑⍴'\s?~~~' '\s?```'⎕S 0⍠('Greedy' 0)⊢⍵}¨preMask/markdown
+      bool←preMask∧fenceMask
+      (bool/markdown)←dtb bool/markdown
+      (bool/markdown)←{'\\'≢¯2↑⍵:⍵ ⋄ (¯2↓⍵),⎕UCS 13}¨bool/markdown
+      r←(⎕UCS 13)Split 1↓↑,/(⎕UCS 13),¨markdown
+    ∇
+
+    ∇ r←GetMaskForCode txt;noOf
+    ⍝ Returns a mask (vector of Booleans with zeros for all APL code in ⍵.
+    ⍝ Does not fall over odd number of ticks.
+      :If 0<noOf←+/r←txt='`'
+      :AndIf {⍵≠⌊⍵}noOf÷2
+          (¯1↑r)←1
+      :EndIf
+      r←r∨≠\r
+    ∇
+
+    ∇ r←PolishMore data
+         ⍝ Make the "more" data ready for use - if any
+      r←⊃,/{('<p>',⍵,'</p>'),nl}¨data
+    ∇
+
+    ∇ r←ProcessHtag r;bm;level
+      :If '<h>'≡1 1 0 1/4↑r ⍝ is it an <h{n}>-tag?
+          r←dtb r
+          bm←MakeBookmark{⍵↑⍨¯1+⍵⍳'<'}{⍵↓⍨⍵⍳'>'}r
+      :AndIf '</h>'≢1 1 1 0 1/¯5↑r
+          level←{2↓¯1↓r↑⍨r⍳'>'}r
+          r,←'</h',level,'>'
+      :EndIf
+    ∇
+
+      ReplaceHtmlSpecialChars←{
+          s←⍵           ⍝ Simple string, typically APL code
+          bool1←'&'=s
+          bool2←'<'=s
+          bool3←'>'=s
+          (bool1/s)←⊂'&amp;'
+          (bool2/s)←⊂'&lt;'
+          (bool3/s)←⊂'&gt;'
+          ∊s
+      }
+
+
+    ∇ r←vs AnalyzeFns(scriptRef noOf);more;buffer;keywords;name;syntax;bool;type;access;masked;source;remarks
+      r←⍬
+      more←''
+      buffer←dmb⊃noOf↑vs.maskedSource
+      keywords←''
+      name←1↓GetNameFromHeader 1⊃vs.origSource
+      :If vs.isNamespace
+      :AndIf ~(⊂name)∊vs.public
+          :Return
+      :EndIf
+      syntax←GetSyntax 1⊃vs.origSource
+      (masked source)←noOf↑¨vs.(maskedSource origSource)
+      :If 0<+/bool←∨/¨∨/¨':implements constructor' ':implements destructor' ':implements method '⍷¨⊂buffer
+          :Select ↑bool⍳1
+          :Case 1
+              type←'Constructor'
+              access←'Public'
+          :Case 2
+              type←'Destructor'
+              access←'Private'
+          :Case 3 ⍝ interface method
+              type←'Interface Method'
+              access←'Public'
+              more,←⊂1↓↑(∨/':implements '⍷⊃masked)/source
+          :EndSelect
+      :Else
+          :If vs.isNamespace
+              access←'Shared'
+              type←(1+3.1=scriptRef.⎕NC⊂name)⊃'Operator' 'Function'
+              :If 0≠≢vs.public
+              :AndIf ~(⊂name)∊vs.public
+                  :Return
+              :EndIf
+              buffer←''
+          :ElseIf ∨/∨/':access'⍷buffer
+              type←'Method'
+              buffer⌷[1]⍨←1⍳⍨∨/':access '⍷buffer
+              :If ∨/'shared'⍷buffer
+                  access←'Shared'
+              :Else ⍝ Therefore, it MUST be "instanced"
+                  access←'Instance'
+               ⍝ Only "instance" methods may be overridable:
+                  :If ∨/' overridable'⍷buffer
+                      more,←⊂'Overridable'
+                  :EndIf
+              :EndIf
+               ⍝ Only "instance" methods may override:
+              :If ∨/' override'⍷buffer
+                  more,←⊂'Override'
+              :EndIf
+          :ElseIf vs.isInterface
+              type←'Method'
+              access←'Instance'  ⍝ Interface methods are always "Public" and therefore either "Instance" or "Shared"!
+              buffer←''
+          :Else
+              :Return
+          :EndIf
+          keywords←({(Uppercase 1↑⍵),Lowercase 1↓⍵}¨{' 'Split ⍵↓⍨⍵⍳' '}buffer)~'Public' 'Instance' 'Shared'
+          :If (⊂'private')∊Lowercase keywords
+              :Return
+          :EndIf
+      :EndIf
+      remarks←''
+      noOf←⍴source←RemoveMultiLocalLines source
+      :If 0≠≢{⍵/⍨'⍝'=↑¨⍵}buffer←1↓noOf↑source ⍝ remarks
+          buffer/⍨←{~∨/∨/¨':access' ':implements'{⍺≡Lowercase(⍴⍺)↑⍵}¨⊂⍵}∘dlb¨buffer
+          buffer↓¨⍨←{+/∧\' '=⍵}¨buffer
+          buffer↑⍨←+/∧\'⍝'=↑¨buffer
+          buffer⌿⍨←'⍝⍝'∘≢¨2↑¨buffer
+      :AndIf 0≠≢buffer←1↓¨buffer
+          buffer←(' '=↑¨buffer)↓¨buffer
+          remarks←{⍵,' '/⍨' '≠↑¯1↑⍵}¨buffer
+      :EndIf
+      :If IgnorePattern{0=≢⍺:1 ⋄ ⍺∨.≠(⍴,⍺)↑⍵}name
+           ⍝ A method name may appear again: an included namespace may provide a
+           ⍝ method with a name also used in the container class. Therefore, any
+           ⍝ additional occurance must be ignored!
+          :If 0=≢vs.publishedStuff
+          :OrIf ~(⊂name)∊(⊂'')~⍨{'Method'≢2⊃⍵[⍵[1;]⍳⊂'type';]:'' ⋄ 2⊃⍵[⍵[;1]⍳⊂'name';]}¨vs.publishedStuff
+              r←⊃('type'type)('name'name)('access'access)('syntax'syntax)('keywords'keywords)('more'more)('comments'remarks)
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ r←AnalyzeHeader(ref header);txt;cmd;noOf;bool;bool2;flags;last;body
+      r←⍬
+      :If 0≠≢∊header
+          :Repeat
+              (cmd txt)←{⍵{a←⍵⍳' ' ⋄ (1↓(a-1)↑⍺)(a↓⍺)}⍵}1⊃header
+              :If 0<noOf←+/∧\(↑¨header)∊'⍝ '
+                  txt←2↓¨noOf↑header
+                  txt/⍨←~0<↑¨{⍴'^\s{0,}⍝∇:require\s{1,}'⎕S 0⍠('IC' 1)⊣⍵}¨txt
+                  r,←⊂'Txt'txt
+              :Else ⍝ nothing we can do here, really!
+                  noOf←⍴header
+              :EndIf
+          :Until 0=≢header←noOf↓header
+      :EndIf
+    ∇
+
+    ∇ header←LookOutForSpecialFunctions(ref header)
+    ⍝ Analyze special fuunctions
+      header←HandleVersionInHeader ref header
+      header←HandleCopyRightInHeader ref header
+      header←HandleHistoryInHeader ref header
+    ∇
+
+    ∇ r←HandleVersionInHeader(ref header);txt;body;last
+    ⍝ Handle special case: is there a function `Version`, and does it return the right stuff?
+      r←header
+      :If ~ignoreVersion
+      :AndIf (⊂'Version')∊ref.⎕NL-3 ⍝ Is there a "Version" function?
+          :Trap 0 ⍝ not nice, but these calls may fail for all sorts of reasons.
+              txt←''
+              :If 9.1≡⎕NC⊂⍕ref  ⍝ Is it an ordinary namespace?!
+                  body←ref.⎕NR'Version'
+                  txt←ref.{11::'' ⋄ ,⍎⍵}'Version'
+              :Else
+                  txt←ref.Version
+              :EndIf
+              :If 0≠≢txt
+                  txt←,/'Version ' ' from ',¨1↓txt
+                  txt←(⊂'## Version'),txt
+                  :If 0=≢r
+                      r←,⊂'Txt'txt
+                  :Else
+                      last←⍴r
+                      (last⊃r)←txt{⍵[1],(⊂(2⊃⍵),⍺)}last⊃r
+                  :EndIf
+              :EndIf
+          :EndTrap
+      :EndIf
+    ∇
+    ∇ r←HandleCopyRightInHeader(ref header);txt;body
+    ⍝ Handle special case: is there a function `Copyright`, and does it return the right stuff?
+      r←header
+      :If ~_ignoreCopyright
+      :AndIf (⊂'Copyright')∊ref.⎕NL-3 ⍝ Is there a "Copyright" function?
+          txt←''
+          :If 9.1≡⎕NC⊂⍕ref  ⍝ Is it an ordinary namespace?!
+              body←ref.⎕NR'Copyright'
+              txt←ref.{11::'' ⋄ ,⍎⍵}'Copyright'
+          :Else
+              txt←{0 1∊⍨≡⍵:,⊂⍵ ⋄ 2=⍴⍴⍵:↓⍵ ⋄ ⍵},ref.Copyright
+          :EndIf
+          :If 0≠≢txt
+              txt←(⊂'## Copyright'),,/txt
+              :If 0=≢r
+                  r←,⊂'Txt'txt
+              :Else
+                  ((⍴r)⊃r)←txt{⍵[1],(⊂(2⊃⍵),⍺)}(⍴r)⊃r
+              :EndIf
+          :EndIf
+      :EndIf
+    ∇
+    ∇ r←HandleHistoryInHeader(ref header);txt;body;last;source;buffer;bool
+    ⍝ Handle special case: is there a function `History`, and does it either return the right stuff
+    ⍝ or consist of comments useful for ADOC?
+      r←header
+      :If ~_ignoreHistory
+      :AndIf (⊂'History')∊ref.⎕NL-3 ⍝ Is there a "History" function?
+          txt←''
+          :If 0=↑↑ref.⎕AT'History'
+              :If 0≠≢txt←dlb 1↓ref.⎕NR'History'
+              :AndIf 0≠≢txt←1↓¨('⍝'=↑¨txt)/txt
+                  txt←(⌊/+/∧\' '=⊃txt)↓¨txt
+              :Else
+                  source←⎕SRC ref
+                  buffer←'^\s*''.+''' '^\s*⍝.*$' '^\s*∇\s*History\b'⎕R(,¨'&' '&' '∇∇')⍠('Greedy' 0)⊣source
+                  :If 0<+/bool←∨/¨'∇∇'∘⍷¨buffer
+                      buffer←(bool⍳1)↓buffer
+                      buffer←dlb(↑'^\s*∇\s*$'⎕S 2⍠('Greedy' 0)⊣buffer)↑buffer
+                      :If 0=+/~(↑¨buffer)∊':⍝'
+                          txt←1↓¨('⍝'=↑¨buffer)/buffer
+                      :EndIf
+                  :EndIf
+              :EndIf
+          :Else
+              :Trap 0 ⍝ not nice, but these calls may very well fail
+                  :If 9.1≡⎕NC⊂⍕ref  ⍝ Is it an ordinary namespace?!
+                      body←ref.⎕NR'History'
+                      txt←ref.{11::'' ⋄ ⍎⍵}'History'
+                  :Else
+                      txt←ref.History
+                  :EndIf
+              :EndTrap
+          :EndIf
+          :If 0≠≢txt
+              :If 2=⍴⍴txt
+                  txt←{'<pre>',⍵,'</pre>'}¨↓⎕FMT txt
+              :EndIf
+              txt←{2=≡⍵:⍵ ⋄ ↓⍵}txt
+              txt←(⊂'## History'),txt
+              :If 0=≢r
+                  r←,⊂'Txt'txt
+              :Else
+                  last←⍴r
+                  (last⊃r)←txt{⍵[1],(⊂(2⊃⍵),⍺)}last⊃r
+              :EndIf
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ r←AnalyzeProperty(noOf source masked);buffer;bool;result;remarks;keywords;name
+      r←⍬
+      :If ∨/bool←∨/¨':access public'∘⍷¨dmb¨masked
+          result←⊂'type' 'Property'
+          (buffer remarks)←SplitAtLamp source
+          (name keywords)←{((⍴⍵)⊃⍵)(¯1↓⍵)}' 'Split dmb buffer
+      :AndIf IgnorePattern{0=≢⍺:1 ⋄ ⍺∨.≠(⍴,⍺)↑⍵}name
+          keywords↓⍨←':'=↑↑keywords
+          result,←⊂'name'name
+          result,←⊂'access'(↑('Instance' 'Shared')[1+∨/∨/⊃'shared'∘⍷¨{(⊂⍵)⊃¨⍨{⍵/⍳⍴,⍵}∨/¨':access'∘⍷¨⍵},¨masked])
+          result,←⊂'readonly'(~∨/'∇set'⍷∊source~¨' ')
+          :If 0=≢remarks
+              result,←⊂'comments'((+/∧\'⍝'={↑¨⍵~¨' '}1↓source)↑1↓source)
+          :Else
+              result,←⊂'comments'({0 1∊⍨≡⍵:⊂⍵ ⋄ ⍵}remarks)
+          :EndIf
+          result,←⊂'keywords'keywords
+          result,←⊂'more' ''
+          r←⊃result
+      :EndIf
+    ∇
+
+    ∇ r←AnalyzeField(noOf source masked);buffer;type;bool;remarks
+      r←⍬
+      :If ∨/' public '⍷↑masked
+          buffer←' 'Split dmb 1⊃source
+          type←⊃('Instance' 'Shared')[1+'shared'≡Lowercase 3⊃buffer]
+          :If ∨/'⍝'∊¨(1⊃source)/⍨bool←~MaskText 1⊃source
+              (buffer remarks)←(1⊃source){((⍵-1)↑⍺)({⍵↓⍨+/∧\' '=⍵}⍵↓⍺)}'⍝'⍳⍨bool\bool/1⊃source
+              remarks←{2=≡⍵:⍵ ⋄ ⊂⍵}remarks
+              remarks,←{⍵↓⍨1+⍵⍳'⍝'}¨1↓source
+              buffer←' 'Split buffer
+          :Else
+              remarks←''
+          :EndIf
+          buffer←dlb⊃,/' ',¨buffer/⍨~(Lowercase buffer)∊':field' 'public' 'instance' 'shared' 'readonly'
+          :If IgnorePattern{0=≢⍺:1 ⋄ ⍺∨.≠(⍴,⍺)↑⍵}buffer
+              r←⊃('type' 'Field')('name'(buffer↑⍨¯1+buffer⍳'←'))('syntax'(buffer↓⍨buffer⍳'←'))('access'type)('comments'remarks)('more' '')('readonly'(∨/' readonly '⍷Lowercase' ',source,' '))
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ {r}←{embeddedClassNames}Analyze_ scriptRef;vs;buffer;bool;tmpFilename;source
+      ⍝ Analyzes a particular script and appends the result to the _META array.
+      ⍝ If the left argument is specified, only that (or these) embedded class(es) gets analyzed.
+      ⍝ Returns either an empty vector or a vector of character vectors with the name(s) of any embedded classes.
+      r←⍬
+      vs←⎕NS''
+      vs.publishedStuff←vs.inheritsFrom←''
+      vs.devisorMeta←⍬
+      vs.formattedScriptName←{⍵↑⍨1+-'.'⍳⍨⌽⍵}{⍵↓⍨2×'#.'≡2↑⍵}⍕scriptRef
+      :Trap 16
+          vs.origSource←{⍵↓⍨+/∧/' '=⍵}¨⎕SRC scriptRef
+      :Else
+          :If 9.1=⎕NC⊂⍕scriptRef
+              #.⎕SHADOW¨'ADOC_Temp' 'ADOC_Source'
+              'ADOC_Temp'#.⎕NS''
+              '#.ADOC_Source'scriptRef.⎕NS↓scriptRef.⎕NL 2 3 4
+              scriptRef←ConvertOrdinaryNamespace2Scripted #.ADOC_Source
+              vs.origSource←{⍵↓⍨+/∧/' '=⍵}¨⎕SRC scriptRef
+              vs.origSource/⍨←1,~∧\'⍝'=↑¨1↓vs.origSource    ⍝ Get rid of any leading comments as they are not meaningful in this context.
+          :Else
+              (∆EM←'Invalid right argument')⎕SIGNAL 11
+          :EndIf
+      :EndTrap
+      vs.require←'' ⍝ GetRequireInfo vs.origSource  ⍝ ??! One day we might look into the file this source code is coming from and report :Require
+      embeddedClassNames←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'embeddedClassNames'
+      :If 0≠≢embeddedClassNames
+      ⍝ User asks for a class embedded in another one. So we simply replace "origSource" by the source of the embedded class
+          :If 0=≢buffer←1↓vs.origSource[{⍵/⍳⍴,⍵}':class'∘{⍺≡Lowercase(⍴⍺)↑⍵}¨dmb¨vs.origSource] ⍝ 1↓ for itself
+              :Return
+          :EndIf
+          bool←vs.origSource∊buffer
+          bool∨←vs.origSource∊¯1↓vs.origSource[{⍵/⍳⍴,⍵}':endclass'∘{⍺≡Lowercase(⍴⍺)↑⍵}¨dmb¨vs.origSource] ⍝ ¯1↓ for itself
+          buffer←({⍵∨≠\⍵}bool)/vs.origSource
+          buffer{(⊂¨⍵/⍺),¨⍺⊂⍨~⍵}←':class'Search dmb¨buffer
+          vs.origSource←buffer⊃⍨1⍳⍨embeddedClassNames∘≡¨{{⍵↑⍨¯1+⌊/⍵⍳' :'}(⍴':class ')↓dmb ⍵}¨1⊃¨buffer
+          vs.formattedScriptName←embeddedClassNames
+      :ElseIf 0≠≢vs.inheritsFrom←GetBase vs.origSource scriptRef
+          (∆EM←'Unknown devisor: ',⍕vs.inheritsFrom)⎕SIGNAL 11/⍨9∨.≠⎕NC⊃vs.inheritsFrom
+          Analyze_∘⍎¨vs.inheritsFrom
+          vs.devisorMeta←_META[(⍴vs.inheritsFrom){1+⍵-⌽⍳⍺}⍴_META]
+          _META←(-⍴vs.devisorMeta)↓_META
+      :EndIf
+      :If 0<+/bool←':include'∘≡¨Lowercase(⍴':include')↑¨dlb¨vs.origSource
+          vs.namespaceList←∪dlb¨{(⍴':include ')↓⍵}¨dlb¨vs.origSource[{⍵/⍳⍴,⍵}bool]
+          vs.namespaceList←{⍵↑⍨¯1+⍵⍳' '}¨vs.namespaceList
+          buffer←scriptRef MakeScriptFromNamespace¨vs.namespaceList
+          buffer←(~¨':namespace'∘Search¨buffer)/¨buffer
+          buffer←(~¨':endnamespace'∘Search¨buffer)/¨buffer
+          vs.origSource,←,¨⊃,/buffer
+      :EndIf
+      (vs.origSource vs.leadingDoc)←{noOf←+/∧\'⍝'=↑¨⍵ ⋄ (noOf↓⍵)(noOf↑⍵)}vs.origSource
+      vs.origSource/⍨←{~(⌽∧\⌽⍵)∨∧\⍵}0=↑∘⍴¨vs.origSource
+      :If 0=≢embeddedClassNames
+          r←':class '{' '~¨⍨(⍴⍺)↓¨dmb ⍵/⍨⍺{⍵≡¨⊂⍺}Lowercase(⍴⍺)↑¨dmb ⍵}1↓vs.origSource
+      :EndIf
+      vs.isInterface←∨/':interface '⍷Lowercase vs.headerLine←1⊃vs.origSource
+      vs.devisor←{0=≢⍵:⍵ ⋄ ⊃{⍺,', ',⍵}/⍵}vs.inheritsFrom
+      vs.scriptType←'Interface' 'Namespace' 'Class'⊃⍨5 1 4⍳10×2⊃0 1⊤|#.⎕NC⊂⍕scriptRef
+      :If 0≠≢embeddedClassNames
+          vs.scriptType,←' embedded into ',⍕scriptRef
+      :EndIf
+      vs.public←''
+      :If vs.isNamespace←':NAMESPACE '{⍺≡(⍴⍺)↑⍵}Uppercase dlb 1⊃vs.origSource
+          vs←GetPublicDefinitionFrom_NS scriptRef vs
+          :If 3=scriptRef.⎕NC'ADOC_Doc'
+              vs.origSource←vs.origSource[1],(dlb 1↓scriptRef.⎕NR'ADOC_Doc'),1↓vs.origSource
+          :ElseIf 2=scriptRef.⎕NC'ADOC_Doc'
+              vs.origSource←vs.origSource[1],('⍝ '∘,¨scriptRef⍎'ADOC_Doc'),1↓vs.origSource
+              vs.origSource←('ADOC_Doc←'{⍺∘≢¨(≢⍺)⍴¨⍵}vs.origSource)/vs.origSource
+          :EndIf
+      :EndIf
+      vs.origSource←1↓¯1↓vs.origSource
+      vs.require,←GetRequireInfoOld vs.origSource
+      (vs.origSource vs.headerDoc)←vs.origSource{(⍵↓⍺)(⍵↑⍺)}+/{∧\(∨/(⊃2↑¨⍵)∧.=⍉⊃'⍝ ' '⍝⍝' '⍝<' '⍝~')∨⍵∧.=¨' '}vs.origSource
+      vs.headerDoc←vs.leadingDoc,vs.headerDoc
+      vs.headerDoc←{0=≢∊⍵:∊⍵ ⋄ ⍵}vs.headerDoc
+      vs.headerDoc←AnalyzeHeader(scriptRef vs.headerDoc)
+      vs.headerDoc←LookOutForSpecialFunctions(scriptRef vs.headerDoc)
+      vs.origSource←dlb dtb vs.origSource
+      vs.maskedSource←(MaskText¨vs.origSource){w←⍵ ⋄ (⍺/w)←' ' ⋄ w}¨vs.origSource
+      vs.commentsStartAt←¯1+vs.origSource⍳¨'⍝'
+      :If 0=≢vs.maskedSource←,¨Lowercase vs.commentsStartAt↑¨vs.maskedSource
+          vs.publishedStuff,←ListVariables scriptRef vs.public
+          vs.publishedStuff←AnalyzeResult vs.publishedStuff
+          _META,←⊂vs.formattedScriptName vs.scriptType vs.devisor vs.headerDoc vs.publishedStuff vs.require
+      :Else
+          vs←LoopOverSource(scriptRef vs)
+          vs←vs ListDfnsAndDops scriptRef
+          vs.publishedStuff,←ListVariables scriptRef vs.public
+          vs.publishedStuff←AnalyzeResult vs.publishedStuff
+          _META,←⊂vs.formattedScriptName vs.scriptType vs.devisor vs.headerDoc vs.publishedStuff vs.require
+      :EndIf
+      :If 0≠≢vs.devisorMeta
+          MergeWithDevisor¨vs.devisorMeta
+      :EndIf
+    ∇
+
+    ∇ r←{maxLength}RestrictVectorLength data
+      maxLength←{0<⎕NC ⍵:⍎⍵ ⋄ 80}'maxLength'
+      :If 0=1↑0⍴data
+          r←maxLength{⍺>⍴⍵:⍵ ⋄ (⍺↑⍵),'...'}⍕data
+      :Else
+          r←maxLength{⍺>⍴⍵:⍵ ⋄ (⍺↑⍵),'...'}data
+      :EndIf
+    ∇
+
+    ∇ vs←LoopOverSource(scriptRef vs);noOf;currentline;this;buffer;name
+    ⍝ Analyzes `origSource` until it's all consumed.
+    ⍝ Looks for trad-fns, trad-opr, included stuff, fields, properties and classes.
+      buffer←''
+      :Repeat
+          noOf←1
+          :If 0≠≢currentline←1⊃vs.maskedSource
+              this←GetNameFromHeader currentline
+              name←'∇'~⍨GetNameFromHeader↑vs.origSource
+              :If '∇'∊this   ⍝ Is it a function, or an operator in case of a scripted namespace?
+                  noOf←⍴(1+'∇'⍳⍨↑¨' '~¨⍨1↓vs.origSource)↑vs.origSource
+                  :If ignoreVersion∨'Version'≢name
+                  :AndIf ignoreCopyright∨'Copyright'≢name
+                  :AndIf ignoreHistory∨'History'≢name
+                  :AndIf 'ADOC_Doc'≢(↑vs.origSource)~'∇ '  ⍝ Ignore `ADOC_Doc`
+                      buffer,←{0=≢⍵:'' ⋄ ⊂⍵}vs AnalyzeFns(scriptRef noOf)
+                  :EndIf
+              :ElseIf ':'=↑this
+                  :Select this
+                  :Case ':include'
+                      buffer,←⊂⊃('type' 'Include')('access' '')('name'({⍵↑⍨¯1+⍵⍳' '}dlb{⍵↓⍨⍵⍳' '}1⊃vs.origSource))
+                  :Case ':field'
+                      noOf←1++/∧\'⍝'=↑¨1↓dlb¨vs.origSource
+                      buffer,←{0=≢⍵:'' ⋄ ⊂⍵}AnalyzeField noOf,noOf↑¨vs.(origSource maskedSource)
+                  :Case ':property'
+                      noOf←vs.maskedSource⍳⊂':endproperty'
+                      buffer,←{0=≢⍵:'' ⋄ ⊂⍵}AnalyzeProperty(noOf,noOf↑¨vs.(origSource maskedSource))
+                  :Case ':class' ⍝ embedded class? Not of any interest to a user of a class
+                      noOf←⍴':endclass'{⍵↑⍨1++/∧\((⍴⍺)↑[2]⊃⍵)∨.≠⍺}vs.maskedSource
+                  :Case ':endnamespace' ⍝ embedded namespace? Not of any interest to a user of a class
+                      noOf←⍴':endnamespace'{⍵↑⍨1++/∧\((⍴⍺)↑[2]⊃⍵)∨.≠⍺}vs.maskedSource
+                  :EndSelect
+              :Else
+                  :If '{'=1↑(⍴this)↓1⊃vs.origSource ⍝ is it a dynamic function?
+                      noOf←FindEndOfDfns vs.maskedSource
+                  :Else
+                      noOf←1⌈+/∧\'∆:'∊⍨↑¨vs.origSource
+                  :EndIf
+              :EndIf
+          :EndIf
+          vs.(origSource maskedSource)←noOf↓¨vs.(origSource maskedSource)
+      :Until 0=≢vs.origSource
+      vs.publishedStuff,←buffer
+    ∇
+
+    ∇ data←AnalyzeResult data;bool
+      ⍝ Re-order the array
+      :If 0≠≢data
+          data←data[⍋'Include' 'Constructor' 'Destructor' 'Interface' 'Property' 'Field' 'Method' 'Functions' 'Operators' 'Vars'⍳Get data]
+          data←'Instance'SortMethods data
+          data←'Shared'SortMethods data
+          data←'Public'SortMethods data
+          data←'Field'Sort data
+          data←'Property'Sort data
+          :If 0<+/bool←2=↑∘⍴∘⍴¨data
+          :AndIf 0<+/bool←bool\'Method'∘≡¨Get bool/data
+              (bool/data)←(bool/data)[⍋'Instance' 'Shared'⍳'access'Get bool/data]
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ vs←vs CreateTop(noOfClasses chapterNo);types;publicTypes;bool
+     ⍝ Create the top part of the HTML page (title, toc) and the links
+      :If 0=⎕NC'OutputType' ⍝ is it an instance?
+      :OrIf OutputType≡'Web'
+          vs.topRef←'<a name="topmost"></a>'
+          :If 1<noOfClasses
+              vs.topRef,←'Go to: ',('a href="#',GetChapterNo,'"')tag'chapter'
+              vs.topRef←'div class="goto"'tag vs.topRef,' | ',('a href="#verytop"')tag'top'
+          :Else
+              vs.topRef,←'div class="goto"'tag'Go to: ',('a href="#verytop"')tag'top'
+          :EndIf
+          vs.topLinks←0 2⍴''
+          :If 0<≢vs.publicStuff
+              bool←2=↑∘⍴∘⍴¨vs.publicStuff
+              types←Get bool/vs.publicStuff
+              :If types∊⍨⊂'Constructor'
+                  vs.topLinks⍪←'ctor'(('a href="#',GetChapterNo,':ctor"')tag'Constructors')
+              :EndIf
+              :If types∊⍨⊂'Destructor'
+                  vs.topLinks⍪←'dtor'(('a href="#',GetChapterNo,':dtor"')tag'Destructors')
+              :EndIf
+              :If types∊⍨⊂'Interface'
+                  vs.topLinks⍪←'interface'(('a href="#',GetChapterNo,':infc"')tag'Interfaces')
+              :EndIf
+              :If types∊⍨⊂'Property'
+                  vs.topLinks⍪←'properties'(('a href="#',GetChapterNo,':props"')tag'Properties')
+              :EndIf
+              :If types∊⍨⊂'Field'
+                  vs.topLinks⍪←'fields'(('a href="#',GetChapterNo,':fields"')tag'Fields')
+              :EndIf
+              :If types∊⍨⊂'Method'
+                  publicTypes←'access'Get(bool/vs.publicStuff)/⍨types≡¨⊂'Method'
+                  :If publicTypes∊⍨⊂'Instance'
+                      vs.topLinks⍪←'instancemethods'(('a href="#',GetChapterNo,':instancemethods"')tag'Instance Methods')
+                  :EndIf
+                  :If publicTypes∊⍨⊂'Shared'
+                      vs.topLinks⍪←'sharedmethods'(('a href="#',GetChapterNo,':sharedmethods"')tag'Shared Methods')
+                  :EndIf
+                  :If publicTypes∊⍨⊂'Public'
+                      vs.topLinks⍪←'publicmethods'(('a href="#',GetChapterNo,':publicmethods"')tag'Interface Methods')
+                  :EndIf
+              :EndIf
+              :If types∊⍨⊂'Function'
+                  vs.topLinks⍪←'sharedmethods'(('a href="#',GetChapterNo,':sharedmethods"')tag'Shared Methods')
+              :EndIf
+              :If types∊⍨⊂'Operator'
+                  vs.topLinks⍪←'sharedoperators'(('a href="#',GetChapterNo,':sharedoperators"')tag'Shared Operators')
+              :EndIf
+              :If types∊⍨⊂'Interface Method'
+                  vs.topLinks⍪←'implementedinterfacemethods'(('a href="#',GetChapterNo,':implementedinterfacemethods"')tag'Implemented Interface(s)')
+              :EndIf
+              :If types∊⍨⊂'Destructor'
+                  vs.topLinks,←⊂'a href="#',GetChapterNo,':dtor"'tag'Destructor'
+              :EndIf
+          :EndIf
+      :Else
+          vs.(topRef topLinks)←⊂⍬
+      :EndIf
+    ∇
+
+    ∇ vs←GetPublicDefinitionFrom_NS(scriptRef vs)
+    ⍝ Only called when `scriptRef` points to a namespace.
+    ⍝ Returns either an empty vector (nothing is public) or a vector of
+    ⍝ text vectors with the names of the functions, operators and variables
+    ⍝ that are public.\\
+    ⍝ If there is a function `Public` then it rules the day. Otherwise
+    ⍝ **all** functions, operators and variables are considered public.\\
+      :If ':NAMESPACE '{⍺≡(⍴⍺)↑⍵}Uppercase dlb 1⊃vs.origSource
+          :If 0=scriptRef.⎕NC'Public'
+              vs.public←' '~¨⍨↓scriptRef.⎕NL 3.1 4.1 2
+          :Else
+              vs.public←scriptRef.{{0=≢⍵:⍵ ⋄ ⍵/⍨3.1 3.2 4.1 4.2 2∊⍨↑∘⎕NC¨⊂¨⍵}⍎⍵}'Public'
+          :EndIf
+      :EndIf
+      :If (⊂'Copyright')∊vs.public
+      :AndIf ~_ignoreCopyright
+          vs.public~←⊂'Copyright'
+      :EndIf
+      :If (⊂'Version')∊vs.public
+      :AndIf ~_ignoreVersion
+          vs.public~←⊂'Version'
+      :EndIf
+      :If (⊂'History')∊vs.public
+      :AndIf ~_ignoreHistory
+          vs.public~←⊂'History'
+      :EndIf
+    ∇
+
+      tag←{
+           ⍝ Examples:
+           ⍝ tag 'foo'                ←→  '<p>foo</p>'
+           ⍝ 'div' tag 'foo'          ←→  '<div>foo</div>'
+           ⍝ 'div id="my"' tag 'foo'  ←→  '<div id="my">foo</div>'
+           ⍝ 'div id="my"' tag ''  ←→  ''
+          ⍺←'p'
+          0=≢⍵:''
+          (tg style)←{⎕ML←1
+              ' '∊⍵:⍵{(⍵↑⍺)(⍵↓⍺)}¯1+⍵⍳' '
+              ⍵''}⍺
+          '<',tg,style,'>',(('<'=1⍴⍵)/nl),⍵,'</',tg,'>',nl
+      }
+
+
+      SyntaxHelper←{
+           ⍝ Help preparing proper HTML for the "Syntax:" box
+          '<div class="aplcode">Syntax: <code>',⍵,'</code></div>',nl
+      }
+
+      MaskText←{
+           ⍝ Returns a boolean mask useful to mask any text
+          ⍺←''''
+          {⍵∨≠\⍵}⍵∊⍺
+      }
+
+    Search←{⍺∘≡¨Lowercase ↓(⍴⍺)↑[2]⊃⍵}
+
+      Get←{
+      ⍝ Get all ⍺ of a series of matrices, typically 5⊃_META; See also GetSingle
+          ⍺←'type'
+          ⍺∘{2⊃⍵[⍵[;1]⍳⊂⍺;]}¨⍵
+      }
+
+      GetSingle←{
+          ⍺←'type'
+          2>⍴⍴⍵:↑⍵
+          2⊃⍵[⍵[;1]⍳⊂⍺;]
+      }
+
+
+      Set←{
+          (mat name newValue)←⍵
+          where←mat[;1]⍳⊂name
+          (1↑⍴mat)<where:mat,[⎕IO]name newValue
+          mat[where;2]←⊂(2⊃mat[where;]),newValue
+          mat
+      }
+
+    ∇ r←GetNameFromHeader header;rightArg
+      r←{⍵/⍨~{⍵∨≠\⍵}⍵∊'{}'}dmb header
+      :If '∇'∊r
+          r←{⍵↑⍨¯1+⍵⍳'⍝'}r                  ⍝ remove comments
+          r←dmb{⍵↑⍨¯1+⍵⍳';'}r               ⍝ remove local vars
+          r←{'←'∊⍵:⍵↓⍨⍵⍳'←' ⋄ ⍵}r           ⍝ remove explicit result
+          rightArg←0
+          :If ')'=¯1↑r                      ⍝ Is there a parathesized right argument?
+              r←⌽{⍵↓⍨(⍵⍳'(')}⌽r             ⍝ remove parenthesized right argument
+              rightArg←1
+          :EndIf
+          :If '('∊r                         ⍝ Operator?!
+              r←1↓¯1↓r{⍺/⍨⍵∨≠\⍵}r∊'()'
+              r←{' 'Split dmb ⍵~'∇'}r       ⍝ split by blank, remove any dels first
+              r←'∇',2⊃r                     ⍝ With operators it's always the second one
+          :Else
+              r←{' 'Split dmb ⍵~'∇'}r       ⍝ split by blank, remove any dels first
+              r←'∇',{⍵⊃⍨(1(1+rightArg)2)[1 2 3⍳⍴⍵]}r ⍝ 1=f ⋄ 2=f r ⋄ 3=(l f r)
+          :EndIf
+      :Else
+          r←{⍵↑⍨¯1+⍵⍳' '}r
+      :EndIf
+    ∇
+
+    ∇ syntax←GetSyntax header
+      syntax←dmb{⍵↑⍨¯1+⍵⍳';'}{⍵↓⍨+/∧\' '=⍵}'∇'~⍨header
+      syntax↑⍨←¯1+syntax⍳'⍝'
+      syntax←{~'}'∊⍵:⍵ ⋄ b←'}'=w←⍵ ⋄ (b/w)←⊂'} ' ⋄ ∊w}syntax
+      syntax←{~':'∊⍵:⍵ ⋄ ⍵↑⍨¯1+⍵⍳':'}syntax
+      syntax←{~'←'∊⍵:⍵ ⋄ b←'←'=w←⍵ ⋄ (b/w)←⊂' ← ' ⋄ ∊w}syntax
+      syntax←dmb syntax ⍝ { and ← in the same header results in "  "
+    ∇
+
+    ∇ keywords←ProcessKeywords data
+      keywords←'keywords'Get data
+      keywords←('readonly'Get data){⍺:(⊂'ReadOnly'),⍵ ⋄ ⍵}¨keywords
+      keywords←{⍵/⍨0<↑∘⍴¨⍵}¨keywords
+      keywords←{0=≢∊⍵:'' ⋄ 1=⍴⍵:' (',(∊⍵),')' ⋄ ' (',(⊃{⍺,',',⍵}/⍵),')'}¨keywords
+    ∇
+
+    ∇ (key filename)←FileBox y;∆;path;filename;caption;extension;mode;DQ_R;key
+      y←{0 1∊⍨≡⍵:⊂⍵ ⋄ ⍵}y
+      (path filename caption extension mode)←y,(⍴y)↓'' '' ''(⊂'*.html' 'ADOC HTML')'write'
+      :If 0=≢path
+          path←,⊃⎕CMD'cd'
+      :EndIf
+      ∆←⊂'FileBox'
+      ∆,←⊂'Directory'path
+      ∆,←⊂'File'filename
+      ∆,←⊂'CAPTION'caption
+      ∆,←⊂'EVENT'('FileBoxOK' 'FileBoxCancel')1
+      ∆,←⊂'Style' 'Single'
+      ∆,←⊂'FileMode'mode
+      ∆,←⊂'Filters'extension
+      'FileBoxForm'⎕WC ∆
+      DQ_R←⎕DQ'FileBoxForm'
+      :If 'FileBoxCancel'≡2⊃DQ_R
+          key←'CANCEL'
+      :Else
+          key←'OK'
+          filename←3⊃DQ_R
+      :EndIf
+    ∇
+
+    ∇ r←GetPrintCss
+      :Access Public Shared
+    ⍝ Returns the CSS for printing purposes.
+      r←''
+      r,←⊂'html {font-family: "Verdana", "Arial"; font-size:9pt; margin:0; padding:0 6pt;}'
+      r,←⊂'html * {text-decoration: none;}'
+      r,←⊂'div.sublinks{margin:1em;}'
+      r,←⊂'ul, ol, p {margin-left:12pt; max-width:auto;}'
+      r,←⊂'p.aplname {font-family:"APL385 Unicode";}'
+      r,←⊂'div.header  {padding:0 ;margin: 0 0 2em 0;}'
+      r,←⊂'h2, h3 {margin-top:2pt; margin-bottom:0;}'
+      r,←⊂'h4,h5,h6 {margin-top:0; margin-bottom:0; padding-top:0; font-size:10pt;}'
+      r,←⊂'.goto, .sublinks {display:none;}'
+      r,←⊂'code, .aplinlinecode {font-family:"APL385 Unicode";}'
+      r,←⊂'#sep {padding-left:4em;}'
+      r,←⊂'pre {font-family:"APL385 Unicode"; margin: 6pt 0 6pt 8pt; padding:0; line-height:1.2; border: 1pt dotted silver; padding:6pt; background-color: #f0f0f0;}'
+      r,←⊂'li > pre {margin-left: 0;}'
+      r,←⊂'div.aplcode {font-family:"APL385 Unicode"; font-size:120%; padding:3pt 0 3pt 7pt; margin:0;}'
+      r,←⊂'code {font-family:"APL385 Unicode", "Courier New", monospace; margin:0; padding:0; font-size:100%; display:inline; color: #950000;}'
+      r,←⊂'pre > code {padding: 0; background-color: #f0f0f0;}'
+      r,←⊂'p.small {padding:0; margin:0 0 0 2em; font-size:7pt;}'
+      r,←⊂'li > p {margin:8pt 0;}'
+      r,←⊂'h1, h2, h3, h4, h5, h6 {margin-left: 0pt;}'
+      r,←⊂'h1{text-align:center; padding:10pt; margin:1em 5pt 2em 5pt; width:100%; font-Size:16pt;}'
+      r,←⊂'h2 {font-size:11pt;}'
+      r,←⊂'h3 {font-size:10pt; margin:1em 0 0 0;}'
+      r,←⊂'h4 {font-size:9pt; padding:0; margin:2pt 0 0 0;}'
+      r,←⊂'h5 {font-size:8pt; padding:0; margin:2pt 0 0 0;}'
+      r,←⊂'h5.aplname {font-family:"APL385 Unicode"; font-size:120%; padding:5pt 0 3pt 7pt; margin:1em 0 0 0;}'
+      r,←⊂'#topmost {text-align:center; padding:10pt; margin:1em 5pt 2em 5pt; width:100%; font-Size:16pt;}'
+      r,←⊂'#toc {line-height:1.3; margin-left:1.5em; background-color: white}'
+      r,←⊂'#footer {text-align:center; font-size:7pt;}'
+      r,←⊂'#maintoc {margin:1em 1em 1em 4em; page-break-after:always}'
+      r,←⊂'#maintoc ol {margin:0 0 1em 0;}'
+      r,←⊂'#maintoc h1 {font-size:10pt; border:0; width:13em; margin:0; text-align:left;}'
+      r,←⊂'#maintoc div {margin-left:30pt;} '
+      r,←⊂'#maintoc div.subtoc {margin-left:40pt;}'
+      r,←⊂'ul, ol {padding-left: 10pt; margin: 10pt 0;}'
+      r,←⊂'li {margin-bottom:0.5em; line-height:1.2; margin-left:1.5em;}'
+      r,←⊂'div.toctab {display:none;}'
+      r,←⊂'a {text-decoration:none; color:black;}'
+      r,←⊂'a.autoheader_anchor {text-decoration:none;}'
+      r,←⊂'div.content {page-break-after:always;}'
+      r,←⊂'tr:nth-child(odd) {background: #eaeaea}'
+      r,←⊂'tr:nth-child(even) {background: #f3f3f3}'
+      r,←⊂'th, td {padding: 4px 6px; border: 1px solid silver;}'
+      r,←⊂'table {border-collapse: collapse; margin: 15px;}'
+    ∇
+
+    ∇ r←GetScreenCss
+      :Access Public Shared
+    ⍝ Return the CSS for screen purposes.
+      r←''
+      r,←⊂'html {font-family: "DejaVu Sans","Noto Sans","Lucida Sans Unicode", Sans-Serif; background-color: #fffeea; font-size: medium; margin:0; padding:0; color:#4b4b4b;}'
+      r,←⊂'body {max-width:920px; margin-left: auto; margin-right: auto;}'
+      r,←⊂'div.sublinks{margin: 1em; }'
+      r,←⊂'div.header h2, h3 {margin-top: 10px; margin-bottom: 0;}'
+      r,←⊂'h2 {margin-top: 5px; margin-bottom: 0;}'
+      r,←⊂'h3 {margin-top: 5px; margin-bottom: 0;}'
+      r,←⊂'h4 {margin-top: 20px; margin-bottom: 0; padding-top:0;}'
+      r,←⊂'h5 {margin-top: 0  ; margin-bottom: 0; padding-top:0;}'
+      r,←⊂'h6 {margin-top: 5px; margin-bottom: -5px; padding-top:0;}'
+      r,←⊂'p {margin: 8px; font-size: medium; line-height: 1.2;}'
+      r,←⊂'p.aplname {font-family: "APL385 Unicode"; font-size: small; }'
+      r,←⊂'div.goto {float: right; margin:0; padding:0 0 0 1em; }'
+      r,←⊂'span.aplinlinecode, span.aplinlinecode a {font-family: "APL385 Unicode"; font-size: medium; color: ',InLineCodeColor,'; padding-left:',(⍕InLineCodePadding),'px;padding-right:',(⍕InLineCodePadding),'px;}'
+      r,←⊂'text.aplinlinecode {font-family: "APL385 Unicode"; font-size: medium; color: inherent;}'
+      r,←⊂'#sep {padding-left: 4em; }'
+      r,←⊂'pre {font-family: "APL385 Unicode"; margin: 1em 0 1em 8px; font-size:medium; padding:3px; line-height: 1.2;'
+      r,←⊂'     overflow:auto; word-break:normal !important; word-wrap:normal !important; white-space: pre !important;'
+      r,←⊂'     border: 2pt dotted silver; background-color: #ebf1fa;}'
+      r,←⊂'li > pre {margin-left: 0;}'
+      r,←⊂'div.aplcode {font-family: "APL385 Unicode"; font-size: 110%; padding: 2px 0px 2px 5px; color:inherent; border: 1px solid silver; '
+      r,←⊂'     background-color:inherent; margin: 5px 0 0 10px; }'
+      r,←⊂'code {font-family: "APL385 Unicode", "Courier New", Monospace; margin: 0 1px; padding: 2px 2px 2px 2px; color:inherent; font-size: 100%; display:inline; color:#950000;}'
+      r,←⊂'pre > code {padding: 0;}'
+      r,←⊂'p.small {padding:0; margin:0 0 0 2em; }'
+      r,←⊂'li > p {margin:8px 0;}'
+      r,←⊂'h1, h2, h3, h4, h5, h6 {color:#97721b; margin-left: 10px; }'
+      r,←⊂'h6 {font-size: 100%;}'
+      r,←⊂'h1{Background-Color: #dedede; text-align: center; padding: 10px 0; margin: 5px 0; font-Size: 150%; border: 1px solid black; }'
+      r,←⊂'h2 {font-Size: 140%;}'
+      r,←⊂'h3 {font-size: 130%;  padding-top: 0em;}'
+      r,←⊂'h4 {font-size: 120%;  padding-top: 0em;}'
+      r,←⊂'h5 {font-size: 110%;  padding-top: 0em;}'
+      r,←⊂'h5.aplname {font-family: "APL385 Unicode"; font-size: 120%; padding: 0.5em 5px 0 5px; margin: 0.5em 0 0 0; }'
+      r,←⊂'h1#topmost {Background-Color: #dedede; text-align: center; padding: 5px 0; margin: 0 0; font-Size: 160%; border: 2px solid black; }'
+      r,←⊂'ol#toc {font-size: small; line-height: 1.3; }'
+      r,←⊂'#toc {font-size: small; line-height: 1.3; margin-left:1em; margin-bottom:1em;}'
+      r,←⊂'toc > a::before {content:"";}'
+      r,←⊂'toc > a {text-decoration:underline}'
+      r,←⊂'#footer {text-align: center; font-size: small; color:inherent; }'
+      r,←⊂'#maintoc {width: 40em; border: 1px solid black; margin: 1em;font-size: small; line-height: 1.15; }'
+      r,←⊂'#maintoc > div {margin-left:1.5em; margin-top:5px;}'
+      r,←⊂'#maintoc ol {margin:0 0 1em 0; }'
+      r,←⊂'#maintoc h1 {font-size:medium; background-color:transparent; border:0; color:inherent; width: 13em; margin: 0; text-align: left;}'
+      r,←⊂'#maintoc div.subtoc {margin-left:3em;}'
+      r,←⊂'ul, ol {padding-left: 20px ; margin: 10px 0; }'
+      r,←⊂'li { margin-bottom:0.5em; margin-left:1em; line-height:1.1;}'
+      r,←⊂'div.toctab {font-size: small; line-height: 1.4em; border: 1px solid silver; float:right; margin: 0.5em 0 0.5em 0.5em; padding:0.75em; '
+      r,←⊂'           background-color:white; line-height:1.6; }'
+      r,←⊂'div.level2 {padding-left: 0em;}'
+      r,←⊂'div.level3 {padding-left: 1em;}'
+      r,←⊂'div.level4 {padding-left: 2.5em;}'
+      r,←⊂'div.level5 {padding-left: 3em;}'
+      r,←⊂'div.level6 {padding-left: 3.56em;}'
+      r,←⊂'thead > tr:nth-child(odd) {background: #dedede;}'
+      r,←⊂'tbody > tr:nth-child(odd)  {background: #eaeaea;}'
+      r,←⊂'tbody > tr:nth-child(even) {background: #f5f5f5;}'
+      r,←⊂'th, td {padding: 4px 6px; border: 1px solid silver; vertical-align: top;}'
+      r,←⊂'table {border-collapse: collapse; margin: 1em 1.8em 0.5em 1.8em; background-color:grey;}'
+      r,←⊂'a.autoheader_anchor {text-decoration:none;}'
+    ∇
+
+    ∇ script←scriptName MakeScriptFromNamespace name;list;ref
+      ⍝ `scriptname` can be either a reference or a fully qualified name.\\
+      ⍝ `name` is the name  of an :Included namespace.\\
+      ⍝ The function returns the code for `name`.
+      :Access Public Shared
+      :If ⍬≡⍴scriptName
+          ref←scriptName
+          :Trap 6 16
+              script←ref.##.{⎕SRC⍎⍵}name
+              :Return
+          :EndTrap
+      :Else
+          ref←⍎{⍵↓⍨-'.'⍳⍨⌽⍵}⍕scriptName
+          :If 0=ref.⎕NC name
+              ∆EM←'Tries to :Include "',name,'" but that does not exist'
+              ∆EM ⎕SIGNAL 999
+          :EndIf
+          :Trap 16
+              script←ref.{⎕SRC⍎⍵}name
+              :Return
+          :EndTrap
+      :EndIf
+      ⍝ If we got to this stage, it is obviously an ordinary namespace
+      :If 9≠ref.⎕NC⍕name
+          ∆EM←'"',(⍕ref),'.',name,'" is not a namespace or does not exist'
+          999 ⎕SIGNAL⍨∆EM
+      :ElseIf ref.{0::0 ⋄ `⊣⎕SRC⍎⍵}⍕name
+          . ⍝ ???
+      :Else
+          :With ⍎(⍕ref),'.',⍕name
+              :If 0≠≢⎕NL 3
+                  list←⎕NL-3
+                  script←,¨⊃,/{⎕IO←1 ⋄ ⎕ML←3 ⋄ {⍵{3.2=⎕NC⊂⍺:⍵ ⋄ (''('∇',1⊃⍵)),(1↓⍵),'∇' '  '}⎕NR ⍵}⍵}¨list
+              :Else
+                  script←''
+              :EndIf
+          :EndWith
+      :EndIf
+      script←(':Namespace ',{⍵↓⍨2×'#.'≡2↑⍵}⍕name)'⍝',script,⊂':EndNamespace'
+    ∇
+
+    ∇ r←FindEndOfDfns source;noOfOpeneded;noOfClosed;this
+      r←0
+      noOfOpeneded←noOfClosed←0
+      :For this :In source
+          noOfOpeneded+←+/'{'=this
+          noOfClosed+←+/'}'=this
+          r+←1
+          :If noOfOpeneded=noOfClosed
+              :Leave
+          :EndIf
+      :EndFor
+      ⍝ Done
+    ∇
+
+    ∇ {r}←View filename;wsh;⎕WX;html;b;title
+      :Access public
+    ⍝ Fires up the default browser or uses the Ride browser to display "filename"
+      ⎕WX←1
+      r←⍬
+      :If 3501⌶⍬ ⍝ Connected to Ride?
+          html←##.APLTreeUtils.ReadUtf8File EncodeBlanksForNix filename
+          title←'<title'{{⍵↑⍨¯1+⍵⍳'<'}⍵↓⍨(⍴⍺)+1⍳⍨⍺⍷⍵}∊html
+          title(3500⌶)∊html
+      :Else
+          :Select ##.APLTreeUtils.GetOperatingSystem ⍬
+          :Case 'Win'
+              'wsh'⎕WC'OLEClient' 'WScript.Shell'
+              :If 0=≢_BrowserPath
+                  {}wsh.Run filename
+              :Else
+                  {}wsh.Run('"',(_BrowserPath~'"'),'" ',EncodeBlanksForNix filename)
+              :EndIf
+          :Case 'Lin'
+              :If 0=≢_BrowserPath
+                  {}⎕SH'xdg-open file://',filename,' &'
+              :Else
+                  {}⎕SH _BrowserPath,' file://',(EncodeBlanksForNix filename),' &'
+              :EndIf
+          :Case 'Mac'
+              .
+          :EndSelect
+      :EndIf
+    ∇
+
+    ∇ noOf←type CalcNoOfListItems data_
+     ⍝ Find out how many items belong to a particular list.
+     
+     ⍝ Note that lists may be nested (one level only) which
+     ⍝ means that an ordered list can live inside an unordered
+     ⍝ one and vice versa.
+      :If 0=type
+          noOf←+/∧\∨/(⊃(2↑¨(+/∧\' '=↑data_)↓¨data_))∧.=⍉2 2⍴'1.  '
+      :ElseIf 1=type
+          noOf←+/∧\(↑¨(+/∧\' '=↑data_)↓¨data_)∊'* '
+      :Else
+          . ⍝ Huuh?!
+      :EndIf
+     
+    ∇
+
+    ∇ r←CompressList vtv;buffer;sep;noOf;bool;lc;noOf
+      ⍝ Takes a vector of character vectors which is supposed to be a list (ordered or not) and
+      ⍝ puts lines together that are not separated by a blank line.
+      lc←⌊/+/∧\' '=⊃vtv         ⍝ Leading chars
+      :If '*'∧.=↑¨lc
+          r←vtv
+      :Else
+          r←''
+          :Repeat
+              :If 1<noOf←+/∧\(↑¨lc↓¨vtv)=' '
+                  buffer←noOf↑vtv
+                  :If 1=noOf
+                      (r[⍴r])←⊂((⍴r)⊃r),dlb↑buffer
+                  :Else
+                      (r[⍴r])←⊂((⍴r)⊃r),↑,/dlb¨buffer
+                  :EndIf
+                  vtv←noOf↓vtv
+              :Else
+                  r,←⊂1⊃vtv
+                  vtv←1↓vtv
+              :EndIf
+          :Until 0=≢vtv
+      :EndIf
+    ∇
+
+    ∇ r←GetBase(headerLine scriptRef);buffer;where;parent;bool
+      ⍝ Return full path to the base class (if any)
+      r←''
+      :If _Inherit
+          bool←~MaskText¨headerLine
+      :AndIf 0≠≢where←{⍵/⍳⍴,⍵}∨/¨':Class '∘⍷¨bool\¨bool/¨headerLine
+          buffer←(1⊃where)⊃headerLine
+          buffer←(⍴':Class ')↓dmb buffer
+          buffer←({~⍵∨≠\⍵}buffer='''')/buffer
+          buffer↑⍨←¯1+buffer⍳'⍝'
+      :AndIf 0≠≢buffer←(buffer⍳':')↓buffer
+          :If ','∊buffer
+              r←dmb¨{⍵⊂⍨','≠⍵}buffer
+          :Else
+              r←⊂dmb buffer
+          :EndIf
+          parent←1⊃'.'SplitPath⍕scriptRef
+          r←parent∘{'#'=1⍴⍵:⍵ ⋄ ⍺,⍵}¨r
+      :EndIf
+    ∇
+
+    ∇ {r}←MergeWithDevisor devisor;currentMeta;name;this;scriptName;type;nameList;i;buffer
+      ⍝ Implicit argument: _META; is also modified
+      currentMeta←(⍴_META)⊃_META
+      scriptName←1 1⊃devisor
+      type←1 2⊃devisor
+      r←''
+      :If 0≠≢buffer←5⊃currentMeta
+          nameList←'name'∘Get 5⊃currentMeta
+          :For i :In ⍳⍴1 5⊃devisor
+              this←i⊃1 5⊃devisor
+              name←'name'GetSingle this
+              :If (⊂name)∊nameList
+                  this←Set this'more'(⊂'Inherited from "',scriptName,'" but re-defined')
+                  (1 5 i⊃devisor)←this
+              :Else
+                  this←Set this'more'(⊂'Inherited from "',scriptName,'"')
+                  (5⊃currentMeta)←(5⊃currentMeta),⊂this
+              :EndIf
+          :EndFor
+          (5⊃currentMeta)←AnalyzeResult 5⊃currentMeta
+          ((⍴_META)⊃_META)←currentMeta
+      :EndIf
+    ∇
+
+    ∇ r←GetVarsFrom spaceRef
+      :With spaceRef
+          r←{⍵(⍎⍵)}¨⎕NL-2 9
+      :EndWith
+      r←⊃¨{IsChar ⍵:'_',⍺,'←''',⍵,'''' ⋄ '_',⍺,'←',⍕⍵}/¨r
+    ∇
+
+      MarkupBookmarks←{
+          0=+/b←'→['⍷s←⍵:s
+          i←¯1+b⍳1
+          s←i⌽s
+          (name s)←{⍵{(2↓¯1↓⍵↑⍺)(⍵↓⍺)}⍵⍳']'}s
+          s←({'<a href="#',(Blank2_ Lowercase ⍵),'">',⍵,'</a>'}name),nl,s
+          s←∇ s
+          (-i)⌽s
+      }
+
+    ∇ vs←InsertChapterToc vs;bool;First;this;no;Toc;i;anchor;buffer;level1Flag
+     ⍝ Inserts anchors to all "leading" <h{n}> tags and prepares a table-of-contents
+     ⍝ although this might be visible only if a certain number of entries is found.
+     ⍝ Adds to vs.Top
+      :If 0≠≢vs.Top
+          Toc←⊂'<div class="toctab">'
+          level1Flag←0≠≢'<h1\b[^>]*>'⎕S 0⍠('Mode' 'D')⊣vs.Top
+          :If 0<+/bool←(⍳⍴vs.Top)∊1+'<h[0-9]\b[^>]*>'⎕S 0⍠('Mode' 'D')⊣vs.Top
+              vs.Top←(1,1↓bool){⎕ML←0 ⋄ ⍺⊂⍵}vs.Top
+              (First vs.Top)←{(1⊃⍵)(1↓⍵)}vs.Top
+              :For i :In ⍳⍴vs.Top
+                  this←i⊃vs.Top
+                  no←⍎this[3]
+                  anchor←'toc_',GetChapterNo,':',¯4↑'0000',⍕i
+                  this[this⍳'>']←⊂' id="',anchor,'">'
+                  this←∊this
+                  (i⊃vs.Top)←this
+                  buffer←'<div class="level',(⍕1⌈6⌊no),'">',nl
+                  buffer,←'<a href="#',anchor,'">',({⍵↑⍨¯1+⍵⍳'<'}{⍵↓⍨⍵⍳'>'}this),'</a>',nl,'</div>'
+                  Toc,←⊂buffer,nl
+              :EndFor
+              :If 0≠≢vs.topLinks
+                  Toc,←'<div class="level2"><a href="#',GetChapterNo,'_tocref">Reference</a></div>'
+                  Toc,←{'<div class="level3">',⍵,'</div>'}¨vs.topLinks[;2]
+              :EndIf
+              Toc←{0=≢⍵:'' ⋄ ⊃,/⍵}Toc
+              vs.Top←(1⊃vs.Top),{0=≢⍵:'' ⋄ ⊃,/⍵}1↓vs.Top
+              :If level1Flag
+                  vs.Top←First,Toc,'</div>',vs.Top
+              :Else
+                  vs.Top←{⍵,Toc,'</div>',(⍴⍵)↓First,vs.Top}'<div class="header">'
+              :EndIf
+          :ElseIf 0≠≢vs.topLinks
+              Toc,←{'<div class="level2">',⍵,'</div>'}¨vs.topLinks[;2]
+              Toc,←'</div>'
+              vs.Top,←'<div id="',GetChapterNo,'_toc">',(⊃{0=≢⍵:'' ⋄ ⊃,/⍵}Toc),'</div>'
+          :EndIf
+      :EndIf
+    ∇
+
+    IsChar←{⎕ml←1  ⋄ ' '=1↑0⍴∊⍵}
+
+    ∇ {append}WriteFile(filename data);fno;fullname;flag
+         ⍝ Write UTF-8 "data" to "filename".
+      :Access Public Shared
+      append←{2=⎕NC ⍵:⍎⍵ ⋄ 0}'append'
+      flag←0
+      :Repeat
+          :Trap 19 22
+              fno←filename ⎕NTIE 0 17 ⍝ Open exclusively
+              filename ⎕NERASE fno
+              flag←1
+          :CaseList 19
+              ⎕DL 0.2
+          :Case 22
+              flag←1 ⍝ That's just fine
+          :Else
+              ⎕DM ⎕SIGNAL ⎕EN
+          :EndTrap
+      :Until flag
+      fno←filename ⎕NCREATE 0
+      :If 160≤⎕DR data
+          data←⎕UCS'UTF-8'⎕UCS data
+      :EndIf
+      data ⎕NAPPEND fno
+      ⎕NUNTIE fno
+    ∇
+
+    ∇ {R}←{wait}Run cmd;∆WAIT;windowStyle;wsh
+     ⍝ Starts an application
+     ⍝ By default, Run doesn't wait for the app to quit.
+      R←0 ''
+      wait←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'wait'
+      (∆EM←'Invalid left argument: must be a Boolean')⎕SIGNAL 11/⍨~wait∊0 1
+      windowStyle←8 ⍝ is WINDOWSTYLE.NORMAL
+      'wsh'⎕WC'OLEClient' 'WScript.Shell'
+      :Trap 0
+          {}wsh.Run cmd windowStyle wait
+      :Else
+          R←1('.'⎕WG'LastError')
+      :EndTrap
+    ∇
+
+    ∇ R←{noSplit}ReadAnsiFile filename;No;Size
+         ⍝ Read contents as chars. File is tied in shared mode.
+      :Access Public Shared
+      noSplit←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noSplit'
+      No←filename ⎕NTIE 0,66
+      Size←⎕NSIZE No
+      R←⎕NREAD No,80,Size,0
+      ⎕NUNTIE No
+      :If ~noSplit
+          :If 0<+/⎕UCS 13 10⍷R
+              R←Split R
+          :ElseIf 0<+/R=⎕UCS 10
+              R←(⎕UCS 10)Split R
+          :EndIf
+      :EndIf
+    ∇
+
+      BasePath←{
+          {⍎⍵↓⍨-'.'⍳⍨⌽⍵}⍕↑⎕CLASS ⍵  ⍝ where is the class script based?
+      }
+
+    ∇ r←SortAlphabet
+      r←(⊃(⎕A,⎕D)('abcdefghijklmnopqrstuvwxyz',⎕D))
+    ∇
+
+    ∇ r←Compress vtv;b;noOf;buffer
+    ⍝ Put together those items in vector of character vectors which end with a " _"
+      r←''
+      :While 0≠≢vtv
+          b←'_'=↑¨¯1↑¨vtv
+          noOf←1++/∧\b
+          buffer←noOf↑vtv
+          vtv←noOf↓vtv
+          r,←⊂{↑,/(¯1↓¨⍵↑⍨¯1+⍴⍵),⍵[⍴⍵]}buffer
+      :EndWhile
+    ∇
+
+    ∇ r←GetChapterNo
+    ⍝ Relies on the existence of a semi-global "chapterNo"
+      r←'ch',¯4↑'0000',⍕chapterNo
+    ∇
+
+      MakeBookmark←{
+          '<a name="',(Blank2_',_'Replace ⍵),'" />',nl
+      }
+
+      MarkupInlineAPL_Code←{
+        ⍝ Marks up anything between ` (ticks) as inline APL code for HTML,
+        ⍝ meaning that ordinary CSS is used.
+          0=+/b←'`'=w←⍵:w                           ⍝ No inline APL code? return ⍵
+          0≠2|+/b:11 ⎕SIGNAL⍨(∆EM←'Odd number of ` (ticks) found; see ',w)
+          ind←{⍵/⍳⍴,⍵}b
+          i1←((⍴ind)⍴1 0)/ind
+          i2←((⍴ind)⍴0 1)/ind
+          w[i1]←⊂'<span class="aplinlinecode">' ⍝ Opening tag
+          w[i2]←⊂'</span>'                       ⍝ Closing tags
+          ↑,/w                                   ⍝ Simplify
+      }
+
+      MarkupBold←{
+      ⍝ Mark up anything between '' and '' because that is meant to go ''bold''!
+          0=+/b←''''''⍷w←⍵:w
+          mask←~'`'{{⍵∨≠\⍵}⍺=⍵}w
+          b∧←mask
+          w[,({⍵/⍳⍴,⍵}b)∘.+¯1+⍳2]←(2×+/b)⍴'<strong>' '' '</strong>' ''
+          ↑,/w
+      }
+
+    ∇ r←EncodeBlanksForNix str;b
+    ⍝ Encode blanks in `str` under Linux and `Mac`
+      :Select ##.APLTreeUtils.GetOperatingSystem ⍬
+      :Case 'Win'
+          r←str
+      :CaseList 'Lin' 'Mac'
+          :If 0<+/b←' '=r←str
+              (b/r)←⊂'\ '
+              r←↑,/r
+          :EndIf
+      :Else
+          . ⍝ Huuh?!
+      :EndSelect
+    ∇
+
+      Replace←{
+          (this that)←⍺
+          0=+/b←this=⍵:⍵
+          w←⍵
+          (b/w)←that
+          w
+      }
+
+      RemoveMultiLocalLines←{
+      ⍝ With version 17.0 the possibility of spreading the definition of what variables are local
+      ⍝ has been extended to several lines. To make things worse between those lines, which must
+      ⍝ start with a semicolon, may be interrupted by blank lines and/or comment lines
+          ~17≤↑(//)⎕VFI{⍵/⍨2>+\⍵='.'}2⊃'#'⎕WG'APLVersion':⍵
+          candidates←(¯1+⍴⍵)-+/∧\~⌽{';'=↑¨⍵}1↓⍵ ⍝ The last line that starts with a ";" dictates the max number of lines
+          buff←↑¨candidates↑1↓⍵
+          ((buff∊' ⍝')/buff)←';'                ⍝ Replace space and "⍝" by a ";"
+          ⍵[1],(+/∧\';'=buff)↓1↓⍵
+      }
+
+    :Class Demo
+    ⍝ This class is embedded into ADOC just as an example
+
+        ∇ r←Hello
+          :Access Public Shared
+          r←'world'
+        ∇
+
+    :EndClass
+
+:EndClass

@@ -1,0 +1,21 @@
+ R←Test_Browse_59(stopFlag batchFlag);⎕TRAP;buffer;ps;filename;html
+⍝ `Browse` a scripted namespace that has both `Version` and `Copyright`
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ 'MyApp'#.Temp.⎕CY'Tests\TestData'
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.MyApp
+ ##.ADOC.RestoreDefaults
+ html←##.APLTreeUtils.ReadUtf8File filename
+ ##.FilesAndDirs.DeleteFile filename
+ html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
+ →T.PassesIf∨/'<a href="#toc_ch0001:0001">Version</a>'⍷html
+ →T.PassesIf∨/'<a href="#toc_ch0001:0002">Copyright</a>'⍷html
+
+ R←T._OK

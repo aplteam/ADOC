@@ -8,15 +8,16 @@
 ⍝ 2017 06 14 Adam: args are now separated with space instead of commas; -info handles multiple names and includes -title
 ⍝ 2017 05 15 KaiJ: -caption → -title
 ⍝ 2017 06 13 KaiJ: -params and ]CreateParms removed; help fixed; documentation updated.
-⍝ 2017 06 15 Adam: -info → -summary, now accepts relative refs, help tweak, removed error trapping
+⍝ 2017 06 15 Adam: -info → -summary, now accepts relative refs, help tweak, removed error trapping.
 ⍝ 2017 06 22 KaiJ: Bug fix regarding Caption/Title + make it compatible with pre-16.0 versions.
 ⍝ 2017 06 26 KaiJ: Documentation shortened. Sub-folder ADOC introduced. CSS for print improved.
 ⍝ 2017 06 27 KaiJ: Sub-folder removed.
 ⍝ 2018 04 18 Adam: ]??cmd → ]cmd -??
-⍝ 2018 05 01 Adam: Add SVN tag
+⍝ 2018 05 01 Adam: Add SVN tag.
 ⍝ 2018 08 11 KaiJ: Help improved and -version flag introduced.
-⍝ 2018 11 05 KaiJ: ADOC user command script relied on exposed properties
-⍝ 2019 01 15 KaiJ: In case nothing was provided as argument an error is thrown
+⍝ 2018 11 05 KaiJ: ADOC user command script relied on exposed properties.
+⍝ 2019 01 15 KaiJ: In case nothing is provided as argument an error is thrown.
+⍝ 2020 01 03 KaiJ: Now the user command tries to figure out where an object lives.
 
     ⎕IO←⎕ML←1
 
@@ -39,7 +40,6 @@
       ⎕SE.⎕EX'ADOC'
       'ADOC'⎕SE.⎕NS''
       ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
-     
       LoadAdoc ##.SourceFile
       :If Args.Switch'version'
           r←{⍵↓⍨+/∧\' '=⍵}⍕1↓⎕SE.ADOC.ADOC.Version
@@ -48,6 +48,7 @@
               calledFrom←{⊃⍵↓⍨'⎕SE'{+/∧\⍺∘≡¨(⍴⍺)↑¨⍵}⍵}⎕NSI
               (bool/Args.Arguments)←calledFrom∘{⍺,'.',⍵}¨bool/Args.Arguments
           :EndIf
+          Args.Arguments←∪LocateStuff Args.Arguments
           :If 0≢Args.summary
               r←AdocInfo Args
           :Else
@@ -68,8 +69,11 @@
           r,←⊂''
           r,←⊂' -title={text}    Add a custom title with the content {text}'
           r,←⊂' -browser={path}  Use the non-default browser specified'
-          r,←⊂' -summary[=full]  Return summarized information about the object members (optionally including full functions headers)'
+          r,←⊂' -summary[=full]  Returns summarized information about the object members (optionally including full function headers)'
           r,←⊂' -version         Returns the version number of ADOC used. If specified everythings else is ignored'
+          r,←⊂''
+          r,←⊂'When objects are not addressed with a full name (= start neither with `#` nor with `⎕SE` then the user command will try to find the'
+          r,←⊂'objects in the namespace the user command was called from. If they cannot be found there it will assume they live in `#`.'
           r,←⊂''
           r,←⊂'Examples:'
           r,←⊂'    ]',Cmd,' MyClass                              ⍝ single class'
@@ -172,6 +176,22 @@
           :EndTrap
           (failed/6)⎕SIGNAL⍨'Cannot find ',ws,' in ',path
       :EndTrap
+    ∇
+
+    ∇ r←LocateStuff r;i;this;type;calledFrom
+      :For i :In ⍳≢r
+          this←i⊃r
+          :If ~(⊃this)∊'#⎕'
+              type←⎕NC⊂'#.',this
+              calledFrom←('⎕SE.'{+/∧\⍺∘≡¨(≢⍺)↑¨⍵}⎕XSI)⊃⎕RSI
+              :If 9=calledFrom.⎕NC this
+                  this←(⍕calledFrom),'.',this
+              :Else
+                  this←'#.',this
+              :EndIf
+          :EndIf
+          (i⊃r)←this
+      :EndFor
     ∇
 
 :EndClass ⍝ ADOC  $Revision$

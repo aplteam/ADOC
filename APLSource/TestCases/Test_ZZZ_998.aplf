@@ -1,0 +1,36 @@
+ R←Test_ZZZ_998(stopFlag batchFlag);⎕IO;⎕ML;⎕TRAP;report;buff;xml;source;FindSpecialString
+⍝ Checks on two text vectors: "⍝TODO⍝" and "⍝CHECK⍝"; never fails, just reports.
+ ⎕IO←0 ⋄ ⎕ML←3
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._OK
+ report←''
+
+ FindSpecialString←{
+⍝ Use this to search for stuff like "CHECK" or "TODO" enclosed between `⍝` (⍵).
+     ⎕IO←0 ⋄ ⎕ML←3
+     startIn←⍺
+     r←⍉1↓[1]⎕SE.UCMD'locate "',⍵,'" -return=count -objects=',⍕startIn
+     r←(0<r[;1])⌿r                                  ⍝ Drop those with no hits
+     0≥1↑⍴r:r
+     r[;0]←{2>'#'+.=⍵:⍵ ⋄ {⌽⍵↑⍨1+⍵⍳'#'}⌽⍵}¨r[;0]    ⍝ Circumvent bug <01356>
+     r
+ }
+
+ xml←⎕XML'flat'##.APLTreeUtils.ReadUtf8File'publish.config'
+ source←2⊃xml[xml[;1]⍳⊂'container';]
+ buff←source FindSpecialString'⍝CHECK⍝'
+ buff←(buff[;0]≢¨⎕XSI[0])⌿buff ⍝ remove caller
+ :If ~0∊⍴buff
+     report,←↓(⊂' ⍝CHECK⍝ found:'),(⊂'   '),¨buff
+ :EndIf
+ buff←source FindSpecialString'⍝TODO⍝'
+ buff←(buff[;0]≢¨⎕XSI[0])⌿buff ⍝ remove caller
+ :If ~0∊⍴buff
+     report,←↓(⊂' ⍝TODO⍝ found:'),(⊂'   '),¨buff
+ :EndIf
+ :If 1=⍴,report
+     report,←⊂'    Nothing found!'
+ :Else
+     ⎕←'Checking for ⍝TODO⍝ and ⍝CHECK⍝ '{⍵↑,'--- ',⍺,' ',⍵⍴'-'}80⌊⎕PW-1
+     ⎕←⊃report
+ :EndIf

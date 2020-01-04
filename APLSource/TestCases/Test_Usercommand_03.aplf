@@ -1,0 +1,13 @@
+ R←Test_Usercommand_03(stopFlag batchFlag);newdoc;buffer;flag;p;sep;⎕TRAP;filename;html;expected;more
+⍝ Test the ADOC user command with a "browse" and -browser=
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ :Trap 11 911
+     more←⎕SE.UCMD'Adoc #.ADOC.ADOC -browser=MyBrowser.exe'
+     →T.FailsIf 1
+ :Else
+     →T.FailsIf 0=+/'DOMAIN ERROR'⍷⎕DMX.EM    ⍝ Should fail because no MyBrowse.exe exists...
+ :EndTrap
+
+ R←T._OK

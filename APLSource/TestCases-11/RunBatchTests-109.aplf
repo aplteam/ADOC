@@ -1,4 +1,0 @@
- {r}←RunBatchTests;ref
-⍝ Run all batch tests
- ref←{9=#.⎕NC ⍵:# ⋄ 9=({⎕ML←1 ⋄ ⊃⍵}⎕RSI).⎕NC ⍵:{⎕ML←1 ⋄ ⊃⍵}⎕RSI ⋄ 9=##.⎕NC ⍵:## ⋄ 'Cannot find "Tester"'⎕SIGNAL 6}'Tester'
- r←ref.Tester.RunBatchTests ⎕THIS

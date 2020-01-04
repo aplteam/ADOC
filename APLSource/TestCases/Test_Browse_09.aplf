@@ -1,0 +1,43 @@
+ R←Test_Browse_09(stopFlag batchFlag);newdoc;buffer;flag;sep;⎕TRAP;code;html;filename;list;ps
+⍝ `Browse` a class that has a multi-line field definition.
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+
+ code←⊂':Class MyClass'
+ code,←⊂':Field Public Instance ReadOnly abc←1 2 3 ⍝ First comment'
+ code,←⊂'⍝ Still first comment'
+ code,←⊂'⍝'
+ code,←⊂'⍝ Second comment'
+ code,←⊂'⍝ * This'
+ code,←⊂'⍝ * That '
+ code,←⊂'⍝ * More'
+ code,←⊂'⍝'
+ code,←⊂'⍝ Third comment'
+ code,←⊂''
+ code,←⊂''
+ code,←⊂'⍝ This does NOT belong to the field any more!'
+ code,←⊂'∇ Hello'
+ code,←⊂':Access Public Shared'
+ code,←⊂'r←(⍕⎕THIS)''5.0.3'' ''2016-04-20'''
+ code,←⊂,'∇'
+ code,←⊂':EndClass'
+
+ #.Temp.⎕FIX code
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.MyClass
+ ##.ADOC.RestoreDefaults
+ html←##.APLTreeUtils.ReadUtf8File filename
+ ##.FilesAndDirs.DeleteFile filename
+
+ →T.PassesIf(⊂'<a name="abc" />')∊html
+ html←(html⍳⊂'<a name="abc" />')↓html
+ html←(html⍳⊂'</div>')↑html
+ →T.PassesIf 0=∨/∨/¨'⍝ This does not belong to the field any more!'∘⍷¨html
+
+ R←T._OK

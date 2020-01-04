@@ -1,0 +1,25 @@
+ R←Test_Browse_17(stopFlag batchFlag);⎕TRAP;ps;filename;html;expected
+⍝ `Browse` a class that carries a single property definition for multiple properties.
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ 'MultipleGetsAndSets'#.TEMP.⎕CY'Tests/TestData'
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.TEMP.MultipleGetsAndSets
+ html←##.APLTreeUtils.ReadUtf8File filename
+ ##.FilesAndDirs.DeleteFile filename
+ html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html
+ expected←'<a href="#ch0001:PrI_A_PrI_B_PrI_C">'
+ →T.PassesIf 3=+/expected⍷html
+ expected←'<a href="#ch0001:PrS_A_PrS_B_PrS_C">'
+ →T.PassesIf 3=+/expected⍷html
+ expected←'<h5 class="aplname" id="ch0001:PrI_A_PrI_B_PrI_C">PrI_A,PrI_B,PrI_C</h5>'
+ →T.PassesIf 1=+/expected⍷html
+ expected←'<h5 class="aplname" id="ch0001:PrS_A_PrS_B_PrS_C">PrS_A,PrS_B,PrS_C</h5>'
+ →T.PassesIf 1=+/expected⍷html
+
+ R←T._OK
