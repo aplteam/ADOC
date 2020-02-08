@@ -74,9 +74,9 @@
 ⍝ lives inside classes and namespaces we have a conflict here: `ADOC` cannot report what's not
 ⍝ in the source code; as a consequence it can only report on `⍝∇:require` but not on `:Require`.
 ⍝ ### Mark-up syntax
-⍝ One can use Markdown, a simplified mark-up language, within the comment sections of public 
-⍝ functions and the so-called leading comments of scripts. `ADOC` uses the APLTree class 
-⍝ [`MarkAPL`](https://github.com/aplteam/MarkAPL "MarkAPL on GitHub") for converting the 
+⍝ One can use Markdown, a simplified mark-up language, within the comment sections of public
+⍝ functions and the so-called leading comments of scripts. `ADOC` uses the APLTree class
+⍝ [`MarkAPL`](https://github.com/aplteam/MarkAPL "MarkAPL on GitHub") for converting the
 ⍝ Markdown to HTML.\\
 ⍝ `ADOC` itself can be used as an example: it makes use of all mark-ups available, most importantly:
 ⍝ * Headers
@@ -187,17 +187,15 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.8.3.67' '2020-01-03'
+      r←(⍕⎕THIS)'6.8.4.69' '2020-02-08'
     ∇
 
     ∇ History
       :Access Public Shared
-      ⍝ * 6.8.3
-      ⍝   * Bug fixes:
-      ⍝     * `ADOC_Doc` should be mentioned in the "Reference" part but is was not when `ADO_Doc` was a variable rather than a function.
-      ⍝     * When there is nothing to report in the "Reference" section it should not make it into the document.
-      ⍝     * ADOC 6.8.2 and earlier is incompatible with changes introduced by MarkAPL version 8.1 because of a bug in ADOC that made
-      ⍝       an appearance only because of those changes in MarkAPL.
+      ⍝ * 6.8.4
+      ⍝   * Bug fix: in case an ordinary namespace contained external stuff (like ⎕NA functions etc.)
+      ⍝     SALT's "Save" function (with "convert" as parameter) failed. Now the external stuff is 
+      ⍝     deleted before SALT's "Save" function is called.
       ⍝\\
       ⍝ For information regarding older versions see <https://github.com/aplteam/ADOC/releases>
     ∇
@@ -1847,6 +1845,7 @@
               #.⎕SHADOW¨'ADOC_Temp' 'ADOC_Source'
               'ADOC_Temp'#.⎕NS''
               '#.ADOC_Source'scriptRef.⎕NS↓scriptRef.⎕NL 2 3 4
+              #.ADOC_Source.⎕EX #.ADOC_Source.⎕NL 3.6 3.9 7.9   ⍝ Delete external stuff, otherwise SALT will crash (Bug <01706>)
               scriptRef←ConvertOrdinaryNamespace2Scripted #.ADOC_Source
               vs.origSource←{⍵↓⍨+/∧/' '=⍵}¨⎕SRC scriptRef
               vs.origSource/⍨←1,~∧\'⍝'=↑¨1↓vs.origSource    ⍝ Get rid of any leading comments as they are not meaningful in this context.

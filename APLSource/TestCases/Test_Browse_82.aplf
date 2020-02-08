@@ -1,0 +1,21 @@
+ R←Test_Browse_82(stopFlag batchFlag);body;htmlFilename;parms;⎕TRAP;myAdoc;expected;html;buff
+⍝ `Browse` an ordinary namespace that contains external stuff (was once a bug)
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ #.Temp.Hello1←'World'
+ #.Temp.⎕FX'r←Hello2' 'r←''World'''
+ 'sendmsg'#.Temp.⎕NA'I4 USER32|SendMessageW U4 U4 U4 U4'
+ #.Temp.ADOC_Doc←'First comment\\' 'Second comment\\' 'Third comment'
+
+ parms←##.ADOC.CreateBrowseDefaults
+ parms.view←0
+ myAdoc←⎕NEW ##.ADOC
+ htmlFilename←myAdoc.Make #.Temp  ⍝ It's good enough if this works.
+
+ R←T._OK
+⍝Done
