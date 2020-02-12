@@ -1,0 +1,20 @@
+ R←Test_Browse_83(stopFlag batchFlag);body;htmlFilename;⎕TRAP;myAdoc;expected;html;buff
+⍝ Make sure that an empty line breaks what is considered "leading comments". Was once a bug.
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ #.Temp.⎕FIX':Namespace Foo' '⍝ First' '⍝' '⍝ Second' '⍝' '⍝ Third' '⍝' '⍝ Forth' '' '⍝ Fifth' '' '      a←1' ':EndNamespace'
+
+ myAdoc←⎕NEW ##.ADOC
+ htmlFilename←myAdoc.Make #.Temp.Foo
+ html←'flat'##.APLTreeUtils.ReadUtf8File htmlFilename
+ html←(1⍳⍨'<body'⍷html)↓html
+ →T.PassesIf∧/∨/¨'<p>First</p>' '<p>Second</p>' '<p>Third</p>' '<p>Forth</p>'⍷¨⊂html
+ →T.PassesIf~∨/'Fifth'⍷html
+
+ R←T._OK
+⍝Done

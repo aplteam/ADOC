@@ -1,0 +1,22 @@
+ R←Test_Browse_85(stopFlag batchFlag);body;htmlFilename;⎕TRAP;html;parms
+⍝ Make sure that the property "includeReference" is honoured: was introduced with 6.9.0
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ #.Temp.⎕FIX':Namespace Foo' '⍝ # Overview' '⍝ Leading' '⍝ comment' '' '∇r←Hello' '⍝ Hello world example' ':Access Public Shared' 'r←''World''' '∇' ':EndNamespace'
+
+ parms←##.ADOC.CreateBrowseDefaults
+ parms.view←0
+ parms.IncludeReference←0
+ htmlFilename←parms ##.ADOC.Browse #.Temp.Foo
+ html←'flat'##.APLTreeUtils.ReadUtf8File htmlFilename
+ html←(1⍳⍨'<body'⍷html)↓html
+ →T.PassesIf∨/'<p>Leading comment</p>'⍷html
+ →T.PassesIf~∨/'Reference'⍷html
+
+ R←T._OK
+⍝Done

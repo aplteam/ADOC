@@ -1,0 +1,21 @@
+ R←Test_Browse_86(stopFlag batchFlag);body;htmlFilename;⎕TRAP;html;myAdoc
+⍝ Make sure that "includeReference" is honoured by an ADOC instance: was introduced with 6.9.0
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ #.Temp.⎕FIX':Namespace Foo' '⍝ Leading' '⍝ comment' '' '∇r←Hello' '⍝ Hello world example' ':Access Public Shared' 'r←''World''' '∇' ':EndNamespace'
+
+ myAdoc←⎕NEW ##.ADOC
+ myAdoc.IncludeReference←0
+ htmlFilename←myAdoc.Make #.Temp.Foo
+ html←'flat'##.APLTreeUtils.ReadUtf8File htmlFilename
+ html←(1⍳⍨'<body'⍷html)↓html
+ →T.PassesIf∨/'<p>Leading comment</p>'⍷html
+ →T.PassesIf~∨/'Reference'⍷html
+
+ R←T._OK
+⍝Done

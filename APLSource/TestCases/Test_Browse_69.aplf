@@ -1,4 +1,4 @@
- R←Test_Browse_69(stopFlag batchFlag);body;htmlFilename;buff;parms;⎕TRAP;myAdoc;expected
+ R←Test_Browse_69(stopFlag batchFlag);body;htmlFilename;buff;⎕TRAP;myAdoc;expected
 ⍝ `Browse` an ordinary namespace with a vector of text vectors `ADOC_Doc` that carries the documentation; see also Test_Browse_52
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -11,8 +11,6 @@
  #.Temp.ADOC_Doc←'My comment from line 1' '' '* This' '* That' '* More'
  #.Temp.⎕FX'r←Hello' 'r←''Word'''
 
- parms←##.ADOC.CreateBrowseDefaults
- parms.view←0
  myAdoc←⎕NEW ##.ADOC
  htmlFilename←myAdoc.Make #.Temp
  ##.ADOC.RestoreDefaults

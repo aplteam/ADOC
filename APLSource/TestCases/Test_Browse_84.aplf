@@ -1,0 +1,20 @@
+ R←Test_Browse_84(stopFlag batchFlag);body;htmlFilename;⎕TRAP;myAdoc;expected;html;buff
+⍝ Make sure that any lines starting with `⍝⍝` within the leading comments are ignored. Was once a bug.
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ #.Temp.⎕FIX':Namespace Foo' '⍝ First\\' '⍝⍝ Second' '⍝ Third' '      a←1' ':EndNamespace'
+
+ myAdoc←⎕NEW ##.ADOC
+ htmlFilename←myAdoc.Make #.Temp.Foo
+ html←'flat'##.APLTreeUtils.ReadUtf8File htmlFilename
+ html←(1⍳⍨'<body'⍷html)↓html
+ →T.PassesIf∧/∨/¨'<p>First</p>' '<p>Third</p>'⍷¨⊂html
+ →T.PassesIf~∨/'Second'⍷html
+
+ R←T._OK
+⍝Done

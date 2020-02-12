@@ -18,6 +18,7 @@
 ⍝ 2018 11 05 KaiJ: ADOC user command script relied on exposed properties.
 ⍝ 2019 01 15 KaiJ: In case nothing is provided as argument an error is thrown.
 ⍝ 2020 01 03 KaiJ: Now the user command tries to figure out where an object lives.
+⍝ 2020 01 03 KaiJ: -ref=1|0 introduced with a default 1. Allows to suppress the reference part.
 
     ⎕IO←⎕ML←1
 
@@ -26,7 +27,7 @@
       r←⎕NS''
       r.Group←'TOOLS'
       r.Name←'ADoc'
-      r.Parse←'-title= -browser= -summary[=]full -version'
+      r.Parse←'-title= -browser= -summary[=]full -version -ref∊0 1'
       r.Desc←'Automated documentation generation'
     ∇
 
@@ -118,16 +119,18 @@
       :EndIf
     ∇
 
-    ∇ r←AdocBrowse Args;title;ref;cs;browser;params
+    ∇ r←AdocBrowse Args;title;ref;cs;browser;params;includeRefeference
       title←''Args.Switch'title' ⍝ default is empty
       browser←''Args.Switch'browser' ⍝ default is empty
+      includeRefeference←1 Args.Switch'ref'
       params←⍎'⎕SE.ADOC.ADOC.CreateBrowseDefaults'Args.Switch'params'
-      :If ~0∊⍴browser
+      :If 0≠≢browser
           params.BrowserPath←browser
       :EndIf
-      :If ~0∊⍴title
+      :If 0≠≢title
           params.Title←title
       :EndIf
+      params.IncludeReference←includeRefeference
       'Nothing to process?!'⎕SIGNAL 6/⍨0=≢Args.Arguments
       ref←CheckRefs¨Args.Arguments
       :If ∨/⍬∘≡¨ref

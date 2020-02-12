@@ -5,7 +5,6 @@
 ⍝ This class is useful for analysing one or more scripts or/and namespaces for
 ⍝ documentation purposes. Note that the documentation is meant to be useful for
 ⍝ the **user** of a class, not the designer/programmer of a class.\\
-⍝ There are three different ways to make use of `ADOC` in order to extract
 ⍝ information from a class or namespace:\\
 ⍝ * Creating a single HTML page with all information available, including any
 ⍝   injected documentation.
@@ -16,6 +15,11 @@
 ⍝ The first one is by far the most powerful and popular option since it allows
 ⍝ one to add additional information to scripts and also ordinary namespaces:
 ⍝ all "leading comments" are treated as special information.\\
+⍝ Leading comments are those lines after the header line (and possibly the definiton of
+⍝ local variabes and access staements like `:Access...` that start with a lamp (`⍝`)
+⍝ symbol followed by either a space or another `⍝`. The first line that is not start with
+⍝ a lamp symbol defines the end of a leading comment, although lines with `⍝⍝` will be
+⍝ ignored.\\
 ⍝ One can use Markdown to format the documentation. See [Mark-up syntax](#) for details
 ⍝ of how to do the mark-up.
 ⍝ Note that `ADOC` can process sub classes. For example, `ADOC` itself comes with a sub class
@@ -34,6 +38,7 @@
 ⍝ ⍝ List all methods, fields and properties
 ⍝ ⍝ of the public interface:
 ⍝       ]ADoc MyClass -summary
+⍝
 ⍝
 ⍝ ⍝ Same but with more details:
 ⍝       ]ADoc MyClass -summary=full
@@ -61,7 +66,7 @@
 ⍝ #### Exclude a line
 ⍝ In case you want to exclude a particular line from those leading comments
 ⍝ use two lamps (`⍝⍝`) at the beginning of the line. This does **not** break
-⍝ the connectionTFTFs with comments further down the line. Example:
+⍝ the connections with comments further down the line. Example:
 ⍝ ~~~
 ⍝ ⍝ This line shows in the `ADOC` documentation.
 ⍝ ⍝⍝ This line won't show in the `ADOC` documentation.
@@ -70,9 +75,9 @@
 ⍝ ### :Require
 ⍝ With version 15.0 Dyalog has introduced the `:Require` keyword for defining
 ⍝ dependencies.\\
-⍝ Since this keyword lives outside classes and namespaces while the older synonym `⍝∇:require`
-⍝ lives inside classes and namespaces we have a conflict here: `ADOC` cannot report what's not
-⍝ in the source code; as a consequence it can only report on `⍝∇:require` but not on `:Require`.
+⍝ Since this keyword lives outside classes and namespaces while the older --- and deprecated ---
+⍝ synonym `⍝∇:require` lives inside classes and namespaces we have a conflict here: `ADOC` cannot
+⍝ report what's not in the source code.
 ⍝ ### Mark-up syntax
 ⍝ One can use Markdown, a simplified mark-up language, within the comment sections of public
 ⍝ functions and the so-called leading comments of scripts. `ADOC` uses the APLTree class
@@ -187,15 +192,13 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.8.4.69' '2020-02-08'
+      r←(⍕⎕THIS)'6.9.0.77' '2020-02-11'
     ∇
 
     ∇ History
       :Access Public Shared
-      ⍝ * 6.8.4
-      ⍝   * Bug fix: in case an ordinary namespace contained external stuff (like ⎕NA functions etc.)
-      ⍝     SALT's "Save" function (with "convert" as parameter) failed. Now the external stuff is 
-      ⍝     deleted before SALT's "Save" function is called.
+      ⍝ * 6.9.0
+      ⍝   * Parameter `IncludeReference` added.
       ⍝\\
       ⍝ For information regarding older versions see <https://github.com/aplteam/ADOC/releases>
     ∇
@@ -267,6 +270,7 @@
     :Field Public Shared InLineCodeColor←'#961c1c' ⍝ The color used for APL inline code. Will be reset by calling `RestoreDefaults`.
 
     :Field Private Shared _BrowserPath←''
+    :Field Private Shared _IncludeReference←1
     :Field Private Shared _Title←''   ⍝ Top-level caption; empty=ignored.
 
     :Field Private Shared _Inherit←1
@@ -285,6 +289,18 @@
           (∆EM←'"Title" must be a string')⎕SIGNAL 11/⍨~IsChar arg.NewValue
           (∆EM←'"Title" must be simple')⎕SIGNAL 11/⍨~0 1∊⍨≡arg.NewValue
           _Title←arg.NewValue
+        ∇
+    :EndProperty
+
+    :Property IncludeReference
+    :Access Public Shared
+    ⍝ Defaults to 1. To suppress the Reference part of the documentation, set this to 0.
+        ∇ r←get
+          r←_IncludeReference
+        ∇
+        ∇ set arg
+          (∆EM←'"IncludeReference" must be a Boolean')⎕SIGNAL 11/⍨~0 1∊⍨arg.NewValue
+          _IncludeReference←arg.NewValue
         ∇
     :EndProperty
 
@@ -544,6 +560,7 @@
       _BrowserPath←''
       _Inherit←1
       _IgnorePattern←''
+      _IncludeReference←1
       CssScreen←'screen'
       CssPrint←'Print'
       InLineCodePadding←5
@@ -668,12 +685,14 @@
           vs.subHeadingCounter←1     ⍝ In case of containers
           :For chapterNo :In ⍳⍴_META
               vs←vs CreateUpperPartOfHTML_Page chapterNo
-              vs.(firstIncludes firstConstructor firstDestructor firstProperty firstField firstInterface)←1
-              vs.(firstInstanceMethod firstSharedMethod firstInterfaceMethod firstOpr firstVars)←1
-              vs.methodType←''                     ⍝ Will become either "Instance" or "Shared"
-              vs.publicStuff←SortPublicStuff vs.publicStuff
-              vs←vs LoopOverPublicStuff chapterNo
-              _DOCS,←⊂vs.formattedScriptName
+              :If _IncludeReference
+                  vs.(firstIncludes firstConstructor firstDestructor firstProperty firstField firstInterface)←1
+                  vs.(firstInstanceMethod firstSharedMethod firstInterfaceMethod firstOpr firstVars)←1
+                  vs.methodType←''                     ⍝ Will become either "Instance" or "Shared"
+                  vs.publicStuff←SortPublicStuff vs.publicStuff
+                  vs←vs LoopOverPublicStuff chapterNo
+                  _DOCS,←⊂vs.formattedScriptName
+              :EndIf
               vs.Body←'div class="content"'tag vs.Body
               _HTML,←⊂vs.Body
           :EndFor
@@ -969,15 +988,16 @@
     ⍝ The result namespace can then be passed as left argument to `ADOC.Browse`.
       :Access Public Shared
       ps←⎕NS''
-      ps.Title←_Title
-      ps.IgnorePattern←_IgnorePattern
+      ps.BrowserPath←_BrowserPath
       ps.embeddedClassesFlag←0
+      ps.IgnorePattern←_IgnorePattern
       ps.Inherit←_Inherit
       ps.ignoreCopyright←0
       ps.ignoreHistory←0
       ps.ignoreVersion←0
-      ps.BrowserPath←_BrowserPath
       ps.IncludeCss←1
+      ps.Title←_Title
+      ps.IncludeReference←_IncludeReference
       ps.view←1
       ps.⎕FX'r←∆List;⎕IO' '⍝ List all variables and possible references in this namespace' '⎕IO←1' 'r←{⍵,[1.5]⍎¨⍵}⎕NL-2 9'
     ∇
@@ -1055,19 +1075,21 @@
           vs.TopMostRefId←vs.formattedScriptName
       :EndIf
       vs.(Top Body)←⊂⍬
-      vs←vs CreateTop(⍴_META)chapterNo
+      vs←vs CreateTop(≢_META)chapterNo
       vs←vs LoopOverHeader chapterNo
       vs.hasLeadingComments←0≠≢vs.Top
       vs←InsertChapterToc vs
       (vs)←CreateBody(vs chapterNo)
       vs.Body,←vs.Top
-      :If vs.hasLeadingComments
-      :AndIf 0≠≢vs.publicStuff
-          vs.Body,←vs.topRef,{(MakeBookmark ⍵),'<h3 id="',GetChapterNo,'_tocref">',⍵,'</h3>',nl}'Reference'
-      :EndIf
-      :If 0≠≢∊vs.require
-          vs.Body,←(MakeBookmark'Requires'),('h4 id="',GetChapterNo,':require"')tag'Requires'
-          vs.Body,←⊃,/{(MakeBookmark ⍵),'h5 class="aplname"'tag ⍵}¨vs.require
+      :If _IncludeReference
+          :If vs.hasLeadingComments
+          :AndIf 0≠≢vs.publicStuff
+              vs.Body,←vs.topRef,{(MakeBookmark ⍵),'<h3 id="',GetChapterNo,'_tocref">',⍵,'</h3>',nl}'Reference'
+          :EndIf
+          :If 0≠≢∊vs.require
+              vs.Body,←(MakeBookmark'Requires'),('h4 id="',GetChapterNo,':require"')tag'Requires'
+              vs.Body,←⊃,/{(MakeBookmark ⍵),'h5 class="aplname"'tag ⍵}¨vs.require
+          :EndIf
       :EndIf
     ∇
 
@@ -1471,23 +1493,6 @@
       :EndIf
     ∇
 
-    ∇ r←GetRequireInfoOld txt;bool
-      ⍝ Looks for "⍝∇:require"d classes/namespaces.\\
-      ⍝ See also `GetRequireInfo` which might one day (looks) for the :Require control structure.
-      r←⍬
-      :If 0<+/bool←∨/¨'⍝∇:require'∘⍷¨Lowercase txt
-          r←' '~¨⍨{⍵↓⍨⍵⍳'='}¨bool/txt
-          r←r[SortAlphabet⍋⊃r]
-      :EndIf
-    ∇
-
-    ∇ r←GetRequireInfo txt;bool
-      ⍝ Looks for ":Require".\\
-      ⍝ See also `GetRequireInfoOld` which looks for the ⍝∇:require keyword.
-      r←⍬
-      . ⍝ Not called yet: this damn thing does not live in the WS! Shall we enhance ADOC so that it can deal with files?!
-    ∇
-
     ∇ (prop remark)←SplitAtLamp data;bool;firstLine
        ⍝ Split "data" not only at the lamp (easy) but takes text into account, too.
        ⍝ So this   :'foo←''⍝''  ⍝ assign lamp<br>    is handled correctly, too.
@@ -1668,19 +1673,12 @@
       :EndIf
     ∇
 
-    ∇ r←AnalyzeHeader(ref header);txt;cmd;noOf;bool;bool2;flags;last;body
+    ∇ r←AnalyzeHeader(ref header);bool;txt
       r←⍬
       :If 0≠≢∊header
-          :Repeat
-              (cmd txt)←{⍵{a←⍵⍳' ' ⋄ (1↓(a-1)↑⍺)(a↓⍺)}⍵}1⊃header
-              :If 0<noOf←+/∧\(↑¨header)∊'⍝ '
-                  txt←2↓¨noOf↑header
-                  txt/⍨←~0<↑¨{⍴'^\s{0,}⍝∇:require\s{1,}'⎕S 0⍠('IC' 1)⊣⍵}¨txt
-                  r,←⊂'Txt'txt
-              :Else ⍝ nothing we can do here, really!
-                  noOf←⍴header
-              :EndIf
-          :Until 0=≢header←noOf↓header
+          bool←'⍝⍝'∘≢¨2↑¨header
+          txt←2↓¨bool/header
+          r,←⊂'Txt'txt
       :EndIf
     ∇
 
@@ -1853,7 +1851,7 @@
               (∆EM←'Invalid right argument')⎕SIGNAL 11
           :EndIf
       :EndTrap
-      vs.require←'' ⍝ GetRequireInfo vs.origSource  ⍝ ??! One day we might look into the file this source code is coming from and report :Require
+      vs.require←''
       embeddedClassNames←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'embeddedClassNames'
       :If 0≠≢embeddedClassNames
       ⍝ User asks for a class embedded in another one. So we simply replace "origSource" by the source of the embedded class
@@ -1902,8 +1900,7 @@
           :EndIf
       :EndIf
       vs.origSource←1↓¯1↓vs.origSource
-      vs.require,←GetRequireInfoOld vs.origSource
-      (vs.origSource vs.headerDoc)←vs.origSource{(⍵↓⍺)(⍵↑⍺)}+/{∧\(∨/(⊃2↑¨⍵)∧.=⍉⊃'⍝ ' '⍝⍝' '⍝<' '⍝~')∨⍵∧.=¨' '}vs.origSource
+      (vs.origSource vs.headerDoc)←SplitIntoSourceAndLeadingComments vs.origSource
       vs.headerDoc←vs.leadingDoc,vs.headerDoc
       vs.headerDoc←{0=≢∊⍵:∊⍵ ⋄ ⍵}vs.headerDoc
       vs.headerDoc←AnalyzeHeader(scriptRef vs.headerDoc)
@@ -1999,8 +1996,8 @@
 
     ∇ vs←vs CreateTop(noOfClasses chapterNo);types;publicTypes;bool
      ⍝ Create the top part of the HTML page (title, toc) and the links
-      :If 0=⎕NC'OutputType' ⍝ is it an instance?
-      :OrIf OutputType≡'Web'
+      :If _IncludeReference
+      :AndIf {0=⎕NC ⍵:0 ⋄ OutputType≡'Web'}'OutputType' ⍝ is it an instance?
           vs.topRef←'<a name="topmost"></a>'
           :If 1<noOfClasses
               vs.topRef,←'Go to: ',('a href="#',GetChapterNo,'"')tag'chapter'
@@ -2675,14 +2672,21 @@
       }
 
       RemoveMultiLocalLines←{
-      ⍝ With version 17.0 the possibility of spreading the definition of what variables are local
-      ⍝ has been extended to several lines. To make things worse between those lines, which must
-      ⍝ start with a semicolon, may be interrupted by blank lines and/or comment lines
+      ⍝ With version 17.0 the possibility of spreading the definition of local variables
+      ⍝ has been extended to several lines. To make things worse, those lines, which must
+      ⍝ start with a semicolon, may be interrupted by blank lines and/or comment lines.
           ~17≤↑(//)⎕VFI{⍵/⍨2>+\⍵='.'}2⊃'#'⎕WG'APLVersion':⍵
           candidates←(¯1+⍴⍵)-+/∧\~⌽{';'=↑¨⍵}1↓⍵ ⍝ The last line that starts with a ";" dictates the max number of lines
           buff←↑¨candidates↑1↓⍵
           ((buff∊' ⍝')/buff)←';'                ⍝ Replace space and "⍝" by a ";"
           ⍵[1],(+/∧\';'=buff)↓1↓⍵
+      }
+
+      SplitIntoSourceAndLeadingComments←{
+          source←⍵
+          b←∧\∨/(⊃2↑¨source)∧.=⍉⊃'⍝ ' '⍝⍝'
+          noOf←+/b
+          (noOf↓source)(noOf↑source)
       }
 
     :Class Demo
