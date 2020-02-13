@@ -1,0 +1,26 @@
+ R←Test_Browse_88(stopFlag batchFlag);body;htmlFilename;⎕TRAP;html;myAdoc
+⍝ Make sure that the property "Toc" is honoured with an instance: was introduced with 6.9.0
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ #.Temp.⎕FIX':Namespace Foo' '⍝ # Overview' '⍝ Leading' '⍝ comment' '' '∇r←Hello' '⍝ Hello world example' ':Access Public Shared' 'r←''World''' '∇' ':EndNamespace'
+
+ myAdoc←⎕NEW ##.ADOC
+ myAdoc.IncludeReference←0
+ myAdoc.Toc←0
+ htmlFilename←myAdoc.Make #.Temp.Foo
+ html←'flat'##.APLTreeUtils.ReadUtf8File htmlFilename
+ html←(1⍳⍨'<body'⍷html)↓html
+ →T.GoToTidyUp~∨/'<p>Leading comment</p>'⍷html
+ →T.GoToTidyUp∨/'Reference'⍷html
+ →T.GoToTidyUp∨/'toctab'⍷html
+
+ R←T._OK
+
+∆TidyUp:
+ ##.FilesAndDirs.DeleteFile htmlFilename
+⍝Done

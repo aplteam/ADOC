@@ -192,13 +192,13 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.9.0.77' '2020-02-11'
+      r←(⍕⎕THIS)'6.9.0.83' '2020-02-13'
     ∇
 
     ∇ History
       :Access Public Shared
       ⍝ * 6.9.0
-      ⍝   * Parameter `IncludeReference` added.
+      ⍝   * Properties `IncludeReference` and `Toc` added
       ⍝\\
       ⍝ For information regarding older versions see <https://github.com/aplteam/ADOC/releases>
     ∇
@@ -223,11 +223,7 @@
       vs.Body←(MakeBookmark name),{('h1 id="',GetChapterNo,'"')tag ⍵}name,tail
     ∇
 
-      Blank2_←{
-          w←⍵
-          ((' '=w)/w)←'_'
-          w
-      }
+      Space2_←{'_'@(⍸' '=⍵)⊣⍵}
 
     ∇ {r}←Fill_META list;this;isRef;scriptRef
     ⍝ Runs a loop on all items in `list` wich can be a single ref or the fully qualified name
@@ -272,7 +268,7 @@
     :Field Private Shared _BrowserPath←''
     :Field Private Shared _IncludeReference←1
     :Field Private Shared _Title←''   ⍝ Top-level caption; empty=ignored.
-
+    :Field Private Shared _Toc←1
     :Field Private Shared _Inherit←1
     :Field Private Shared _IgnorePattern←''
     :Field Private Shared CssScreen←'screen'
@@ -294,13 +290,28 @@
 
     :Property IncludeReference
     :Access Public Shared
-    ⍝ Defaults to 1. To suppress the Reference part of the documentation, set this to 0.
+    ⍝ Defaults to 1. To suppress the Reference part of the documentation, set this to 0.\\
+    ⍝ This can be useful when you want ADOC to create documentation just from the "leading comments".
         ∇ r←get
           r←_IncludeReference
         ∇
         ∇ set arg
           (∆EM←'"IncludeReference" must be a Boolean')⎕SIGNAL 11/⍨~0 1∊⍨arg.NewValue
           _IncludeReference←arg.NewValue
+        ∇
+    :EndProperty
+
+    :Property Toc
+    :Access Public Shared
+    ⍝ Defaults to 1. To have no TOC at all specify a 0.\\
+    ⍝ This can be useful when you want ADOC to create documentation just from the "leading comments"
+    ⍝ but without many --- if any --- headers, and no reference part at all.
+        ∇ r←get
+          r←_Toc
+        ∇
+        ∇ set arg
+          (∆EM←'"Toc" must be a Boolean')⎕SIGNAL 11/⍨~0 1∊⍨arg.NewValue
+          _Toc←arg.NewValue
         ∇
     :EndProperty
 
@@ -561,6 +572,7 @@
       _Inherit←1
       _IgnorePattern←''
       _IncludeReference←1
+      _Toc←1
       CssScreen←'screen'
       CssPrint←'Print'
       InLineCodePadding←5
@@ -997,6 +1009,7 @@
       ps.ignoreVersion←0
       ps.IncludeCss←1
       ps.Title←_Title
+      ps.Toc←_Toc
       ps.IncludeReference←_IncludeReference
       ps.view←1
       ps.⎕FX'r←∆List;⎕IO' '⍝ List all variables and possible references in this namespace' '⎕IO←1' 'r←{⍵,[1.5]⍎¨⍵}⎕NL-2 9'
@@ -2492,7 +2505,7 @@
           i←¯1+b⍳1
           s←i⌽s
           (name s)←{⍵{(2↓¯1↓⍵↑⍺)(⍵↓⍺)}⍵⍳']'}s
-          s←({'<a href="#',(Blank2_ Lowercase ⍵),'">',⍵,'</a>'}name),nl,s
+          s←({'<a href="#',(Space2_ Lowercase ⍵),'">',⍵,'</a>'}name),nl,s
           s←∇ s
           (-i)⌽s
       }
@@ -2501,7 +2514,8 @@
      ⍝ Inserts anchors to all "leading" <h{n}> tags and prepares a table-of-contents
      ⍝ although this might be visible only if a certain number of entries is found.
      ⍝ Adds to vs.Top
-      :If 0≠≢vs.Top
+      :If _Toc
+      :AndIf 0≠≢vs.Top
           Toc←⊂'<div class="toctab">'
           level1Flag←0≠≢'<h1\b[^>]*>'⎕S 0⍠('Mode' 'D')⊣vs.Top
           :If 0<+/bool←(⍳⍴vs.Top)∊1+'<h[0-9]\b[^>]*>'⎕S 0⍠('Mode' 'D')⊣vs.Top
@@ -2623,7 +2637,7 @@
     ∇
 
       MakeBookmark←{
-          '<a name="',(Blank2_',_'Replace ⍵),'" />',nl
+          '<a name="',(Space2_',_'Replace ⍵),'" />',nl
       }
 
       MarkupInlineAPL_Code←{

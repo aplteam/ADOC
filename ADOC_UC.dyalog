@@ -27,7 +27,7 @@
       r←⎕NS''
       r.Group←'TOOLS'
       r.Name←'ADoc'
-      r.Parse←'-title= -browser= -summary[=]full -version -ref∊0 1'
+      r.Parse←'-title= -browser= -summary[=]full -version -ref∊0 1 -toc∊0 1'
       r.Desc←'Automated documentation generation'
     ∇
 
@@ -119,10 +119,11 @@
       :EndIf
     ∇
 
-    ∇ r←AdocBrowse Args;title;ref;cs;browser;params;includeRefeference
+    ∇ r←AdocBrowse Args;title;ref;cs;browser;params;includeRefeference;toc
       title←''Args.Switch'title' ⍝ default is empty
       browser←''Args.Switch'browser' ⍝ default is empty
       includeRefeference←1 Args.Switch'ref'
+      toc←1 Args.Switch'toc'
       params←⍎'⎕SE.ADOC.ADOC.CreateBrowseDefaults'Args.Switch'params'
       :If 0≠≢browser
           params.BrowserPath←browser
@@ -131,6 +132,7 @@
           params.Title←title
       :EndIf
       params.IncludeReference←includeRefeference
+      params.Toc←toc
       'Nothing to process?!'⎕SIGNAL 6/⍨0=≢Args.Arguments
       ref←CheckRefs¨Args.Arguments
       :If ∨/⍬∘≡¨ref
