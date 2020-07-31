@@ -1,0 +1,23 @@
+ R←Test_Browse_72(stopFlag batchFlag);⎕TRAP;ref;ps;filename;html
+⍝ `Browse` a scripted namespace that has nothing public, therefore the "Reference" chapter should not appear at all.
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ ref←⍎'Temp'#.⎕NS''
+
+ ref.MyFns←{''Hello''}
+ ref.ADOC_Doc←'# Doku' '' 'This should show'
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp
+ ##.ADOC.RestoreDefaults
+ html←##.APLTreeUtils.ReadUtf8File filename
+ ##.FilesAndDirs.DeleteFile filename
+ html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
+ →T.PassesIf 1=+/'This should show'⍷html
+ →T.PassesIf 0=+/'ADOC_Doc'⍷html
+
+ R←T._OK

@@ -1,4 +1,4 @@
- R←Test_Browse_57(stopFlag batchFlag);newdoc;buffer;flag;sep;⎕TRAP;code;html;filename;list;ps;ind;ss
+ R←Test_Browse_57(stopFlag batchFlag);⎕TRAP;code;html;ps;filename;ss;ind
 ⍝ `Browse` a scripted namespace that has a `Public` definition
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')

@@ -19,6 +19,7 @@
 ⍝ 2019 01 15 KaiJ: In case nothing is provided as argument an error is thrown.
 ⍝ 2020 01 03 KaiJ: Now the user command tries to figure out where an object lives.
 ⍝ 2020 01 03 KaiJ: -ref=1|0 introduced with a default 1. Allows to suppress the reference part.
+⍝ 2020 07 31 KaiJ: User function `Public` in a namespcae can now also return a simple matrix rather than a VTV
 
     ⎕IO←⎕ML←1
 

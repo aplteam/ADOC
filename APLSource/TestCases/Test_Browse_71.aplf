@@ -1,0 +1,35 @@
+ R←Test_Browse_71(stopFlag batchFlag);⎕TRAP;code;ps;filename;html
+⍝ `Browse` a scripted namespace that has nothing public, therefore the "Reference" chapter should not appear at all.
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+
+ code←''
+ code,←⊂':Namespace ScriptedNamespace'
+ code,←⊂'⍝ This namespace script is used in the test for how ADOC processes namespaces script.'
+ code,←⊂''
+ code,←⊂'    ∇ r←Private1'
+ code,←⊂'      r←''Private1'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ r←Public'
+ code,←⊂'      r←⍬'
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂':EndNamespace'
+
+ #.Temp.⎕FIX code
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.ScriptedNamespace
+ ##.ADOC.RestoreDefaults
+ html←##.APLTreeUtils.ReadUtf8File filename
+ ##.FilesAndDirs.DeleteFile filename
+ html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
+ →T.PassesIf 0=+/'Reference'⍷html
+
+ R←T._OK

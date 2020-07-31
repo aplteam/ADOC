@@ -1,0 +1,45 @@
+ R←Test_Browse_70(stopFlag batchFlag);⎕TRAP;code;ps;filename
+⍝ `Browse` a scripted namespace that has a `Public` definition which is a matrix
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+
+ code←''
+ code,←⊂':Namespace ScriptedNamespace'
+ code,←⊂'⍝ This namespace script is used in the test for how ADOC processes namespaces script.'
+ code,←⊂''
+ code,←⊂'    ∇ r←Private1'
+ code,←⊂'      r←''Private1'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ r←Public1(arg1 arg2)'
+ code,←⊂'    ⍝ Comment 1.'
+ code,←⊂'    ⍝ Comment 2.'
+ code,←⊂'      r←''Public3'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ r←left Public2 arg'
+ code,←⊂'    ⍝ Comment 1.\\'
+ code,←⊂'    ⍝ Comment 2 on separate line.'
+ code,←⊂'      r←''Public4'''
+ code,←⊂'    ∇'
+ code,←⊂''
+ code,←⊂'    ∇ r←Public'
+ code,←⊂'     r←↑''Public1'' ''Public2'''
+ code,←⊂'    ∇'
+ code,←⊂'    '
+ code,←⊂':EndNamespace'
+
+ #.Temp.⎕FIX code
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.ScriptedNamespace
+ ##.ADOC.RestoreDefaults
+ ##.FilesAndDirs.DeleteFile filename
+ ⍝ We trust that it works because we've checked that already; this once crashed ADOC
+
+ R←T._OK

@@ -1,4 +1,4 @@
-.acre
+.acre/
+aplcore
 Dist/
-Development.dws
-ADOC.dws
+.gitignore

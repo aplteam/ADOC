@@ -192,11 +192,15 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.9.0.83' '2020-02-13'
+      r←(⍕⎕THIS)'6.9.1.85' '2020-07-31'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 6.9.1
+      ⍝   * The user function `Public`, when found in namespace, was executed by ADOC which expected a
+      ⍝     vector of vectors and crashed on a matrix. There is no reason why a simple reason should 
+      ⍝     not be processed as well.
       ⍝ * 6.9.0
       ⍝   * Properties `IncludeReference` and `Toc` added
       ⍝\\
@@ -223,7 +227,7 @@
       vs.Body←(MakeBookmark name),{('h1 id="',GetChapterNo,'"')tag ⍵}name,tail
     ∇
 
-      Space2_←{'_'@(⍸' '=⍵)⊣⍵}
+    Space2_←{'_'@(⍸' '=⍵)⊣⍵}
 
     ∇ {r}←Fill_META list;this;isRef;scriptRef
     ⍝ Runs a loop on all items in `list` wich can be a single ref or the fully qualified name
@@ -2067,7 +2071,7 @@
       :EndIf
     ∇
 
-    ∇ vs←GetPublicDefinitionFrom_NS(scriptRef vs)
+    ∇ vs←GetPublicDefinitionFrom_NS(scriptRef vs);buff
     ⍝ Only called when `scriptRef` points to a namespace.
     ⍝ Returns either an empty vector (nothing is public) or a vector of
     ⍝ text vectors with the names of the functions, operators and variables
@@ -2078,7 +2082,8 @@
           :If 0=scriptRef.⎕NC'Public'
               vs.public←' '~¨⍨↓scriptRef.⎕NL 3.1 4.1 2
           :Else
-              vs.public←scriptRef.{{0=≢⍵:⍵ ⋄ ⍵/⍨3.1 3.2 4.1 4.2 2∊⍨↑∘⎕NC¨⊂¨⍵}⍎⍵}'Public'
+              buff←↓⍣(↑2=⍴⍴scriptRef.⍎'Public')⊣scriptRef.⍎'Public'
+              vs.public←scriptRef.{0=≢⍵:⍵ ⋄ ⍵/⍨3.1 3.2 4.1 4.2 2∊⍨↑∘⎕NC¨⊂¨⍵}buff
           :EndIf
       :EndIf
       :If (⊂'Copyright')∊vs.public

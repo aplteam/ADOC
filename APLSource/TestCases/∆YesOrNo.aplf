@@ -1,4 +1,4 @@
- yesOrNo←{default}∆YesOrNo question;isOkay;answer;add
+ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2
 ⍝ Ask a simple question and allows just "Yes" or "No" as answers.
 ⍝ You may specify a default via the optional left argument which when specified
 ⍝ rules what happens when the user just presses <enter>.
@@ -30,9 +30,12 @@
  :Repeat
      ⍞←question
      answer←⍞
-     :If (≢answer)=¯1+≢question                 ⍝ Did the...
+     :If answer≡question                        ⍝ Did...  (since version 18.0 trailing blanks are not removed anynmore)
+     :OrIf (≢answer)=¯1+≢question               ⍝ ..the ...
      :OrIf 0=≢answer                            ⍝ ...user just...
-     :OrIf answer≡{⍵↓⍨-+/∧\' '=⌽⍵}⎕PW↓question  ⍝ ...press <enter>?
+         dtb←{⍵↓⍨-+/∧\' '=⌽⍵}
+         answer2←dtb answer
+     :OrIf answer2≡((-≢answer2)↑dtb question)   ⍝ ...press <enter>?
          :If 0≠≢default
              yesOrNo←default
              isOkay←1
