@@ -1,0 +1,25 @@
+ R←Test_Browse_89(stopFlag batchFlag);⎕TRAP;buffer;ps;filename;html
+⍝ Checks whether "Reference" is part of the TOC; was once a bug
+ R←T._Failed
+
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ 'VersionCopyrightHistory'#.Temp.⎕CY'Tests\TestData'
+
+ ps←##.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.Browse #.Temp.VersionCopyrightHistory
+ ##.ADOC.RestoreDefaults
+
+ html←##.APLTreeUtils.ReadUtf8File filename
+ ##.FilesAndDirs.DeleteFile filename
+
+ html←1↓⊃,/(⎕UCS 13),¨∆RemoveCSS html
+ html↓⍨←1⍳⍨'<div class="toctab">'⍷html          ⍝ Throw away everything until the TOC starts
+ html↑⍨←0⍳⍨↑-/+\¨'<div' '</div'⍷¨⊂html          ⍝ Keep only the TOC
+ →T.PassesIf 1=+/'>Reference</a>'⍷html
+
+ R←T._OK

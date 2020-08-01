@@ -192,11 +192,13 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(⍕⎕THIS)'6.9.1.85' '2020-07-31'
+      r←(⍕⎕THIS)'6.9.2.88' '2020-08-01'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 6.9.2
+      ⍝   * "References" has disappeared from the TOC by accident. 
       ⍝ * 6.9.1
       ⍝   * The user function `Public`, when found in namespace, was executed by ADOC which expected a
       ⍝     vector of vectors and crashed on a matrix. There is no reason why a simple reason should 
@@ -2014,7 +2016,7 @@
     ∇ vs←vs CreateTop(noOfClasses chapterNo);types;publicTypes;bool
      ⍝ Create the top part of the HTML page (title, toc) and the links
       :If _IncludeReference
-      :AndIf {0=⎕NC ⍵:0 ⋄ OutputType≡'Web'}'OutputType' ⍝ is it an instance?
+      :AndIf {0=⎕NC ⍵:1 ⋄ OutputType≡'Web'}'OutputType' ⍝ is it an instance?
           vs.topRef←'<a name="topmost"></a>'
           :If 1<noOfClasses
               vs.topRef,←'Go to: ',('a href="#',GetChapterNo,'"')tag'chapter'
