@@ -34,7 +34,7 @@
  ps.view←0
  filename←ps ##.ADOC.Browse #.Temp.MyClass
  html←##.APLTreeUtils.ReadUtf8File filename
- ##.FilesAndDirs.DeleteFile filename
+ FilesAndDirs.DeleteFile filename
  ##.ADOC.RestoreDefaults
  html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html
  →T.PassesIf 4=+/'<ul'⍷html

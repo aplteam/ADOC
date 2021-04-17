@@ -28,7 +28,7 @@
  filename←ps ##.ADOC.Browse #.Temp.ScriptedNamespace
  ##.ADOC.RestoreDefaults
  html←##.APLTreeUtils.ReadUtf8File filename
- ##.FilesAndDirs.DeleteFile filename
+ FilesAndDirs.DeleteFile filename
  html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
  →T.PassesIf 0=+/'Reference'⍷html
 

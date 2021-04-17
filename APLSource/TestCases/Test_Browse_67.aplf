@@ -48,7 +48,7 @@
  ##.ADOC.RestoreDefaults
  html←##.APLTreeUtils.ReadUtf8File filename
  html←∆RemoveCSS html
- ##.FilesAndDirs.DeleteFile filename
+ FilesAndDirs.DeleteFile filename
  →T.PassesIf 3=+/∨/¨'class="aplname"'∘⍷¨html   ⍝ Two functions and one operator, dfns and tfn
  →T.PassesIf 1=+/∨/¨' id="Version"'∘⍷¨html     ⍝ The special "Version" function
  →T.PassesIf 1=+/∨/¨' id="Copyright"'∘⍷¨html   ⍝ The special "copyright" function

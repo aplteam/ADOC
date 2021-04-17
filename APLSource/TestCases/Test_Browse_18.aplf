@@ -15,7 +15,7 @@
  ps.view←0
  filename←ps ##.ADOC.Browse #.TEMP
  html←##.APLTreeUtils.ReadUtf8File filename
- ##.FilesAndDirs.DeleteFile filename
+ FilesAndDirs.DeleteFile filename
  html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html
 
  R←T._OK

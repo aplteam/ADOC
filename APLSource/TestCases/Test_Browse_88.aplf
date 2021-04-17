@@ -22,5 +22,5 @@
  R←T._OK
 
 ∆TidyUp:
- ##.FilesAndDirs.DeleteFile htmlFilename
+ FilesAndDirs.DeleteFile htmlFilename
 ⍝Done

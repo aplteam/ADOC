@@ -9,7 +9,7 @@
  (('∘'=folders)/folders)←';'
  folders←';'##.APLTreeUtils.Split folders
  files←folders,¨⊂'\ADOC_UC.dyalog'
- files←(##.FilesAndDirs.IsFile files)/files
+ files←(FilesAndDirs.IsFile files)/files
  →T.FailsIf 0=≢files
  executed←##.APLTreeUtils.ReadUtf8File⊃files
  →T.PassesIf executed≡inCurrentDir

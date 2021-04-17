@@ -24,4 +24,4 @@
  R←T._OK
 
 ∆TidyUp:
- ##.FilesAndDirs.DeleteFile filename
+ FilesAndDirs.DeleteFile filename

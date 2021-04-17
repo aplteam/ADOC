@@ -8,7 +8,7 @@
  ps.view←0
  filename←ps ##.ADOC.Browse testclass2
  html←##.APLTreeUtils.ReadUtf8File filename
- ##.FilesAndDirs.DeleteFile filename
+ FilesAndDirs.DeleteFile filename
  html←↑⊃,/(⎕UCS 13),¨html
  html←(⎕UCS 13)##.APLTreeUtils.Split ∆ExtractBodyFromHTML html
  expected←'<h4 id="ch0002:ctor">Constructor</h4>' '<h4 id="ch0002:instancemethods">Instance Methods</h4>'

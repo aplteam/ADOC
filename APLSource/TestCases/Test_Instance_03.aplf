@@ -4,7 +4,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
  ##.ADOC.RestoreDefaults
- filename←##.FilesAndDirs.GetTempPath,'test_',('- :'~⍨∆FormatDateTime ⎕TS),'.html'
+ filename←FilesAndDirs.GetTempPath,'test_',('- :'~⍨∆FormatDateTime ⎕TS),'.html'
  #.⎕SHADOW'TEMP'
  'TEMP'#.⎕NS''
  #.TEMP.⎕FIX ⎕SRC ##.APLTreeUtils
