@@ -3,6 +3,10 @@
 ADOC stand for Automated DOCumentation. It analyzes Dyalog APL Classes, Interfaces and namespaces, scripted as well as non-scripted ones, and generates documentation from them. 
 That documentation can be enriched by adding Markdown to the Class, Interface or namespace script as comments.
 
+## Requirements
+
+ADOC requires Dyalog 17.1 Unicode or better.
+
 ## Samples
 
 ```
