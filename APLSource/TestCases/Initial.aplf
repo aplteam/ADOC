@@ -7,6 +7,6 @@
  FilesAndDirs.PolishCurrentDir
  Globals←⎕NS''
  Globals.saveInherit←##.ADOC.Inherit
- A←##.APLTreeUtils
+ A←APLTreeUtils2
  ##.ADOC.RestoreDefaults
  MarkAPL←##.MarkAPL

@@ -12,7 +12,7 @@
  ps.view←0
  filename←ps ##.ADOC.Browse #.Temp.MyApp
  ##.ADOC.RestoreDefaults
- html←##.APLTreeUtils.ReadUtf8File filename
+ html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
  html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
  →T.PassesIf∨/'<a href="#toc_ch0001:0001">Version</a>'⍷html

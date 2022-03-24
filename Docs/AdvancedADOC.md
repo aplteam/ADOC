@@ -3,7 +3,7 @@ Advanced ADOC
 
 This document addresses the advanced features of ADOC which can only be used when ADOC it loaded into a workspace; these features are **not** available when ADOC is used as a user command.
 
-In order to use the advanced features of ADOC you must either load `ADOC.dws` or coy `ADOC` from this workspace. You find it in the folder where you've installed the ADOC user command.
+In order to use the advanced features of ADOC you must either load `ADOC.dws` or copy `ADOC` from this workspace. You'll find it in the folder where you've installed the ADOC user command.
 
 
 ## Main method
@@ -20,7 +20,7 @@ Parameter space
 
 A parameter space is by definition a namespace that carries variables recognized by `ADOC` as parameters. 
 
-Such a namespace can be created by `⎕NS` and then populated with variables. However, it is recommended to call `ADOC.CreateBrowseDefaults` which returns such a namespace populated with all the variables `ADOC` would recognize with reasonable defaults which you change in order to make them suit your needs. 
+Such a namespace can be created by `⎕NS` and then populated with variables. However, it is recommended to call `ADOC.CreateBrowseDefaults` which returns such a namespace populated with all the variables `ADOC` would recognize with reasonable defaults which you may change in order to make them suit your needs. 
 
 Such a namespace can then be passed as left argument to the `Browse` method.
 

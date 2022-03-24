@@ -33,7 +33,7 @@
  ps←##.ADOC.CreateBrowseDefaults
  ps.view←0
  filename←ps ##.ADOC.Browse #.Temp.MyClass
- html←##.APLTreeUtils.ReadUtf8File filename
+ html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
  ##.ADOC.RestoreDefaults
  html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html

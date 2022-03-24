@@ -7,7 +7,7 @@
  filename←FilesAndDirs.GetTempPath,'test_',('- :'~⍨∆FormatDateTime ⎕TS),'.html'
  #.⎕SHADOW'TEMP'
  'TEMP'#.⎕NS''
- #.TEMP.⎕FIX ⎕SRC ##.APLTreeUtils
+ #.TEMP.⎕FIX ⎕SRC APLTreeUtils
  'Hash'#.TEMP.⎕CY'Tests/TestData'
  MyADOC←⎕NEW ##.ADOC(,⊂filename)
  MyADOC.(Title Inherit)←'ADOC and Hash in one file' 0  ⍝ Set parameters

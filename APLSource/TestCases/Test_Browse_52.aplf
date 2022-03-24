@@ -17,7 +17,7 @@
  myAdoc←⎕NEW ##.ADOC
  htmlFilename←myAdoc.Make #.Temp
  ##.ADOC.RestoreDefaults
- buff←##.APLTreeUtils.ReadUtf8File htmlFilename
+ buff←⊃⎕NGET htmlFilename 1
  buff←⊃,/∆RemoveCSS buff
  buff↑⍨←('Reference</h2>'⍷buff)⍳1  ⍝ ADOC_Doc stuff must appear _before_ the reference part!
  expected←'<div class="header"><p>My comment from line 1</p><ul><li>This</li><li>That</li><li>More</li></ul>'

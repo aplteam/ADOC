@@ -14,7 +14,7 @@
  filename←ps ##.ADOC.Browse #.Temp.VersionCopyrightHistory
  ##.ADOC.RestoreDefaults
 
- html←##.APLTreeUtils.ReadUtf8File filename
+ html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
 
  html←1↓⊃,/(⎕UCS 13),¨∆RemoveCSS html

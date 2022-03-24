@@ -15,7 +15,7 @@
  ps.view←0
  htmlFilename←ps ##.ADOC.Browse #.Temp.Foo
  ##.ADOC.RestoreDefaults
- buff←##.APLTreeUtils.ReadUtf8File htmlFilename
+ buff←⊃⎕NGET htmlFilename
  →T.PassesIf 1=+/'My comment from line 1'⍷∊buff
 
  R←T._OK

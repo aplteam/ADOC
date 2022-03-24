@@ -76,9 +76,9 @@
  #.Temp.⎕FIX code
 
  buffer←1 ##.ADOC.Info #.Temp.ScriptedNamespace
- buffer←(⎕UCS 13)##.APLTreeUtils.Split buffer
+ buffer←(⎕UCS 13)APLTreeUtils2.Split buffer
  →T.PassesIf'*** ScriptedNamespace (Namespace) ***'≡0⊃buffer
- buffer←##.APLTreeUtils.dmb 1↓buffer
+ buffer←APLTreeUtils2.DMB 1↓buffer
  →T.PassesIf 1 1≡'Functions:' 'Operators:'∊buffer
  buffer~←'Functions:' 'Operators:' ''
  expected←'r ← Public3(arg1 arg2)' 'r ← left Public4 arg' 'r ← {left} Public5 arg' '{r} ← {left} Public6 arg' '{(r1 r2)} ← {left} Public7 arg' 'r ← (fns Public8)arg' 'r ← leftArg(fns Public9)rightArg'

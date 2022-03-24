@@ -3,7 +3,7 @@
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- shouldBe←##.APLTreeUtils.dlb⍕1↓##.ADOC.Version
+ shouldBe←APLTreeUtils2.DLB⍕1↓##.ADOC.Version
  itIs←⎕SE.UCMD'ADOC -version'
  →T.PassesIf≡/{⍵/⍨3>+\'.'=⍵}¨shouldBe itIs
 

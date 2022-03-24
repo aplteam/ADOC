@@ -46,7 +46,7 @@
  ps.view←0
  filename←ps ##.ADOC.Browse #.Temp.ScriptedNamespace
  ##.ADOC.RestoreDefaults
- html←##.APLTreeUtils.ReadUtf8File filename
+ html←⊃⎕NGET filename 1
  html←∆RemoveCSS html
  FilesAndDirs.DeleteFile filename
  →T.PassesIf 3=+/∨/¨'class="aplname"'∘⍷¨html   ⍝ Two functions and one operator, dfns and tfn

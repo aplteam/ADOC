@@ -11,7 +11,7 @@
 
  myAdoc←⎕NEW ##.ADOC
  htmlFilename←myAdoc.Make #.Temp.Foo
- html←'flat'##.APLTreeUtils.ReadUtf8File htmlFilename
+ html←⊃⎕NGET htmlFilename
  html←(1⍳⍨'<body'⍷html)↓html
  →T.PassesIf∧/∨/¨'<p>First</p>' '<p>Second</p>' '<p>Third</p>' '<p>Forth</p>'⍷¨⊂html
  →T.PassesIf~∨/'Fifth'⍷html

@@ -13,6 +13,6 @@
 
  buffer←##.ADOC.Info #.Temp
 
- →T.PassesIf'Functions:' 'PublicFns'≡(2↓(⎕UCS 13)##.APLTreeUtils.Split buffer)~¨' '
+ →T.PassesIf'Functions:' 'PublicFns'≡(2↓(⎕UCS 13)APLTreeUtils2.Split buffer)~¨' '
 
  R←T._OK

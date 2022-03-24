@@ -10,7 +10,7 @@
  ps←##.ADOC.CreateBrowseDefaults
  ps.view←0
  filename←ps ##.ADOC.Browse #.TEMP.CarriesStuffInComment
- html←##.APLTreeUtils.ReadUtf8File filename
+ html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
  html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html
  expexted←'<h1 id="ch0001">CarriesStuffInComment (Class)</h1>' '<p>Leading comment in Class</p>'

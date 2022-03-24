@@ -14,7 +14,7 @@
  ⍝ There is exactly 1 method both implemented and inherited from the "testinterface" interface:
  →T.FailsIf 1≠+/('Public'∘≡¨({↑⍵[1⍳⍨⍵[;0]≡¨⊂'access';1]}¨4⊃0⊃newdoc))∧(({↑⍵[1⍳⍨⍵[;0]≡¨⊂'type';1]}¨4⊃0⊃newdoc))≡¨⊂'Interface Method'    ⍝ the main comment'
 
- buffer←↑('type' 'Include')('access' '')('name' '##.APLTreeUtils')
+ buffer←↑('type' 'Include')('access' '')('name' 'APLTreeUtils')
  →T.FailsIf buffer≢0⊃4⊃0⊃newdoc
 
  buffer←↑('type' 'Constructor')('name' 'make0')('access' 'Public')('syntax' 'make0')('keywords' '')('more' '')('comments'('This comment is related to the niladic constructor ' 'Two concatenated _ ' 'lines! ' 'List: ' '* First ' '* Second '))
@@ -39,12 +39,12 @@
  →T.FailsIf'readonly' 0≢buffer[3;]
 
  buffer←8⊃4⊃0⊃newdoc
- →T.FailsIf(##.APLTreeUtils.Lowercase¨buffer[5;])≢'keywords'('default' 'numbered')
+ →T.FailsIf(⎕C¨buffer[5;])≢'keywords'('default' 'numbered')
 
  buffer←9⊃4⊃0⊃newdoc
- →T.FailsIf(##.APLTreeUtils.Lowercase¨buffer[5;])≢'keywords'(,⊂'keyed')
+ →T.FailsIf(⎕C¨buffer[5;])≢'keywords'(,⊂'keyed')
 
  buffer←10⊃4⊃0⊃newdoc
- →T.FailsIf(##.APLTreeUtils.Lowercase¨buffer[5;])≢'keywords'('default' 'numbered')
+ →T.FailsIf(⎕C¨buffer[5;])≢'keywords'('default' 'numbered')
 
  R←T._OK

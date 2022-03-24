@@ -4,14 +4,14 @@
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- inCurrentDir←##.APLTreeUtils.ReadUtf8File'ADOC_UC.dyalog'
+ inCurrentDir←⊃⎕NGET'ADOC_UC.dyalog'
  folders←⎕SE.UCMD'Settings cmddir'
  (('∘'=folders)/folders)←';'
- folders←';'##.APLTreeUtils.Split folders
+ folders←';'APLTreeUtils2.Split folders
  files←folders,¨⊂'\ADOC_UC.dyalog'
  files←(FilesAndDirs.IsFile files)/files
  →T.FailsIf 0=≢files
- executed←##.APLTreeUtils.ReadUtf8File⊃files
+ executed←⊃⎕NGET⊃files
  →T.PassesIf executed≡inCurrentDir
 
  R←T._OK

@@ -10,7 +10,7 @@
  ps←##.ADOC.CreateBrowseDefaults
  ps.view←0
  filename←ps ##.ADOC.Browse #.TEMP.MultipleGetsAndSets
- html←##.APLTreeUtils.ReadUtf8File filename
+ html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
  html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html
  expected←'<a href="#ch0001:PrI_A_PrI_B_PrI_C">'

@@ -1,3 +1,0 @@
- hwnd←FindWindow name;∆FindWindow
- '∆FindWindow'⎕NA'P user32|FindWindow* I4 <0T'
- hwnd←∆FindWindow 0 name

@@ -26,7 +26,7 @@
  ps.view←0
  filename←ps ##.ADOC.Browse #.Temp.MyClass
  ##.ADOC.RestoreDefaults
- html←##.APLTreeUtils.ReadUtf8File filename
+ html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
 
  →T.PassesIf(⊂'<a name="abc" />')∊html
@@ -34,10 +34,10 @@
  html←(html⍳⊂'</div>')↑html
  →T.PassesIf'<h5 class="aplname" id="ch0001:abc">abc</h5>'≡1⊃html
  →T.PassesIf'<p class="small">Instance</p>'≡2⊃html
- →T.PassesIf'<a name="Shared_Methods" />'≡4⊃html
- →T.PassesIf'<h4 id="ch0001:sharedmethods">Shared Methods</h4>'≡5⊃html
- list←(⎕UCS 13)##.APLTreeUtils.Split 3⊃html
+ →T.PassesIf'<a name="Shared_Methods" />'≡12⊃html
+ →T.PassesIf'<h4 id="ch0001:sharedmethods">Shared Methods</h4>'≡13⊃html
  expected←'<div' '<p' '<p' '<p' '<ul' '<li' '<li' '<li' '</ul'
+ list←(≢expected)↑3↓html
  →T.PassesIf expected≡{⍵↑⍨⌊/⍵⍳'> '}¨list
 
  R←T._OK
