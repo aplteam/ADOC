@@ -21,7 +21,7 @@
 ⍝ 2020 01 03 KaiJ: -ref=1|0 introduced with a default 1. Allows to suppress the reference part.
 ⍝ 2020 07 31 KaiJ: User function `Public` in a namespcae can now also return a simple matrix rather than a VTV
 ⍝ 2021 01 11 KaiJ: Now checks whether a Tatin package is involved, and handles them accordingly
-⍝ 2022 03 23 KaiJ: ]ADOC -??? amended to new user command framework (18.2) plus -filename added to "Browse"
+⍝ 2022 03 23 KaiJ: ]ADOC -??? amended to new user command framework (18.2)
 
     ⎕IO←⎕ML←1
 
@@ -206,5 +206,11 @@
           (i⊃r)←this
       :EndFor
     ∇
+    
+      IfAtLeastVersion←{
+      ⍝ ⍵ is supposed to be a number like 15 or 17.1, representing a version of Dyalog APL.
+      ⍝ Returns a Boolean that is 1 only if the current version is at least as good.
+          ⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'
+      }    
 
 :EndClass ⍝ ADOC  $Revision$
