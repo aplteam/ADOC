@@ -20,7 +20,8 @@
 ⍝ 2020 01 03 KaiJ: Now the user command tries to figure out where an object lives.
 ⍝ 2020 01 03 KaiJ: -ref=1|0 introduced with a default 1. Allows to suppress the reference part.
 ⍝ 2020 07 31 KaiJ: User function `Public` in a namespcae can now also return a simple matrix rather than a VTV
-⍝ 2022 03 24 KaiJ:
+⍝ 2021 01 11 KaiJ: Now checks whether a Tatin package is involved, and handles them accordingly
+⍝ 2022 03 23 KaiJ: ]ADOC -??? amended to new user command framework (18.2)
 
     ⎕IO←⎕ML←1
 
@@ -75,8 +76,9 @@
           r,←⊂' -summary[=full]  Returns summarized information about the object members (optionally including full function headers)'
           r,←⊂' -version         Returns the version number of ADOC used. If specified everythings else is ignored'
           r,←⊂''
-          r,←⊂'When objects are not addressed with a full name (= start neither with `#` nor with `⎕SE` then the user command will try to find the'
-          r,←⊂'objects in the namespace the user command was called from. If they cannot be found there it will assume they live in `#`.'
+          r,←⊂'When objects are not addressed with a full name (= start neither with `#` nor with `⎕SE`) then the user command '
+          r,←⊂'will try to find the objects in the namespace the user command was called from. If they cannot be found there it '
+          r,←⊂'will assume they live in `#`.'
           r,←⊂''
           r,←⊂'Examples:'
           r,←⊂'    ]',Cmd,' MyClass                              ⍝ single class'
@@ -90,7 +92,11 @@
           ⎕SE.⎕SHADOW'ADOC'
           ⎕SE.⎕EX'ADOC'
           'ADOC'⎕SE.⎕NS''
-          LoadAdoc ##.##.c
+          :If IfAtLeastVersion 18.2
+              LoadAdoc(⊃⎕RSI).c
+          :Else
+              LoadAdoc ##.##.c
+          :EndIf
           r←⊂'HTML page saved as ',⎕SE.ADOC.ADOC.ShowDocumentation ⍬
       :EndSelect
       r,←(l=0)/⊂']',Cmd,' -??  ⍝ for syntax details'
@@ -200,5 +206,11 @@
           (i⊃r)←this
       :EndFor
     ∇
+    
+      IfAtLeastVersion←{
+      ⍝ ⍵ is supposed to be a number like 15 or 17.1, representing a version of Dyalog APL.
+      ⍝ Returns a Boolean that is 1 only if the current version is at least as good.
+          ⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'
+      }    
 
 :EndClass ⍝ ADOC  $Revision$
