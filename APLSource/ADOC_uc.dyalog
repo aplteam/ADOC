@@ -22,6 +22,7 @@
 ⍝ 2020 07 31 KaiJ: User function `Public` in a namespcae can now also return a simple matrix rather than a VTV
 ⍝ 2021 01 11 KaiJ: Now checks whether a Tatin package is involved, and handles them accordingly
 ⍝ 2022 03 23 KaiJ: ]ADOC -??? amended to new user command framework (18.2)
+⍝ ???? ?? ?? KaiJ: -filename added to "Browse"
 
     ⎕IO←⎕ML←1
 
@@ -30,7 +31,7 @@
       r←⎕NS''
       r.Group←'TOOLS'
       r.Name←'ADoc'
-      r.Parse←'-title= -browser= -summary[=]full -version -ref∊0 1 -toc∊0 1'
+      r.Parse←'-title= -browser= -summary[=]full -version -ref∊0 1 -toc∊0 1 -filename='
       r.Desc←'Automated documentation generation'
     ∇
 
@@ -71,10 +72,11 @@
           r,←⊂'Gathers information about one or more classes and/or namespaces.'
           r,←⊂'Either compiles an HTML page which is then displayed in a browser (default) or prints summarizing information to the session (-summary).'
           r,←⊂''
-          r,←⊂' -title={text}    Add a custom title with the content {text}'
-          r,←⊂' -browser={path}  Use the non-default browser specified'
-          r,←⊂' -summary[=full]  Returns summarized information about the object members (optionally including full function headers)'
-          r,←⊂' -version         Returns the version number of ADOC used. If specified everythings else is ignored'
+          r,←⊂' -title={text}    Add a custom title with the content {text}.'
+          r,←⊂' -browser={path}  Use the non-default browser specified.'
+          r,←⊂' -summary[=full]  Returns summarized information about the object members (optionally including full fn headers).'
+          r,←⊂' -filename=       Modifier Default is a temp filename but allows any filename'
+          r,←⊂' -version         Returns the version number of ADOC used. If specified everythings else is ignored.'
           r,←⊂''
           r,←⊂'When objects are not addressed with a full name (= start neither with `#` nor with `⎕SE`) then the user command '
           r,←⊂'will try to find the objects in the namespace the user command was called from. If they cannot be found there it '
@@ -128,6 +130,7 @@
     ∇
 
     ∇ r←AdocBrowse Args;title;ref;cs;browser;params;includeRefeference;toc
+      Args.Arguments←CheckArgumentsForTatin Args.Arguments
       title←''Args.Switch'title' ⍝ default is empty
       browser←''Args.Switch'browser' ⍝ default is empty
       includeRefeference←1 Args.Switch'ref'
@@ -141,6 +144,7 @@
       :EndIf
       params.IncludeReference←includeRefeference
       params.Toc←toc
+      ∘∘∘⍝ params.Filename←{(,0)≡,⍵:''⋄⍵}
       'Nothing to process?!'⎕SIGNAL 6/⍨0=≢Args.Arguments
       ref←CheckRefs¨Args.Arguments
       :If ∨/⍬∘≡¨ref
@@ -206,7 +210,25 @@
           (i⊃r)←this
       :EndFor
     ∇
-    
+
+    ∇ r←CheckArgumentsForTatin args;arg;name;ref;flag
+      r←''
+      :For arg :In args
+          name←⍕ref←⍎arg
+          :Trap 2
+              flag←'_tatin'{⍺≡(≢⍺)↑⍵}{'#.'≡2⍴⍵:2↓⍵ ⋄ '⎕SE.'≡1 ⎕C 4⍴⍵:4↓⍵ ⋄ ⍵}name
+          :Else
+              flag←0
+          :EndTrap
+          :If flag
+              name←⍕ref.##
+              r,←⊂name
+          :Else
+              r,←⊂arg
+          :EndIf
+      :EndFor
+    ∇
+
       IfAtLeastVersion←{
       ⍝ ⍵ is supposed to be a number like 15 or 17.1, representing a version of Dyalog APL.
       ⍝ Returns a Boolean that is 1 only if the current version is at least as good.
