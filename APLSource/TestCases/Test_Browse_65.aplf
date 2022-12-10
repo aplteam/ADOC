@@ -33,8 +33,8 @@
  ps.view←0
  filename←ps ##.ADOC.Browse #.Temp.ScriptedNamespace
  ##.ADOC.RestoreDefaults
- html←##.APLTreeUtils.ReadUtf8File filename
- ##.FilesAndDirs.DeleteFile filename
+ html←⊃⎕NGET filename 1
+ FilesAndDirs.DeleteFile filename
  html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
  ss←'<h5 class="aplname" id="'
  →T.PassesIf 3=+/ss⍷html

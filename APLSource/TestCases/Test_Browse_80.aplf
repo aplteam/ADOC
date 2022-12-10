@@ -14,7 +14,7 @@
 
  myAdoc←⎕NEW ##.ADOC
  htmlFilename←myAdoc.Make #.Temp
- html←##.APLTreeUtils.ReadUtf8File htmlFilename
+ html←⊃⎕NGET htmlFilename
  html←⊃,/∆RemoveCSS html
  →T.PassesIf 0=+/'Reference'⍷html  ⍝ There should be no "Rerefence" section at all
  →T.PassesIf 0=+/'ADOC_Doc'⍷html  ⍝ There should be no "ADOC_Doc" section at all

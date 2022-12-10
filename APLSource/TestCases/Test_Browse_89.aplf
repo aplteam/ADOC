@@ -14,8 +14,8 @@
  filename←ps ##.ADOC.Browse #.Temp.VersionCopyrightHistory
  ##.ADOC.RestoreDefaults
 
- html←##.APLTreeUtils.ReadUtf8File filename
- ##.FilesAndDirs.DeleteFile filename
+ html←⊃⎕NGET filename 1
+ FilesAndDirs.DeleteFile filename
 
  html←1↓⊃,/(⎕UCS 13),¨∆RemoveCSS html
  html↓⍨←1⍳⍨'<div class="toctab">'⍷html          ⍝ Throw away everything until the TOC starts

@@ -39,7 +39,7 @@
  ps.view←0
  filename←ps ##.ADOC.Browse #.Temp.ScriptedNamespace
  ##.ADOC.RestoreDefaults
- ##.FilesAndDirs.DeleteFile filename
+ FilesAndDirs.DeleteFile filename
  ⍝ We trust that it works because we've checked that already; this once crashed ADOC
 
  R←T._OK

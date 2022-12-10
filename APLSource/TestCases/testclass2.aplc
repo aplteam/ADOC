@@ -21,7 +21,7 @@
 ⍝ # second
 ⍝ # third
 
-    :Include ##.APLTreeUtils
+    :Include APLTreeUtils
 
     :field  Public  shared MySharedField←1 2 3 ⍝ a comment about MySharedField
      ⍝ to be ignored
@@ -392,3 +392,4 @@
     :EndClass
 
 :EndClass
+

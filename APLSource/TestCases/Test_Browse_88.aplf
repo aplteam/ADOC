@@ -13,7 +13,7 @@
  myAdoc.IncludeReference←0
  myAdoc.Toc←0
  htmlFilename←myAdoc.Make #.Temp.Foo
- html←'flat'##.APLTreeUtils.ReadUtf8File htmlFilename
+ html←⊃⎕NGET htmlFilename
  html←(1⍳⍨'<body'⍷html)↓html
  →T.GoToTidyUp~∨/'<p>Leading comment</p>'⍷html
  →T.GoToTidyUp∨/'Reference'⍷html
@@ -22,5 +22,5 @@
  R←T._OK
 
 ∆TidyUp:
- ##.FilesAndDirs.DeleteFile htmlFilename
+ FilesAndDirs.DeleteFile htmlFilename
 ⍝Done

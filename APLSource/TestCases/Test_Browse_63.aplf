@@ -13,8 +13,8 @@
  ps.view←0
  filename←ps ##.ADOC.Browse #.Temp.OrdinaryNS
  ##.ADOC.RestoreDefaults
- html←##.APLTreeUtils.ReadUtf8File filename
- ##.FilesAndDirs.DeleteFile filename
+ html←⊃⎕NGET filename 1
+ FilesAndDirs.DeleteFile filename
  html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
  →T.PassesIf 1=+/'<p>Can do one of:</p>'⍷html
  →T.PassesIf 1=+/'<li>calculate the letters in a given document.</li>'⍷html

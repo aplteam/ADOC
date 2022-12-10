@@ -39,9 +39,9 @@
  ps.(ignoreCopyright ignoreHistory ignoreVersion)←1
  filename←ps ##.ADOC.Browse #.Temp.ScriptedNamespace
  ##.ADOC.RestoreDefaults
- html←##.APLTreeUtils.ReadUtf8File filename
+ html←⊃⎕NGET filename 1
  html←∆RemoveCSS html
- ##.FilesAndDirs.DeleteFile filename
+ FilesAndDirs.DeleteFile filename
  →T.PassesIf 4=+/∨/¨'class="aplname"'∘⍷¨html   ⍝ Two functions and one operator, dfns and tfn
  →T.PassesIf 0=+/∨/¨' id="version"'∘⍷¨html     ⍝ No special "Version" function
  →T.PassesIf 0=+/∨/¨' id="copyright"'∘⍷¨html   ⍝ No special "copyright" function

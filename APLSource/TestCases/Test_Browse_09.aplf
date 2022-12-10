@@ -32,8 +32,8 @@
  ps.view←0
  filename←ps ##.ADOC.Browse #.Temp.MyClass
  ##.ADOC.RestoreDefaults
- html←##.APLTreeUtils.ReadUtf8File filename
- ##.FilesAndDirs.DeleteFile filename
+ html←⊃⎕NGET filename 1
+ FilesAndDirs.DeleteFile filename
 
  →T.PassesIf(⊂'<a name="abc" />')∊html
  html←(html⍳⊂'<a name="abc" />')↓html

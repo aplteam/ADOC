@@ -12,8 +12,8 @@
  ps.view←0
  filename←ps ##.ADOC.Browse #.Temp.OrdinaryNS.EXIT
  ##.ADOC.RestoreDefaults
- html←##.APLTreeUtils.ReadUtf8File filename
- ##.FilesAndDirs.DeleteFile filename
+ html←⊃⎕NGET filename 1
+ FilesAndDirs.DeleteFile filename
  html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html
  allVars←' '~¨⍨↓#.Temp.OrdinaryNS.EXIT.⎕NL 2
  →T.PassesIf(⍴allVars)=+/↑∨/('>',¨allVars,¨⊂'</h5>')⍷¨⊂html

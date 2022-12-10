@@ -7,8 +7,8 @@
  ps.embeddedClassesFlag←1
  ps.view←0
  filename←ps ##.ADOC.Browse ##.ADOC
- html←##.APLTreeUtils.ReadUtf8File filename
- ##.FilesAndDirs.DeleteFile filename
+ html←⊃⎕NGET filename
+ FilesAndDirs.DeleteFile filename
  expected←⊂'<h1 id="ch0001">Demo (Class embedded into ',(⍕##.⎕THIS),'.ADOC)</h1>'
  expected,←⊂'<h5 class="aplname" id="ch0001:Hello">Hello</h5>'
  →T.PassesIf∧/expected∊html

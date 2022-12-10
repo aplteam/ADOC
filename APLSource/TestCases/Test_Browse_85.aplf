@@ -13,7 +13,7 @@
  parms.view←0
  parms.IncludeReference←0
  htmlFilename←parms ##.ADOC.Browse #.Temp.Foo
- html←'flat'##.APLTreeUtils.ReadUtf8File htmlFilename
+ html←⊃⎕NGET htmlFilename
  html←(1⍳⍨'<body'⍷html)↓html
  →T.PassesIf∨/'<p>Leading comment</p>'⍷html
  →T.PassesIf~∨/'Reference'⍷html

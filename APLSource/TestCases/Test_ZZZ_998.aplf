@@ -16,7 +16,7 @@
      r
  }
 
- xml←⎕XML'flat'##.APLTreeUtils.ReadUtf8File'publish.config'
+ xml←⎕XML'flat'⊃⎕NGET'publish.config'
  source←2⊃xml[xml[;1]⍳⊂'container';]
  buff←source FindSpecialString'⍝CHECK⍝'
  buff←(buff[;0]≢¨⎕XSI[0])⌿buff ⍝ remove caller

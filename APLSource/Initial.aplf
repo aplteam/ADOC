@@ -1,0 +1,8 @@
+ {r}←Initial;⎕TRAP;parent
+ ⎕TRAP←0 'S'
+ r←⍬
+ parent←⍕⎕THIS
+ {}⎕SE.Tatin.LoadDependencies'./packages/'parent
+ parent,←'.TestCases'
+ {}⎕SE.Tatin.LoadDependencies'./packages_dev/'parent
+⍝Done
