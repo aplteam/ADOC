@@ -10,8 +10,9 @@
      ⎕←'This test needs you! ADOC will show itself in the default browser'
      ⎕←''
      0/⍞,0/⎕←'Press <enter> to contiue;'
-     ⎕SE.UCMD'Adoc #.ADOC.ADOC'
+     ⎕SE.UCMD'Adoc #.ADOC.ADOC.ADOC'
 
-     R←~1 ∆YesOrNo'Did ADOC show up in your default browser?'
+     →T.PassesIf 1 ∆YesOrNo'Did ADOC show up in your default browser?'
+     R←T._OK
 
  :EndIf

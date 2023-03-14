@@ -3,16 +3,16 @@
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
  #.⎕SHADOW'Temp'
  'Temp'#.⎕NS''
  #.Temp.⎕FIX':Namespace Foo' '⍝ # Overview' '⍝ Leading' '⍝ comment' '' '∇r←Hello' '⍝ Hello world example' ':Access Public Shared' 'r←''World''' '∇' ':EndNamespace'
 
- parms←##.ADOC.CreateBrowseDefaults
+ parms←##.ADOC.ADOC.CreateBrowseDefaults
  parms.view←0
  parms.IncludeReference←0
- htmlFilename←parms ##.ADOC.Browse #.Temp.Foo
+ htmlFilename←parms ##.ADOC.ADOC.Browse #.Temp.Foo
  html←⊃⎕NGET htmlFilename
  html←(1⍳⍨'<body'⍷html)↓html
  →T.PassesIf∨/'<p>Leading comment</p>'⍷html

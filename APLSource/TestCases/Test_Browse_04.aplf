@@ -2,7 +2,7 @@
 ⍝ `Browse` a class that has both a `Version` and `History` method.
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
  #.⎕SHADOW'Temp'
  'Temp'#.⎕NS''
@@ -27,13 +27,13 @@
 
  #.Temp.⎕FIX code
 
- ps←##.ADOC.CreateBrowseDefaults
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
  ps.view←0
- filename←ps ##.ADOC.Browse #.Temp.MyClass
+ filename←ps ##.ADOC.ADOC.Browse #.Temp.MyClass
  html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
  html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
  →T.PassesIf 1=+/'<ul'⍷html
  →T.PassesIf 0=+/'<ol'⍷html
  →T.PassesIf 4=+/'<li'⍷html

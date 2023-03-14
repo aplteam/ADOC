@@ -2,7 +2,7 @@
 ⍝ `Browse` a scripted namespace with dfns and dops which carry comments
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
  #.⎕SHADOW'Temp'
  'Temp'#.⎕NS''
@@ -29,10 +29,10 @@
 
  #.Temp.⎕FIX code
 
- ps←##.ADOC.CreateBrowseDefaults
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
  ps.view←0
- filename←ps ##.ADOC.Browse #.Temp.ScriptedNamespace
- ##.ADOC.RestoreDefaults
+ filename←ps ##.ADOC.ADOC.Browse #.Temp.ScriptedNamespace
+ ##.ADOC.ADOC.RestoreDefaults
  html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
  html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html

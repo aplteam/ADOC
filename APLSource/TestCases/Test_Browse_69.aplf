@@ -3,7 +3,7 @@
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
  #.⎕SHADOW'Temp'
  'Temp'#.⎕NS''
@@ -11,9 +11,9 @@
  #.Temp.ADOC_Doc←'My comment from line 1' '' '* This' '* That' '* More'
  #.Temp.⎕FX'r←Hello' 'r←''Word'''
 
- myAdoc←⎕NEW ##.ADOC
+ myAdoc←⎕NEW ##.ADOC.ADOC
  htmlFilename←myAdoc.Make #.Temp
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
  buff←⊃⎕NGET htmlFilename 1
  buff←⊃,/∆RemoveCSS buff
  buff↑⍨←('Reference</h2>'⍷buff)⍳1  ⍝ ADOC_Doc stuff must appear _before_ the reference part!

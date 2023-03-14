@@ -2,12 +2,12 @@
 ⍝ `List` a class that carries a single property definition for multiple properties.
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
  #.⎕SHADOW'TEMP'
  'TEMP'#.⎕NS''
- 'MultipleGetsAndSets'#.TEMP.⎕CY'Tests/TestData'
+ 'MultipleGetsAndSets'#.TEMP.⎕CY ##.CiderConfig.HOME,'/Tests/TestData'
 
- buff←##.ADOC.List #.TEMP.MultipleGetsAndSets
+ buff←##.ADOC.ADOC.List #.TEMP.MultipleGetsAndSets
  expected←' PrS_A,PrS_B,PrS_C'
  →T.PassesIf∨/expected⍷buff
  expected←' PrI_A,PrI_B,PrI_C'

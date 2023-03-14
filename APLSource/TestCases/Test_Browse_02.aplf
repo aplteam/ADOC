@@ -10,12 +10,13 @@
      ⎕←'This test needs the user - please check the top part for proper markup!'
      ⎕←'Press <enter> to continue'
      {}⍞
-     ##.ADOC.RestoreDefaults
+     ##.ADOC.ADOC.RestoreDefaults
      p←⎕NS''
      p.Title←'Check all the mark-up'
-     p ##.ADOC.Browse ##.ADOC
-     ##.ADOC.RestoreDefaults
+     p ##.ADOC.ADOC.Browse ##.ADOC.ADOC
+     ##.ADOC.ADOC.RestoreDefaults
 
-     R←~1 ∆YesOrNo'Is the markup okay?'
+     →T.PassesIf 1 ∆YesOrNo'Is the markup okay?'
+     R←T._OK
 
  :EndIf

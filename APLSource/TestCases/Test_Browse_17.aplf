@@ -2,14 +2,14 @@
 ⍝ `Browse` a class that carries a single property definition for multiple properties.
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
  #.⎕SHADOW'TEMP'
  'TEMP'#.⎕NS''
- 'MultipleGetsAndSets'#.TEMP.⎕CY'Tests/TestData'
+ 'MultipleGetsAndSets'#.TEMP.⎕CY ##.CiderConfig.HOME,'/Tests/TestData'
 
- ps←##.ADOC.CreateBrowseDefaults
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
  ps.view←0
- filename←ps ##.ADOC.Browse #.TEMP.MultipleGetsAndSets
+ filename←ps ##.ADOC.ADOC.Browse #.TEMP.MultipleGetsAndSets
  html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
  html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html

@@ -2,18 +2,18 @@
 ⍝ Exercise `Browse` on a class :Including stuff that does not exist
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
  #.⎕SHADOW'TEMP'
  'TEMP'#.⎕NS''
- 'IncludesNonExistingScript'#.TEMP.⎕CY'Tests/TestData'
+ 'IncludesNonExistingScript'#.TEMP.⎕CY ##.CiderConfig.HOME,'/Tests/TestData'
 
  :Trap 11
      ##.ADOC.view←0
-     ##.ADOC.Browse #.TEMP.IncludesNonExistingScript
+     ##.ADOC.ADOC.Browse #.TEMP.IncludesNonExistingScript
      →T.FailsIf 1
  :Else
      →T.FailsIf 0=+/'is not a namespace or does not exist'⍷0⊃⎕DM
  :EndTrap
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
  R←T._OK

@@ -1,5 +1,5 @@
  Cleanup
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
  ##.ADOC.Inherit←Globals.saveInherit
  ⎕EX'Globals'
  ⎕WX←∆WX

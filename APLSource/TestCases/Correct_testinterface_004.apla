@@ -1,0 +1,17 @@
+(
+ '*** testinterface (Interface) ***'
+ ''
+ 'Methods:'
+ '  NiladicWithResult'
+ '  MonadicWithResult'
+ '  DyadicWithResult'
+ '  AmbiWithResult'
+ '  NiladicWithShyResult'
+ '  MonadicWithShyResult'
+ '  DyadicWithShyResult'
+ '  AmbiWithShyResult'
+ '  Niladic'
+ '  Monadic'
+ '  Dyadic'
+ '  Ambi'
+)

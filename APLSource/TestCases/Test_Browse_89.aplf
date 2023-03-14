@@ -3,16 +3,16 @@
  R←T._Failed
 
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
  #.⎕SHADOW'Temp'
  'Temp'#.⎕NS''
- 'VersionCopyrightHistory'#.Temp.⎕CY'Tests\TestData'
+ 'VersionCopyrightHistory'#.Temp.⎕CY ##.CiderConfig.HOME,'/Tests/TestData'
 
- ps←##.ADOC.CreateBrowseDefaults
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
  ps.view←0
- filename←ps ##.ADOC.Browse #.Temp.VersionCopyrightHistory
- ##.ADOC.RestoreDefaults
+ filename←ps ##.ADOC.ADOC.Browse #.Temp.VersionCopyrightHistory
+ ##.ADOC.ADOC.RestoreDefaults
 
  html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename

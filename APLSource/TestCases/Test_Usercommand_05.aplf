@@ -3,7 +3,7 @@
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- more←⎕SE.UCMD'??Adoc #.ADOC.ADOC'
+ more←⎕SE.UCMD'??Adoc #.ADOC.ADOC.ADOC'
  →T.PassesIf 15<(⎕UCS 13)+.=more
 
  R←T._OK

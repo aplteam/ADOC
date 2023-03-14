@@ -3,7 +3,7 @@
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
  #.⎕SHADOW'Temp'
  'Temp'#.⎕NS''
@@ -12,7 +12,7 @@
  #.Temp.Sub.⎕FX'r←Hello2' 'r←''World'''
  #.Temp.⎕FX'ADOC_Doc' '⍝ First comment\\' '⍝ Second comment\\' '⍝ Third comment'
 
- myAdoc←⎕NEW ##.ADOC
+ myAdoc←⎕NEW ##.ADOC.ADOC
  htmlFilename←myAdoc.Make #.Temp
  html←⊃⎕NGET htmlFilename
  html←⊃,/∆RemoveCSS html

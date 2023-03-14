@@ -4,14 +4,14 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
  :Trap 11
-     'Demo'##.ADOC.Browse ##.ADOC
+     'Demo'##.ADOC.ADOC.Browse ##.ADOC.ADOC
      →T.FailsIf 1
  :Else
      →T.PassesIf'This syntax is retired; set "embeddedClassesFlag" in a parameter space instead'≡⊃⎕DM
  :EndTrap
 
  :Trap 11
-     1 ##.ADOC.Browse ##.ADOC
+     1 ##.ADOC.ADOC.Browse ##.ADOC.ADOC
      →T.FailsIf 1
  :Else
      →T.PassesIf'This syntax is retired; set "embeddedClassesFlag" in a parameter space instead'≡⊃⎕DM

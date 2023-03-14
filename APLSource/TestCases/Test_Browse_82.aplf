@@ -3,7 +3,7 @@
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
  #.⎕SHADOW'Temp'
  'Temp'#.⎕NS''
@@ -12,7 +12,7 @@
  'sendmsg'#.Temp.⎕NA'I4 USER32|SendMessageW U4 U4 U4 U4'
  #.Temp.ADOC_Doc←'First comment\\' 'Second comment\\' 'Third comment'
 
- myAdoc←⎕NEW ##.ADOC
+ myAdoc←⎕NEW ##.ADOC.ADOC
  htmlFilename←myAdoc.Make #.Temp  ⍝ It's good enough if this works.
 
  R←T._OK

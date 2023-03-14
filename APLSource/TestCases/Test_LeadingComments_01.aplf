@@ -15,9 +15,9 @@
  #.TestHelp.⎕FX'r←Hello;a;b;c' ';d;e' ';f;g' '⍝ This is a leading comment' 'a←1' 'b←2' 'r←a+b'
  #.TestHelp.⎕FX'r←Public' 'r←,⊂''Hello'''
 
- parms←##.ADOC.CreateBrowseDefaults
+ parms←##.ADOC.ADOC.CreateBrowseDefaults
  parms.view←0
- filename←parms ##.ADOC.Browse #.TestHelp
+ filename←parms ##.ADOC.ADOC.Browse #.TestHelp
  html←⊃⎕NGET filename
  →T.GoToTidyUp 0=+/'<p>This is a leading comment</p>'⍷html
 

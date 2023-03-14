@@ -2,14 +2,14 @@
 ⍝ `Browse` a class that carries the string ":Class" in a comment
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
  #.⎕SHADOW'TEMP'
  'TEMP'#.⎕NS''
- 'CarriesStuffInComment'#.TEMP.⎕CY'Tests/TestData'
+ 'CarriesStuffInComment'#.TEMP.⎕CY ##.CiderConfig.HOME,'/Tests/TestData'
 
- ps←##.ADOC.CreateBrowseDefaults
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
  ps.view←0
- filename←ps ##.ADOC.Browse #.TEMP.CarriesStuffInComment
+ filename←ps ##.ADOC.ADOC.Browse #.TEMP.CarriesStuffInComment
  html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
  html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html

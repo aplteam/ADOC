@@ -15,9 +15,9 @@
  body←'r←Hello;a' '⍝ Comment' '' ';d;e' '⍝ Leading comment' 'r←1'
  #.TestHelp.⎕FX body
 
- parms←##.ADOC.CreateBrowseDefaults
+ parms←##.ADOC.ADOC.CreateBrowseDefaults
  parms.view←0
- filename←parms ##.ADOC.Browse #.TestHelp
+ filename←parms ##.ADOC.ADOC.Browse #.TestHelp
  html←⊃⎕NGET filename
  →T.GoToTidyUp 0=+/'<p>Leading comment</p>'⍷html
 

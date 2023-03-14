@@ -3,7 +3,7 @@
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
  #.⎕SHADOW'Temp'
  'Temp'#.⎕NS''
@@ -11,10 +11,10 @@
  body←,¨'⍝ My comment from line 1' ':Class Foo' '∇ r←Hello' ':Access Public Shared' 'r←''World''' '∇' ':EndClass'
  #.Temp.⎕FIX body ⍝ Does it work?
 
- ps←##.ADOC.CreateBrowseDefaults
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
  ps.view←0
- htmlFilename←ps ##.ADOC.Browse #.Temp.Foo
- ##.ADOC.RestoreDefaults
+ htmlFilename←ps ##.ADOC.ADOC.Browse #.Temp.Foo
+ ##.ADOC.ADOC.RestoreDefaults
  buff←⊃⎕NGET htmlFilename
  →T.PassesIf 1=+/'My comment from line 1'⍷∊buff
 

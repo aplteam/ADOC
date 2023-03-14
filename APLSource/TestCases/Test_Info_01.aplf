@@ -2,20 +2,20 @@
 ⍝ Exercise the "Info" method on an interface
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- newdoc←##.ADOC.Info testinterface
  sep←⎕UCS 13
+ newdoc←sep(≠⊆⊢)##.ADOC.ADOC.Info testinterface
  show←batchFlag∘{⍺:⍬ ⋄ ⎕←⍵ ⋄ ⍬}
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
- :If Correct_testinterface_002≢newdoc
+ :If ≢/∆DropEmptyItems¨Correct_testinterface_002 newdoc
      _←show'   --- ',0⊃⎕SI
      flag←0
-     :If ~0∊⍴buffer←↑{⍺/⍨~⍺∊⍵}/{⍵⊂⍨sep=⍵}¨Correct_testinterface_002 newdoc
+     :If 0≠≢buffer←↑{⍺/⍨~⍺∊⍵}/∆DropEmptyItems¨Correct_testinterface_002 newdoc
          _←show'  Should be contained but isn''t:'
          _←show buffer
          flag←1
      :EndIf
-     :If ~0∊⍴buffer←↑{⍺/⍨~⍺∊⍵}/{⍵⊂⍨sep=⍵}¨newdoc Correct_testinterface_002
+     :If 0≠≢buffer←↑{⍺/⍨~⍺∊⍵}/∆DropEmptyItems¨newdoc Correct_testinterface_002
          _←show'  Should not be contained but is:'
          _←show buffer
          flag←1

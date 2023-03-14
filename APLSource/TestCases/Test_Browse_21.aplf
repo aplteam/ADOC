@@ -1,0 +1,18 @@
+ R←Test_Browse_21(stopFlag batchFlag);⎕TRAP;ps;filename;html
+⍝ `Browse` a namespace that contains ADOC_Doc without any header and without a `Version`/`CopyRight`/`History` function
+⍝ Was once a bug: no TOC showed
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.ADOC.RestoreDefaults
+
+ SomeNS.⎕EX↑'Version' 'Copyright' 'History'
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.ADOC.Browse SomeNS
+ html←⊃⎕NGET filename
+ →T.GoToTidyUp~∨/'class="toctab"'⍷html          ⍝ Check for TOC
+
+ R←T._OK
+
+∆TidyUp:
+ FilesAndDirs.DeleteFile filename

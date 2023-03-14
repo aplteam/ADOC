@@ -2,16 +2,16 @@
 ⍝ `Browse` a scripted namespace that has both `Version` and `Copyright`
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
  #.⎕SHADOW'Temp'
  'Temp'#.⎕NS''
- 'MyApp'#.Temp.⎕CY'Tests\TestData'
+ 'MyApp'#.Temp.⎕CY ##.CiderConfig.HOME,'/Tests/TestData'
 
- ps←##.ADOC.CreateBrowseDefaults
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
  ps.view←0
- filename←ps ##.ADOC.Browse #.Temp.MyApp
- ##.ADOC.RestoreDefaults
+ filename←ps ##.ADOC.ADOC.Browse #.Temp.MyApp
+ ##.ADOC.ADOC.RestoreDefaults
  html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
  html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html

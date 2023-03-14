@@ -11,8 +11,9 @@
      ⎕←'It''s called as a user command here!'
      ⎕←''
      0/⍞,0/⎕←'Press <enter> to contiue;'
-     ⎕SE.UCMD'???Adoc'
+     ⎕SE.UCMD'Adoc -???'
 
-     R←~1 ∆YesOrNo'Did ADOC show up in your default browser?'
+     →T.PassesIf 1 ∆YesOrNo'Did ADOC show up in your default browser?'
+     R←T._OK
 
  :EndIf

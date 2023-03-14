@@ -8,6 +8,6 @@
  'TestHelp'#.⎕NS''
  #.TestHelp.⎕FIX':Class Foo'(100000⍴'⍝'),(3000⍴'⍝'),⊂':EndClass'
 
- ##.ADOC.Browse #.TestHelp.Foo
+ ##.ADOC.ADOC.Browse #.TestHelp.Foo
 
  R←T._OK
