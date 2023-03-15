@@ -22,7 +22,7 @@
      ⎕←('Checking for ',lookFor1,' and ',lookFor2,' '){⍵↑,'--- ',⍺,' ',⍵⍴'-'}80⌊⎕PW-1
      ⎕←↑report
      :If ~batchFlag
-         0 0⍴⍞,0/⎕←'  To continue press <enter>'
+        CommTools.Pause ''
      :EndIf
  :EndIf
 ⍝Done

@@ -1,5 +1,5 @@
- R←Test_Browse_11(stopFlag batchFlag);⎕TRAP;buffer;ps;filename;html
-⍝ `Browse` a class that has `Version`, `Copyright` and `History` in it.
+ R←Test_Misc_23(stopFlag batchFlag);⎕TRAP;buffer;ps;filename;html
+⍝ `Browse` a namespace script that hosts `Version`, `Copyright` and `History` as variables
  R←T._Failed
 
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -7,11 +7,11 @@
 
  #.⎕SHADOW'Temp'
  'Temp'#.⎕NS''
- 'VersionCopyrightHistory'#.Temp.⎕CY ##.CiderConfig.HOME,'/Tests/TestData'
+ 'VersionCopyrightHistoryScriptedNS'#.Temp.⎕CY ##.CiderConfig.HOME,'/Tests/TestData'
 
  ps←##.ADOC.ADOC.CreateBrowseDefaults
  ps.view←0
- filename←ps ##.ADOC.ADOC.Browse #.Temp.VersionCopyrightHistory
+ filename←ps ##.ADOC.ADOC.Browse #.Temp.VersionCopyrightHistoryScriptedNS
  ##.ADOC.ADOC.RestoreDefaults
  html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename

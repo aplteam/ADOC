@@ -17,17 +17,15 @@
 ⍝ all "leading comments" are treated as special information.\\
 ⍝ Leading comments are the lines after the header line (and possibly the definition of
 ⍝ local variables and access statements like `:Access...`) that start with a lamp (`⍝`)
-⍝ symbol followed by either a space or another `⍝`. The first line that is not start with
+⍝ symbol followed by either a space or another `⍝`. The first line that does not start with
 ⍝ a lamp symbol defines the end of a leading comment, although lines with `⍝⍝` are ignored.\\
 ⍝ You can use Markdown to format the documentation. See [Markup syntax](#) for details
-⍝ of how to do this.
+⍝ of how to do this.\\
+⍝ There is a workaround available for non-scripted namespaces.\\
 ⍝ Note that `ADOC` can handle subclasses. For example, `ADOC` itself comes with a subclass
 ⍝ called `Demo`. Therefore, both `Browse` and `List` will process `ADOC.Demo`. However, you
 ⍝ cannot make use of `ADOC.Demo` when it is run as a user command.
 ⍝ ### `ADOC` as a user command
-⍝ You can use advanced features. The features and how to use them are documented in a separate
-⍝ document that can be put on display by calling `]ADOC -advanced`.\\
-⍝ However, the reference section documents all methods, both shared **and** instance.
 ⍝ The following examples assume that you have `MyClass`, `MyInterface` and `MyNamespace`
 ⍝ in your workspace.
 ⍝ ~~~
@@ -47,6 +45,10 @@
 ⍝ ⍝ Same but for several objects:
 ⍝       ]ADoc MyClass MyInterface MyNamespace
 ⍝ ~~~
+⍝ ### Advanced features
+⍝ You can use advanced features by using the API via `⎕SE.ADOC` introduced in version 7.0.0\\
+⍝ The advanced  features are documented in a separate document that can be viewed
+⍝ by calling `⎕SE.ADOC.ShowDocumentation 2`. (Passing a 1 as `⍵` would view the same as `]ADOC -???`)\\
 ⍝ ### What `ADOC` considers to be documentation
 ⍝ Note that comments are recognized only if and as long they follow
 ⍝ the "header": the top of a script, functions and operators, headers and field
@@ -58,7 +60,7 @@
 ⍝ a comment to the right of a `:Field` definition.\\
 ⍝ Since 5.4 however any further comment lines are considered part of the `:Field`
 ⍝ documentation until either two empty lines are detected, or something like a  function,
-⍝ operator, property, another field definition etc. is detected.
+⍝ operator, property, another field definition etc.
 ⍝ #### Excluding a line
 ⍝ In case you want to exclude a particular line from the leading comments
 ⍝ use two lamps (`⍝⍝`) at the beginning of the line. This will **not** break
@@ -79,7 +81,7 @@
 ⍝ functions and the so-called leading comments of scripts. `ADOC` uses the APLTree class
 ⍝ [`MarkAPL`](https://github.com/aplteam/MarkAPL "MarkAPL on GitHub") to convert the
 ⍝ Markdown to HTML.\\
-⍝ `ADOC` itself can be used as an example: it uses of available markup, most importantly:
+⍝ `ADOC` itself can be used as an example: it uses all of the markup available, most importantly:
 ⍝ * Headers
 ⍝ * Bulleted lists
 ⍝   1. Ordered lists
@@ -97,12 +99,13 @@
 ⍝ 1. You can insert a line break (`<br />`) by having a single backslash character (`\`) at the
 ⍝    end of a line.
 ⍝ 1. You can enforce a new paragraph by adding two backslashes at the end of a line.\\
-⍝    This can be useful when you need to document plenty of method calls etc in order to avoid
+⍝    This can be useful when you need to document plenty of method calls etc but want to avoid
 ⍝    a large number of empty lines.\\
 ⍝ Note that these are ADOC features, not MarkAPL features.
 ⍝ #### Leading comments in functions and operators
 ⍝ Headers within the leading comments in public functions and operators are limited to level six.
-⍝ However, since  all other levels are converted into level six anyway you may well use level one
+⍝ If you define a different level then it will be converted to level 6 anyway. Therefore, you may
+⍝ well define level-1 headers for better readability.
 ⍝ for better readability.\\
 ⍝ ### Namespaces
 ⍝ #### Overview
@@ -118,7 +121,7 @@
 ⍝ `ADOC` will process leading comment lines in a scripted namespace in the same way
 ⍝ as it does with classes and interfaces.\\
 ⍝ However, in normal namespaces there can be no "leading" comments. As a replacement you can
-⍝ create a variable: a vector of text vectors.\\
+⍝ create a variable: a vector of text vectors. The name is by convention `ADOC_Doc`.\\
 ⍝ The variable can contain the markdown as is, without the leading `⍝` symbol; this makes editing easier.\\
 ⍝ For example:
 ⍝ ```
@@ -128,37 +131,44 @@
 ⍝ #.Temp.⎕FX'r←Hello' 'r←''Word'''
 ⍝ ]ADoc #.Temp
 ⍝ ```
-⍝ Prior to version 6.0 `Browse` accepted the name of a function within an ordinary namespace;
-⍝ this is no longer supported. If you were using this feature: create a vector of text vectors
-⍝ `ADOC_Doc` and put the content of that function into it and exeute `]Link.Add ADOC_Doc`. Then
-⍝ create a function `Public`; if it returns an empty vector you'll get exactly the same behaviour.\\
+⍝ Prior to version 6.0 `Browse` accepted `ADOC_Doc` as the name of a function within an ordinary namespace;
+⍝ this is no longer supported. Replace the function by a variable (vector of character vectors) with the
+⍝ same name.
 ⍝ ### Reserved names
-⍝ Since version 3.0 `ADOC` looks for a number of fixed names. If a function with such a name is
-⍝ found, that function is executed and the result returned by that function is used.\\
+⍝ Since version 3.0 `ADOC` looks for a number of fixed names. If a function or a variable
+⍝ with such a name is found, the contents of the variable or the result of that function is used.\\
 ⍝ The syntax rules are fixed: if such a function does not honor the syntax rules it will
-⍝ fail. However, since the call is trapped that won't stop `ADOC` from producing a result.\\
-⍝ All these functions must be niladic traditional functions marked as:
+⍝ fail. However, since all calls are trapped that won't stop `ADOC` from producing a result.\\
+⍝ Functions must be niladic traditional functions marked as:
 ⍝
 ⍝ ~~~
 ⍝ :Access Public Shared
 ⍝ ~~~
 ⍝ and they must return a result.\\
-⍝ Below are functions listed that will be honoured in case they exist.\\
+⍝ Note that variables make no sense in class scripts since they cannot be public.
+⍝ `History` and `Copyright` might be nested vectors of character vectors while `Version` might be a simple
+⍝ character vector or a nested vector of length two or three.\\
 ⍝ #### Copyright
-⍝ Must return a vector of strings.\\
+⍝ Must be/return a vector of character vectors.\\
 ⍝ #### History
-⍝ If this function exists, it must be one of the following:
-⍝ * A function that returns either a simple text vector or a vector of text vectors
+⍝ If this exists, it must be one of the following:
+⍝ * A function that returns either a simple text vector or a vector of text vectors with markdown
 ⍝   (now deprecated).
 ⍝ * A function that returns **no** result and contains markdown as comments.\\
+⍝ * A variable that is a nested vector of character vectors.\\
 ⍝ #### Version
-⍝ Must return a vector of length three:
-⍝ 1. The name, for example `ADOC`
-⍝ 1. A string with version information, for example "1.2.3" or "17.0.1.13245"
-⍝ 1. A string representing a date, for example "2009-01-01"\\
+⍝ Must return one of:
+⍝ * A simple character vector like `1.2.3`
+⍝ * A nested vector of length two:
+⍝   1. A character vector with version information, for example "1.2.3" or "17.0.1+13245"
+⍝   1. A character vector representing a date, for example "2009-01-01"
+⍝ * A nested vector of length three:
+⍝   1. The name, for example `ADOC`
+⍝   1. A character vector with version information
+⍝   1. A character vector representing a date\\
 ⍝ For example, a function returning this:
 ⍝ ~~~
-⍝ ('1.2.3' '2009-06-01') ←→ 1↓#.MyOrdNameSp.Version
+⍝ ('1.2.3' '2009-06-01') ←→ 1↓#.MyNameSpace.Version
 ⍝ ~~~
 ⍝ lets `ADOC` produce this information:
 ⍝ "Version 1.2.3 from 2009-06-01"\\
@@ -181,12 +191,14 @@
       :Access Public Shared
       ⍝ * 7.0.0
       ⍝   * Breaking change: requires 18.0 or better
-      ⍝   * Breaking change: is a Tatin package now
+      ⍝   * Breaking change: is a Tatin package now, an depends on Tatin packages
       ⍝   * Breaking change: "IncludeCss" removed from the default parameter space (CreateBrowseDefaults)
       ⍝   * New parameter `htmlFilename` added to the parameter space.
       ⍝   * `ADOC_Doc` may not be a function anymore: it **must** be a variable (vector of char vectors)
       ⍝   * Needs `APLTreeUtils2` but does not :Include `APLTreeUtils` anymore
-      ⍝   * Can deal with Tatin packages
+      ⍝   * The reserved names `History`, `Version` and `Copyrigth` may now (still) be functions, but they
+      ⍝     can now also be variables
+      ⍝   * The deprecated function `List` was removed
       ⍝   * Bug fixes
       ⍝     * In case ADOC_Doc did not carry any header...
       ⍝       * no TOC was injected into the HTML
@@ -284,7 +296,7 @@
     :Property IncludeReference
     :Access Public Shared
     ⍝ Defaults to 1. To suppress the Reference part of the documentation, set this to 0.\\
-    ⍝ This can be useful when you want ADOC to create documentation just from the "leading comments".
+    ⍝ This can be useful when you want `ADOC` to create documentation just from the "leading comments".
         ∇ r←get
           r←_IncludeReference
         ∇
@@ -296,8 +308,8 @@
 
     :Property Toc
     :Access Public Shared
-    ⍝ Defaults to 1. To have no TOC at all specify a 0.\\
-    ⍝ This can be useful when you want ADOC to create documentation just from the "leading comments"
+    ⍝ Defaults to 1. To have no Toc at all specify a 0.\\
+    ⍝ This can be useful when you want `ADOC` to create documentation just from the "leading comments"
     ⍝ but without many --- if any --- headers, and no reference part at all.
         ∇ r←get
           r←_Toc
@@ -652,9 +664,25 @@
       _HTML,←html
     ∇
 
-    ∇ r←ShowDocumentation dummy
+    ∇ r←ShowDocumentation type;filename;path;cfg
+    ⍝ * type=1 shows the same information as ]ADOC -??? (read: ADOC adocs itself)
+    ⍝ * type=2 shows the "Advanced" document
       :Access Public Shared
-      r←Browse ⎕THIS
+      :Select ↑∊type
+      :Case 1
+          r←Browse ⎕THIS
+      :Case 2
+          :If 0<##.⎕NC'TatinVars'
+              filename←'file://',##.TatinVars.GetFullPath2AssetsFolder,'/AdvancedADOC.html'
+          :Else
+              path←##.##.CiderConfig.HOME
+              cfg←⎕SE.Tatin.ReadPackageConfigFile path
+              filename←'file://',path,'/',cfg.assets,'/AdvancedADOC.html'
+          :EndIf
+          P.APLTreeUtils2.GoToWebPage filename
+      :Else
+          r←'⍵ must be 1 (ADOC -???) or 2 (for the "Advanced" document'
+      :EndSelect
     ∇
 
     ∇ {embeddedClassNames}Analyze scriptRef;list;embeddedFlag
@@ -804,8 +832,7 @@
          ⍝ not supported any more.\\
          ⍝ ## Reference to a script
          ⍝ If `scriptRef` is empty, the formerly created HTML is displayed.\\
-         ⍝ Note that in this case any formerly created HTML remains
-         ⍝ untouched. Therefore it can still be used for other purposes.\\
+         ⍝ Note that in this case the HTML remains untouched. Therefore it can still be used for other purposes.\\
          ⍝ You can pass the name of one or more embedded classes --- classes locally defined
          ⍝ within a class script; see `ADOC` itself as an example --- or embedded namespaces.
          ⍝ You get then a document which contains only these embedded
@@ -863,14 +890,6 @@
           View filename
       :EndIf
       _embeddedClassName←''
-    ∇
-
-    ∇ r←{verbose}List scriptName
-      :Access Public Shared
-    ⍝ This method is deprecated in will be removed in a future version of ADOC; use `Info` instead.
-      verbose←{2=⎕NC ⍵:⍎⍵ ⋄ 0}'verbose'
-      verbose←{IsChar ⍵:'full'≡⎕C ⍵ ⋄ (,1)≡,⍵}verbose
-      r←verbose Info scriptName
     ∇
 
     ∇ r←{verbose}Info scriptName;data;my;nl;keywords
@@ -964,8 +983,8 @@
     ∇
 
     ∇ ProcessAsHtml(scripts filename);myDoc;key;newname
-      ⍝ Process one or more scripts and write the resulting HTML into "filename"
-      ⍝ which defaults (if empty) to the script name (without `#.`) in the current directory.
+      ⍝ Process one or more scripts and write the resulting HTML to "filename"
+      ⍝ which defaults (if empty) to the name of the script without `#.` in the current directory.
       :Access Public shared
       (∆EM←'Please pass references only!')⎕SIGNAL 11/⍨{⍵≡⍕¨⍵}scripts
       :If 0=≢filename
@@ -1693,46 +1712,54 @@
     ⍝ Handle special case: is there a function `Version`, and does it return the right stuff?
       r←header
       :If ~ignoreVersion
-      :AndIf (⊂'Version')∊ref.⎕NL-3 ⍝ Is there a "Version" function?
-          :Trap 0 ⍝ not nice, but these calls may fail for all sorts of reasons.
-              txt←''
-              :If 9.1≡⎕NC⊂⍕ref  ⍝ Is it an ordinary namespace?!
-                  body←ref.⎕NR'Version'
-                  txt←ref.{11::'' ⋄ ,⍎⍵}'Version'
+          txt←''
+          :If (⊂'Version')∊ref.⎕NL-3 ⍝ Is there a "Version" function?
+              :Trap 0 ⍝ not nice, but these calls may fail for all sorts of reasons.
+                  txt←''
+                  :If 9.1≡⎕NC⊂⍕ref  ⍝ Is it an ordinary namespace?!
+                      body←ref.⎕NR'Version'
+                      txt←ref.{11::'' ⋄ ,⍎⍵}'Version'
+                  :Else
+                      txt←ref.Version
+                  :EndIf
               :Else
-                  txt←ref.Version
+                  qdmx←⎕DMX
+                  ⎕←'Processing the "Version" function crashed (',qdmx.EM,')'
+              :EndTrap
+          :ElseIf (⊂'Version')∊ref.⎕NL-2 ⍝ Is there a "Version" variable?
+              txt←ref.Version
+          :EndIf
+          :If 0≠≢txt
+              :If 2>|≡txt
+                  txt←⊆{'+'∊⍵:⍵↑⍨¯1+⍵⍳'+' ⋄ ⍵}txt
+              :Else
+                  txt←{'Version ',({'+'∊⍵:⍵↑⍨¯1+⍵⍳'+' ⋄ ⍵}⍺),' from ',⍵}/(3=≢txt)↓txt
               :EndIf
-              :If 0≠≢txt
-                  :If 2>|≡txt
-                      txt←⊆{'+'∊⍵:⍵↑⍨¯1+⍵⍳'+' ⋄ ⍵}txt
-                  :Else
-                      txt←{'Version ',({'+'∊⍵:⍵↑⍨¯1+⍵⍳'+' ⋄ ⍵}⍺),' from ',⍵}/(3=≢txt)↓txt
-                  :EndIf
-                  txt←(⊂'## Version'),txt
-                  :If 0=≢r
-                      r←,⊂'Txt'txt
-                  :Else
-                      last←≢r
-                      (last⊃r)←txt{⍵[1],(⊂(2⊃⍵),⍺)}last⊃r
-                  :EndIf
+              txt←(⊂'## Version'),txt
+              :If 0=≢r
+                  r←,⊂'Txt'txt
+              :Else
+                  last←≢r
+                  (last⊃r)←txt{⍵[1],(⊂(2⊃⍵),⍺)}last⊃r
               :EndIf
-          :Else
-              qdmx←⎕DMX
-              ⎕←'Processing the "Version" function crashed (',qdmx.EM,')'
-          :EndTrap
+          :EndIf
       :EndIf
     ∇
     ∇ r←HandleCopyRightInHeader(ref header);txt;body
     ⍝ Handle special case: is there a function `Copyright`, and does it return the right stuff?
       r←header
       :If ~_ignoreCopyright
-      :AndIf (⊂'Copyright')∊ref.⎕NL-3 ⍝ Is there a "Copyright" function?
           txt←''
-          :If 9.1≡⎕NC⊂⍕ref  ⍝ Is it an ordinary namespace?!
-              body←ref.⎕NR'Copyright'
-              txt←ref.{11::'' ⋄ ,⍎⍵}'Copyright'
-          :Else
-              txt←{0 1∊⍨≡⍵:,⊂⍵ ⋄ 2=⍴⍴⍵:↓⍵ ⋄ ⍵},ref.Copyright
+          :If (⊂'Copyright')∊ref.⎕NL-3 ⍝ Is there a "Copyright" function?
+              txt←''
+              :If 9.1≡⎕NC⊂⍕ref  ⍝ Is it an ordinary namespace?!
+                  body←ref.⎕NR'Copyright'
+                  txt←ref.{11::'' ⋄ ,⍎⍵}'Copyright'
+              :Else
+                  txt←{0 1∊⍨≡⍵:,⊂⍵ ⋄ 2=⍴⍴⍵:↓⍵ ⋄ ⍵},ref.Copyright
+              :EndIf
+          :ElseIf (⊂'Copyright')∊ref.⎕NL-2 ⍝ Is there a "Copyright" variable?
+              txt←ref.Copyright
           :EndIf
           :If 0≠≢txt
               txt←(⊂'## Copyright'),,/txt
@@ -1749,32 +1776,37 @@
     ⍝ or consist of comments useful for ADOC?
       r←header
       :If ~_ignoreHistory
-      :AndIf (⊂'History')∊ref.⎕NL-3 ⍝ Is there a "History" function?
           txt←''
-          :If 0=↑↑ref.⎕AT'History'
-              :If 0≠≢txt←P.APLTreeUtils2.DLB 1↓ref.⎕NR'History'
-              :AndIf 0≠≢txt←1↓¨('⍝'=↑¨txt)/txt
-                  txt←(⌊/+/∧\' '=⊃txt)↓¨txt
-              :Else
-                  source←⎕SRC ref
-                  buffer←'^\s*''.+''' '^\s*⍝.*$' '^\s*∇\s*History\b'⎕R(,¨'&' '&' '∇∇')⍠('Greedy' 0)⊣source
-                  :If 0<+/bool←∨/¨'∇∇'∘⍷¨buffer
-                      buffer←(bool⍳1)↓buffer
-                      buffer←P.APLTreeUtils2.DLB(↑'^\s*∇\s*$'⎕S 2⍠('Greedy' 0)⊣buffer)↑buffer
-                      :If 0=+/~(↑¨buffer)∊':⍝'
-                          txt←1↓¨('⍝'=↑¨buffer)/buffer
+          :If (⊂'History')∊ref.⎕NL-3 ⍝ Is there a "History" function?
+              txt←''
+              :If 0=↑↑ref.⎕AT'History'
+                  :If 0≠≢txt←P.APLTreeUtils2.DLB 1↓ref.⎕NR'History'
+                  :AndIf 0≠≢txt←1↓¨('⍝'=↑¨txt)/txt
+                      txt←(⌊/+/∧\' '=⊃txt)↓¨txt
+                  :Else
+                      source←⎕SRC ref
+                      buffer←'^\s*''.+''' '^\s*⍝.*$' '^\s*∇\s*History\b'⎕R(,¨'&' '&' '∇∇')⍠('Greedy' 0)⊣source
+                      :If 0<+/bool←∨/¨'∇∇'∘⍷¨buffer
+                          buffer←(bool⍳1)↓buffer
+                          buffer←P.APLTreeUtils2.DLB(↑'^\s*∇\s*$'⎕S 2⍠('Greedy' 0)⊣buffer)↑buffer
+                          :If 0=+/~(↑¨buffer)∊':⍝'
+                              txt←1↓¨('⍝'=↑¨buffer)/buffer
+                          :EndIf
                       :EndIf
                   :EndIf
+              :Else
+                  :Trap 0 ⍝ not nice, but these calls may very well fail
+                      :If 9.1≡⎕NC⊂⍕ref  ⍝ Is it an ordinary namespace?!
+                          body←ref.⎕NR'History'
+                          txt←ref.{11::'' ⋄ ⍎⍵}'History'
+                      :Else
+                          txt←ref.History
+                      :EndIf
+                  :EndTrap
               :EndIf
-          :Else
-              :Trap 0 ⍝ not nice, but these calls may very well fail
-                  :If 9.1≡⎕NC⊂⍕ref  ⍝ Is it an ordinary namespace?!
-                      body←ref.⎕NR'History'
-                      txt←ref.{11::'' ⋄ ⍎⍵}'History'
-                  :Else
-                      txt←ref.History
-                  :EndIf
-              :EndTrap
+          :ElseIf (⊂'History')∊ref.⎕NL-2 ⍝ Is there a "History" variable...
+          :AndIf 0<≢ref.History ⍝ ... that is not empty?
+              txt←ref.History
           :EndIf
           :If 0≠≢txt
               :If 2=⍴⍴txt
@@ -1799,22 +1831,26 @@
           (buffer remarks)←SplitAtLamp source
           (name keywords)←{((⍴⍵)⊃⍵)(¯1↓⍵)}' 'P.APLTreeUtils2.Split P.APLTreeUtils2.DMB buffer
       :AndIf IgnorePattern{0=≢⍺:1 ⋄ ⍺∨.≠(⍴,⍺)↑⍵}name
-          keywords↓⍨←':'=↑↑keywords
-          result,←⊂'name'name
-          result,←⊂'access'(↑('Instance' 'Shared')[1+∨/∨/⊃'shared'∘⍷¨{(⊂⍵)⊃¨⍨{⍵/⍳⍴,⍵}∨/¨':access'∘⍷¨⍵},¨masked])
-          result,←⊂'readonly'(~∨/'∇set'⍷∊source~¨' ')
-          :If 0=≢remarks
-              result,←⊂'comments'((+/∧\'⍝'={↑¨⍵~¨' '}1↓source)↑1↓source)
-          :Else
-              result,←⊂'comments'({0 1∊⍨≡⍵:⊂⍵ ⋄ ⍵}remarks)
+          :If _ignoreCopyright∨name≢'Copyright'
+          :AndIf _ignoreVersion∨name≢'Version'
+          :AndIf _ignoreHistory∨name≢'History'
+              keywords↓⍨←':'=↑↑keywords
+              result,←⊂'name'name
+              result,←⊂'access'(↑('Instance' 'Shared')[1+∨/∨/⊃'shared'∘⍷¨{(⊂⍵)⊃¨⍨{⍵/⍳⍴,⍵}∨/¨':access'∘⍷¨⍵},¨masked])
+              result,←⊂'readonly'(~∨/'∇set'⍷∊source~¨' ')
+              :If 0=≢remarks
+                  result,←⊂'comments'((+/∧\'⍝'={↑¨⍵~¨' '}1↓source)↑1↓source)
+              :Else
+                  result,←⊂'comments'({0 1∊⍨≡⍵:⊂⍵ ⋄ ⍵}remarks)
+              :EndIf
+              result,←⊂'keywords'keywords
+              result,←⊂'more' ''
+              r←⊃result
           :EndIf
-          result,←⊂'keywords'keywords
-          result,←⊂'more' ''
-          r←⊃result
       :EndIf
     ∇
 
-    ∇ r←AnalyzeField(noOf source masked);buffer;type;bool;remarks
+    ∇ r←AnalyzeField(noOf source masked);buffer;type;bool;remarks;name
       r←⍬
       :If ∨/' public '⍷↑masked
           buffer←' 'P.APLTreeUtils2.Split P.APLTreeUtils2.DMB 1⊃source
@@ -1829,7 +1865,12 @@
           :EndIf
           buffer←P.APLTreeUtils2.DLB⊃,/' ',¨buffer/⍨~(⎕C buffer)∊':field' 'public' 'instance' 'shared' 'readonly'
           :If IgnorePattern{0=≢⍺:1 ⋄ ⍺∨.≠(⍴,⍺)↑⍵}buffer
-              r←⊃('type' 'Field')('name'(buffer↑⍨¯1+buffer⍳'←'))('syntax'(buffer↓⍨buffer⍳'←'))('access'type)('comments'remarks)('more' '')('readonly'(∨/' readonly '⍷⎕C' ',source,' '))
+              name←buffer↑⍨¯1+buffer⍳'←'
+              :If _ignoreCopyright∨name≢'Copyright'
+              :AndIf _ignoreVersion∨name≢'Version'
+              :AndIf _ignoreHistory∨name≢'History'
+                  r←⊃('type' 'Field')('name'name)('syntax'(buffer↓⍨buffer⍳'←'))('access'type)('comments'remarks)('more' '')('readonly'(∨/' readonly '⍷⎕C' ',source,' '))
+              :EndIf
           :EndIf
       :EndIf
     ∇

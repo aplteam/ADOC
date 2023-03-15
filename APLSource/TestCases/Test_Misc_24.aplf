@@ -1,0 +1,23 @@
+ R←Test_Misc_24(stopFlag batchFlag);⎕TRAP;buffer;ps;filename;html
+⍝ `Browse` a ordinary namespace that hosts `Version`, `Copyright` and `History` as variables
+ R←T._Failed
+
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ 'VersionCopyrightHistoryNS'#.Temp.⎕CY ##.CiderConfig.HOME,'/Tests/TestData'
+
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.ADOC.Browse #.Temp.VersionCopyrightHistoryNS
+ ##.ADOC.ADOC.RestoreDefaults
+ html←⊃⎕NGET filename 1
+ FilesAndDirs.DeleteFile filename
+ html←1↓⊃,/(⎕UCS 13),¨∆RemoveCSS html
+ →T.PassesIf 1=+/'>Version</h'⍷html
+ →T.PassesIf 1=+/'>History</h'⍷html
+ →T.PassesIf 1=+/'>Copyright</h'⍷html
+
+ R←T._OK

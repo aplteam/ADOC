@@ -1,28 +1,6 @@
-﻿:Class  ADOC_uc ⍝ V3.000
+:Class  ADOC_uc ⍝ V3.000
 ⍝ User Command script for "ADOC".
-⍝ Expects the WS ADOC.dws to be a sibling of this script.
-⍝
-⍝ 2017 06 05 Adam: ]help → ]info; "parms" → "params"; ]help → -help
-⍝ 2017 06 07 Adam: disable ]CreateParams; "List" → "Info"
-⍝ 2017 06 14 Adam: ]browse → ]TOOLS.adoc; -help → ]???adoc; ]info [-full] → ]adoc -info[=full]
-⍝ 2017 06 14 Adam: args are now separated with space instead of commas; -info handles multiple names and includes -title
-⍝ 2017 05 15 KaiJ: -caption → -title
-⍝ 2017 06 13 KaiJ: -params and ]CreateParms removed; help fixed; documentation updated.
-⍝ 2017 06 15 Adam: -info → -summary, now accepts relative refs, help tweak, removed error trapping.
-⍝ 2017 06 22 KaiJ: Bug fix regarding Caption/Title + make it compatible with pre-16.0 versions.
-⍝ 2017 06 26 KaiJ: Documentation shortened. Sub-folder ADOC introduced. CSS for print improved.
-⍝ 2017 06 27 KaiJ: Sub-folder removed.
-⍝ 2018 04 18 Adam: ]??cmd → ]cmd -??
-⍝ 2018 05 01 Adam: Add SVN tag.
-⍝ 2018 08 11 KaiJ: Help improved and -version flag introduced.
-⍝ 2018 11 05 KaiJ: ADOC user command script relied on exposed properties.
-⍝ 2019 01 15 KaiJ: In case nothing is provided as argument an error is thrown.
-⍝ 2020 01 03 KaiJ: Now the user command tries to figure out where an object lives.
-⍝ 2020 01 03 KaiJ: -ref=1|0 introduced with a default 1. Allows to suppress the reference part.
-⍝ 2020 07 31 KaiJ: User function `Public` in a namespcae can now also return a simple matrix rather than a VTV
-⍝ 2021 01 11 KaiJ: Now checks whether a Tatin package is involved, and handles them accordingly
-⍝ 2022 03 23 KaiJ: ]ADOC -??? amended to new user command framework (18.2)
-⍝ 2023 03 13 KaiJ: Transformed into a Tatin packages and -filename added to "Browse" & several bug fixes
+⍝ 2023 03 14 Kai: Transformed into a Tatin packages plus plenty of improvements and fixes
 
     ⎕IO←⎕ML←1
 
@@ -53,7 +31,7 @@
           :EndIf
       :EndIf
       :If 0=wasLoaded
-          ⍝TODO⍝ How to unload?! If at all!!
+          ⍝ Unload? Always? Only on demand?
       :EndIf
     ∇
 
