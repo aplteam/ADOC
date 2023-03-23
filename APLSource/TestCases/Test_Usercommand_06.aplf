@@ -9,7 +9,7 @@
      1 CommTools.Pause'This test needs you! ADOC will show itself in the default browser'
      ⎕SE.UCMD'Adoc #.ADOC.ADOC.ADOC'
 
-     →T.PassesIf 1 ∆YesOrNo'Did ADOC show up in your default browser?'
+     →T.PassesIf 1 CommTools.YesOrNo'Did ADOC show up in your default browser?'
      R←T._OK
 
  :EndIf

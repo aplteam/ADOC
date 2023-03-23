@@ -134,6 +134,19 @@
 ⍝ Prior to version 6.0 `Browse` accepted `ADOC_Doc` as the name of a function within an ordinary namespace;
 ⍝ this is no longer supported. Replace the function by a variable (vector of character vectors) with the
 ⍝ same name.
+⍝ ### Tatin packages
+⍝ The user command is able to deal with a reference to a Tatin package provided as argument , but only
+⍝ one package at the time.\\
+⍝ For example:
+⍝ ```
+⍝       ]LoadPackages [tatin]MakeHelpers
+⍝       ⎕←#.MakeHelpers
+⍝
+⍝ #._tatin.aplteam_MakeHelpers_0_7_0.code.API
+⍝       ]ADoc #._tatin.aplteam_MakeHelpers_0_7_0.code.API   ⍝ Works
+⍝       ]ADoc #._tatin.aplteam_MakeHelpers_0_7_0.code       ⍝ Works as well
+⍝       ]ADoc #.MakeHelpers                                 ⍝ Works, too
+⍝ ```
 ⍝ ### Reserved names
 ⍝ Since version 3.0 `ADOC` looks for a number of fixed names. If a function or a variable
 ⍝ with such a name is found, the contents of the variable or the result of that function is used.\\
@@ -184,19 +197,20 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'ADOC' '7.0.0+90' '2023-03-14'
+      r←'ADOC' '7.0.0+90' '2023-03-22'
     ∇
 
     ∇ History
       :Access Public Shared
       ⍝ * 7.0.0
       ⍝   * Breaking change: requires 18.0 or better
-      ⍝   * Breaking change: is a Tatin package now, an depends on Tatin packages
+      ⍝   * Breaking change: ADOC is now a Tatin package, and depends on Tatin packages
       ⍝   * Breaking change: "IncludeCss" removed from the default parameter space (CreateBrowseDefaults)
+      ⍝   * Called without an argument ]ADoc now investigates the namespace it was called from
       ⍝   * New parameter `htmlFilename` added to the parameter space.
       ⍝   * `ADOC_Doc` may not be a function anymore: it **must** be a variable (vector of char vectors)
       ⍝   * Needs `APLTreeUtils2` but does not :Include `APLTreeUtils` anymore
-      ⍝   * The reserved names `History`, `Version` and `Copyrigth` may now (still) be functions, but they
+      ⍝   * The reserved names `History`, `Version` and `Copyrigth` may (still) be functions, but they
       ⍝     can now also be variables
       ⍝   * The deprecated function `List` was removed
       ⍝   * Bug fixes
@@ -668,6 +682,7 @@
     ⍝ * type=1 shows the same information as ]ADOC -??? (read: ADOC adocs itself)
     ⍝ * type=2 shows the "Advanced" document
       :Access Public Shared
+      'Right argument must be either 1 or 2'⎕SIGNAL 11/⍨~(⊂type)∊1 2
       :Select ↑∊type
       :Case 1
           r←Browse ⎕THIS

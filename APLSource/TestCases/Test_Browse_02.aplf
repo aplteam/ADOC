@@ -13,7 +13,7 @@
      p ##.ADOC.ADOC.Browse ##.ADOC.ADOC
      ##.ADOC.ADOC.RestoreDefaults
 
-     →T.PassesIf 1 ∆YesOrNo'Is the markup okay?'
+     →T.PassesIf 1 CommTools.YesOrNo'Is the markup okay?'
      R←T._OK
 
  :EndIf

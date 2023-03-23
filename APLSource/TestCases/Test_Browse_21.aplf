@@ -10,6 +10,7 @@
  ps.view←0
  filename←ps ##.ADOC.ADOC.Browse SomeNS
  html←⊃⎕NGET filename
+ →T.GoToTidyUp~∨/'This is an ADOC_Doc variable. It does not carry any header.'⍷⊃,/html
  →T.GoToTidyUp~∨/'class="toctab"'⍷html          ⍝ Check for TOC
 
  R←T._OK

@@ -1,6 +1,6 @@
-:Class  ADOC_uc ⍝ V3.000
+﻿:Class  ADOC_uc ⍝ V3.000
 ⍝ User Command script for "ADOC".
-⍝ 2023 03 14 Kai: Transformed into a Tatin packages plus plenty of improvements and fixes
+⍝ 2023 03 22 Kai: Transformed into a Tatin packages plus plenty of improvements and fixes
 
     ⎕IO←⎕ML←1
 
@@ -66,11 +66,13 @@
           r,←⊂' -filename=       Modifier Default is a temp filename but allows any filename'
           r,←⊂' -version         Returns the version number of ADOC used. If specified everythings else is ignored.'
           r,←⊂''
-          r,←⊂'When objects are not addressed with a full name (= start neither with `#` nor with `⎕SE`) then the user command '
-          r,←⊂'will try to find the objects in the namespace the user command was called from. If they cannot be found there it '
-          r,←⊂'will assume they live in `#`.'
+          r,←⊂'* When ]ADoc is called without an argument it will investigate the namespace the user command was called from'
+          r,←⊂'* When objects are not addressed with a full name (= start neither with `#` nor with `⎕SE`) then the user command '
+          r,←⊂'  will try to find the objects in the namespace the user command was called from. If they cannot be found there'
+          r,←⊂'  ADOC will assume they live in `#`.'
           r,←⊂''
           r,←⊂'Examples:'
+          r,←⊂'    ]',Cmd,'                                      ⍝ work on namespace it was called from'
           r,←⊂'    ]',Cmd,' MyClass                              ⍝ single class'
           r,←⊂'    ]',Cmd,' MyClass FilesAndDirs                 ⍝ two classes'
           r,←⊂'    ]',Cmd,' MyClass -title="My Doc"              ⍝ custom title'
@@ -80,7 +82,7 @@
           r,←⊂''
       :Case 2
           LoadAdoc ⍬
-          r←⊂'HTML page saved as ',⎕SE.ADOC.ShowDocumentation ⍬
+          r←⊂'HTML page saved as ',⎕SE.ADOC.ShowDocumentation 1
       :EndSelect
       r,←(l=0)/⊂']',Cmd,' -??  ⍝ for syntax details'
       r,←(l∊0 1)/⊂']',Cmd,' -??? ⍝ to view the complete ADoc documentation in a browser window'
@@ -111,8 +113,8 @@
     ∇
 
     ∇ r←AdocBrowse Args;title;ref;cs;browser;params;includeRefeference;toc
-      Args.Arguments←CheckArgumentsForTatin Args.Arguments
       title←''Args.Switch'title' ⍝ default is empty
+      (Args.Arguments title)←title CheckArgumentsForTatin Args.Arguments
       browser←''Args.Switch'browser' ⍝ default is empty
       includeRefeference←1 Args.Switch'ref'
       toc←1 Args.Switch'toc'
@@ -126,6 +128,9 @@
       params.IncludeReference←includeRefeference
       params.Toc←toc
       params.Filename←{(,0)≡,⍵:'' ⋄ ⍵}params.Filename
+      :If 0=≢Args.Arguments
+          Args.Arguments←{0::'' ⋄ ⍵[¯1+(⊂'⎕SE')⍳⍨1 ⎕C ⍵]}⌽⎕NSI
+      :EndIf
       'Nothing to process?!'⎕SIGNAL 6/⍨0=≢Args.Arguments
       ref←CheckRefs¨Args.Arguments
       :If ∨/⍬∘≡¨ref
@@ -174,7 +179,7 @@
       :EndFor
     ∇
 
-    ∇ r←CheckArgumentsForTatin args;arg;name;ref;flag
+    ∇ (r title)←title CheckArgumentsForTatin args;arg;name;ref;flag;buff;bool
       r←''
       :For arg :In args
           name←⍕ref←⍎arg
@@ -184,8 +189,25 @@
               flag←0
           :EndTrap
           :If flag
-              name←⍕ref.##
+              :If '.code'{⍺≡(-≢⍺)↑⍵}⍕ref
+                  name←⍕ref
+              :ElseIf 9=ref.⎕NC'code'
+                  name←⍕ref←ref⍎'code'
+              :ElseIf ∨/bool←'.code.'⍷⍕ref
+                  name←⍕ref←⍎((¯1+bool⍳1)↑⍕ref),'.code'
+              :Else
+                  name←⍕ref.##
+              :EndIf
+              buff←⎕JSON⍠('Dialect' 'JSON5')⊢ref.TatinVars.CONFIG
+              :If 0<≢buff←(⎕JSON⍠('Dialect' 'JSON5')⊢ref.TatinVars.CONFIG).api
+                  name←⍕ref⍎buff
+              :EndIf
               r,←⊂name
+              :If 0=≢title
+                  title←'.code'{⍵↑⍨¯1+1⍳⍨⍺⍷⍵}name
+                  title←{⍵↑⍨-¯1+'.'⍳⍨⌽⍵}title
+                  title←⊃{⍺,'-',⍵}/2↑'_'(≠⊆⊢)title
+              :EndIf
           :Else
               r,←⊂arg
           :EndIf

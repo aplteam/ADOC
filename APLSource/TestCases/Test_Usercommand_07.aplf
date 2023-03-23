@@ -9,7 +9,7 @@
      1 CommTools.Pause'This test needs you!' 'ADOC will show itself in the default browser with the title "APL is great!"'
      ⎕SE.UCMD'ADoc #.ADOC.ADOC.ADOC -title="APL is great!"'
 
-     →T.PassesIf 1 ∆YesOrNo'Did ADOC show up in your default browser with the title "APL is great?"'
+     →T.PassesIf 1 CommTools.YesOrNo'Did ADOC show up in your default browser with the title "APL is great?"'
      R←T._OK
 
  :EndIf
