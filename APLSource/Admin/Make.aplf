@@ -1,5 +1,5 @@
  Make flag;targetPath;M;A;F;C;cfg;version;zipFilename;res
-⍝ Version 3.0.0 from 2023-03-12
+⍝ Version 3.0.1 from 2023-03-23
  ⎕IO←1 ⋄ ⎕ML←1
  :If flag
      M←⎕SE.MakeHelpers
@@ -8,9 +8,10 @@
      cfg←M.GetPackageCfg C.HOME
      M.FetchLaterUserCommand'ADOC_uc.dyalog'cfg C('[MyUCMDs]ADOC')
      M.RecreateFolder targetPath
-     M.ConvertMarkdownToHtml5 (C.HOME,'/docs') (targetPath,'html')
+     M.ConvertMarkdownToHtml5(C.HOME,'/docs')(targetPath,'html')
      version←M.CompileVersionNumberPattern cfg
      zipFilename←⎕SE.Tatin.BuildPackage C.HOME targetPath version
+     {}M.##.F.RmDirByForce targetPath,'html'
      ⎕←'*** New version build successfully:',M.CR,'   ',zipFilename
      :If 1 M.YesOrNo'Install new version in MyUCMDs?'
          {}M.##.F.RmDirByForce M.GetMyUCMDsFolder'ADOC'
