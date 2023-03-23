@@ -1,8 +1,6 @@
- {r}←Initial;⎕TRAP;parent
- ⎕TRAP←0 'S'
+ {r}←Initial
  r←⍬
- parent←⍕⎕THIS
- {}⎕SE.Tatin.LoadDependencies'./packages/'parent
- parent,←'.TestCases'
- {}⎕SE.Tatin.LoadDependencies'./packages_dev/'parent
+ ADOC.APLTreeUtils2←APLTreeUtils2
+ ADOC.FilesAndDirs←FilesAndDirs
+ ADOC.MarkAPL←MarkAPL
 ⍝Done

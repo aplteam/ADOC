@@ -6,12 +6,10 @@
  :If batchFlag
      R←∆NoBatchTest
  :Else
-     ⎕←(⎕PW-1)⍴'-'
-     ⎕←'This test needs you! ADOC will show itself in the default browser'
-     ⎕←''
-     0/⍞,0/⎕←'Press <enter> to contiue;'
-     ⎕SE.UCMD'Adoc #.ADOC.ADOC'
+     1 CommTools.Pause'This test needs you! ADOC will show itself in the default browser'
+     ⎕SE.UCMD'Adoc #.ADOC.ADOC.ADOC'
 
-     R←~1 ∆YesOrNo'Did ADOC show up in your default browser?'
+     →T.PassesIf 1 CommTools.YesOrNo'Did ADOC show up in your default browser?'
+     R←T._OK
 
  :EndIf

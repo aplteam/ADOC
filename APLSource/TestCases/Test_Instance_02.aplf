@@ -3,8 +3,8 @@
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- ##.ADOC.RestoreDefaults
- MyADOC←⎕NEW ##.ADOC
+ ##.ADOC.ADOC.RestoreDefaults
+ MyADOC←⎕NEW ##.ADOC.ADOC
  (MyADOC.ReportEmbeddedClasses Pepper)MyADOC.Analyze Pepper
  newdoc←MyADOC.Meta
  →T.FailsIf 3≠⍴newdoc             ⍝ contains 3 embedded classes

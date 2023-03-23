@@ -3,13 +3,13 @@
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
  #.⎕SHADOW'Temp'
  'Temp'#.⎕NS''
  #.Temp.⎕FIX':Namespace Foo' '⍝ First\\' '⍝⍝ Second' '⍝ Third' '      a←1' ':EndNamespace'
 
- myAdoc←⎕NEW ##.ADOC
+ myAdoc←⎕NEW ##.ADOC.ADOC
  htmlFilename←myAdoc.Make #.Temp.Foo
  html←⊃⎕NGET htmlFilename
  html←(1⍳⍨'<body'⍷html)↓html

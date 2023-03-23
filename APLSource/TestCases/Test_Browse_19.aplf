@@ -2,11 +2,11 @@
 ⍝ `Browse` a class that is a sub class of another class (was once a bug).
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
- ps←##.ADOC.CreateBrowseDefaults
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
  ps.view←0
- filename←ps ##.ADOC.Browse ##.ADOC.Demo
+ filename←ps ##.ADOC.ADOC.Browse ##.ADOC.ADOC.Demo
  html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
  html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html

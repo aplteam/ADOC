@@ -2,7 +2,7 @@
 ⍝ Exercise the "Info" method on an ordinary namespace with a `Public` definition
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
  #.⎕SHADOW'Temp'
  'Temp'#.⎕NS''
@@ -11,7 +11,7 @@
  #.Temp.⎕FX'r←PrivatFnse' 'r←''Hello'''
  #.Temp.⎕FX'r←Public' 'r←⊂''PublicFns'''
 
- buffer←##.ADOC.Info #.Temp
+ buffer←##.ADOC.ADOC.Info #.Temp
 
  →T.PassesIf'Functions:' 'PublicFns'≡(2↓(⎕UCS 13)APLTreeUtils2.Split buffer)~¨' '
 

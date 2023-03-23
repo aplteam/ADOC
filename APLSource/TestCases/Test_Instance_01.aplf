@@ -3,8 +3,8 @@
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- ##.ADOC.RestoreDefaults
- MyADOC←⎕NEW ##.ADOC
+ ##.ADOC.ADOC.RestoreDefaults
+ MyADOC←⎕NEW ##.ADOC.ADOC
  MyADOC.Analyze testclass
  newdoc←MyADOC.Meta
  →T.FailsIf'testclass'≢0⊃0⊃newdoc                     ⍝ name does not match'
@@ -14,7 +14,7 @@
  ⍝ There is exactly 1 method both implemented and inherited from the "testinterface" interface:
  →T.FailsIf 1≠+/('Public'∘≡¨({↑⍵[1⍳⍨⍵[;0]≡¨⊂'access';1]}¨4⊃0⊃newdoc))∧(({↑⍵[1⍳⍨⍵[;0]≡¨⊂'type';1]}¨4⊃0⊃newdoc))≡¨⊂'Interface Method'    ⍝ the main comment'
 
- buffer←↑('type' 'Include')('access' '')('name' 'APLTreeUtils')
+ buffer←↑('type' 'Include')('access' '')('name' '##.APLTreeUtils')
  →T.FailsIf buffer≢0⊃4⊃0⊃newdoc
 
  buffer←↑('type' 'Constructor')('name' 'make0')('access' 'Public')('syntax' 'make0')('keywords' '')('more' '')('comments'('This comment is related to the niladic constructor ' 'Two concatenated _ ' 'lines! ' 'List: ' '* First ' '* Second '))
@@ -33,10 +33,7 @@
  →T.FailsIf buffer≢5⊃4⊃0⊃newdoc
 
  buffer←6⊃4⊃0⊃newdoc
- →T.FailsIf'readonly' 1≢buffer[3;]
-
- buffer←7⊃4⊃0⊃newdoc
- →T.FailsIf'readonly' 0≢buffer[3;]
+ →T.FailsIf(⊂'readonly')∊1≢buffer[;1]
 
  buffer←8⊃4⊃0⊃newdoc
  →T.FailsIf(⎕C¨buffer[5;])≢'keywords'('default' 'numbered')

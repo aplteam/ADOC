@@ -1,28 +1,6 @@
-﻿:Class  ADOC_uc ⍝ V2.391
+﻿:Class  ADOC_uc ⍝ V3.000
 ⍝ User Command script for "ADOC".
-⍝ Expects the WS ADOC.dws to be a sibling of this script.
-⍝
-⍝ 2017 06 05 Adam: ]help → ]info; "parms" → "params"; ]help → -help
-⍝ 2017 06 07 Adam: disable ]CreateParams; "List" → "Info"
-⍝ 2017 06 14 Adam: ]browse → ]TOOLS.adoc; -help → ]???adoc; ]info [-full] → ]adoc -info[=full]
-⍝ 2017 06 14 Adam: args are now separated with space instead of commas; -info handles multiple names and includes -title
-⍝ 2017 05 15 KaiJ: -caption → -title
-⍝ 2017 06 13 KaiJ: -params and ]CreateParms removed; help fixed; documentation updated.
-⍝ 2017 06 15 Adam: -info → -summary, now accepts relative refs, help tweak, removed error trapping.
-⍝ 2017 06 22 KaiJ: Bug fix regarding Caption/Title + make it compatible with pre-16.0 versions.
-⍝ 2017 06 26 KaiJ: Documentation shortened. Sub-folder ADOC introduced. CSS for print improved.
-⍝ 2017 06 27 KaiJ: Sub-folder removed.
-⍝ 2018 04 18 Adam: ]??cmd → ]cmd -??
-⍝ 2018 05 01 Adam: Add SVN tag.
-⍝ 2018 08 11 KaiJ: Help improved and -version flag introduced.
-⍝ 2018 11 05 KaiJ: ADOC user command script relied on exposed properties.
-⍝ 2019 01 15 KaiJ: In case nothing is provided as argument an error is thrown.
-⍝ 2020 01 03 KaiJ: Now the user command tries to figure out where an object lives.
-⍝ 2020 01 03 KaiJ: -ref=1|0 introduced with a default 1. Allows to suppress the reference part.
-⍝ 2020 07 31 KaiJ: User function `Public` in a namespcae can now also return a simple matrix rather than a VTV
-⍝ 2021 01 11 KaiJ: Now checks whether a Tatin package is involved, and handles them accordingly
-⍝ 2022 03 23 KaiJ: ]ADOC -??? amended to new user command framework (18.2)
-⍝ ???? ?? ?? KaiJ: -filename added to "Browse"
+⍝ 2023 03 22 Kai: Transformed into a Tatin packages plus plenty of improvements and fixes
 
     ⎕IO←⎕ML←1
 
@@ -35,19 +13,11 @@
       r.Desc←'Automated documentation generation'
     ∇
 
-    ∇ r←Run(Cmd Args);bool;calledFrom
+    ∇ r←Run(Cmd Args);bool;calledFrom;wasLoaded
       :Access Shared Public
-      ⍝ We now create a namespace ⎕SE.ADOC but keep it local to this function!
-     
-      ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
-      ⍝ This code CANNOT run in a sub-function!
-      ⎕SE.⎕SHADOW'ADOC'
-      ⎕SE.⎕EX'ADOC'
-      'ADOC'⎕SE.⎕NS''
-      ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
-      LoadAdoc ##.SourceFile
+      wasLoaded←LoadAdoc ⍬
       :If Args.Switch'version'
-          r←{⍵↓⍨+/∧\' '=⍵}⍕1↓⎕SE.ADOC.ADOC.Version
+          r←{⍵↓⍨+/∧\' '=⍵}⍕1↓⎕SE.ADOC.Version
       :Else
           :If ∨/bool←'##.'∘{⍺≡(⍴⍺)↑⍵}¨Args.Arguments
               calledFrom←{⊃⍵↓⍨'⎕SE'{+/∧\⍺∘≡¨(⍴⍺)↑¨⍵}⍵}⎕NSI
@@ -59,6 +29,24 @@
           :Else
               r←AdocBrowse Args
           :EndIf
+      :EndIf
+      :If 0=wasLoaded
+          ⍝ Unload? Always? Only on demand?
+      :EndIf
+    ∇
+
+    ∇ {r}←LoadAdoc dummy
+    ⍝ Loads ADOC into ⎕SE if it's not already there.
+    ⍝ Returns 1 if it was loaded and 0 when it was already there
+      :If 0=⎕SE.⎕NC'Tatin'
+          :Trap 6
+              {}⎕SE.UCMD'Tatin.Version'
+          :Else
+              'Tatin is not available and cannot be loaded into ⎕SE, therefore ADOC can''t be loaded'Assert 0
+          :EndTrap
+      :EndIf
+      :If r←0=⎕SE.⎕NC'ADOC'
+          {}⎕SE.Tatin.LoadDependencies(⊃⎕NPARTS ##.SourceFile)'⎕SE'
       :EndIf
     ∇
 
@@ -78,11 +66,13 @@
           r,←⊂' -filename=       Modifier Default is a temp filename but allows any filename'
           r,←⊂' -version         Returns the version number of ADOC used. If specified everythings else is ignored.'
           r,←⊂''
-          r,←⊂'When objects are not addressed with a full name (= start neither with `#` nor with `⎕SE`) then the user command '
-          r,←⊂'will try to find the objects in the namespace the user command was called from. If they cannot be found there it '
-          r,←⊂'will assume they live in `#`.'
+          r,←⊂'* When ]ADoc is called without an argument it will investigate the namespace the user command was called from'
+          r,←⊂'* When objects are not addressed with a full name (= start neither with `#` nor with `⎕SE`) then the user command '
+          r,←⊂'  will try to find the objects in the namespace the user command was called from. If they cannot be found there'
+          r,←⊂'  ADOC will assume they live in `#`.'
           r,←⊂''
           r,←⊂'Examples:'
+          r,←⊂'    ]',Cmd,'                                      ⍝ work on namespace it was called from'
           r,←⊂'    ]',Cmd,' MyClass                              ⍝ single class'
           r,←⊂'    ]',Cmd,' MyClass FilesAndDirs                 ⍝ two classes'
           r,←⊂'    ]',Cmd,' MyClass -title="My Doc"              ⍝ custom title'
@@ -91,15 +81,8 @@
           r,←⊂'    ]',Cmd,' MyClass -summary=full                ⍝ more detailed info'
           r,←⊂''
       :Case 2
-          ⎕SE.⎕SHADOW'ADOC'
-          ⎕SE.⎕EX'ADOC'
-          'ADOC'⎕SE.⎕NS''
-          :If IfAtLeastVersion 18.2
-              LoadAdoc(⊃⎕RSI).c
-          :Else
-              LoadAdoc ##.##.c
-          :EndIf
-          r←⊂'HTML page saved as ',⎕SE.ADOC.ADOC.ShowDocumentation ⍬
+          LoadAdoc ⍬
+          r←⊂'HTML page saved as ',⎕SE.ADOC.ShowDocumentation 1
       :EndSelect
       r,←(l=0)/⊂']',Cmd,' -??  ⍝ for syntax details'
       r,←(l∊0 1)/⊂']',Cmd,' -??? ⍝ to view the complete ADoc documentation in a browser window'
@@ -130,12 +113,12 @@
     ∇
 
     ∇ r←AdocBrowse Args;title;ref;cs;browser;params;includeRefeference;toc
-      Args.Arguments←CheckArgumentsForTatin Args.Arguments
       title←''Args.Switch'title' ⍝ default is empty
+      (Args.Arguments title)←title CheckArgumentsForTatin Args.Arguments
       browser←''Args.Switch'browser' ⍝ default is empty
       includeRefeference←1 Args.Switch'ref'
       toc←1 Args.Switch'toc'
-      params←⍎'⎕SE.ADOC.ADOC.CreateBrowseDefaults'Args.Switch'params'
+      params←⍎'⎕SE.ADOC.CreateBrowseDefaults'Args.Switch'params'
       :If 0≠≢browser
           params.BrowserPath←browser
       :EndIf
@@ -144,7 +127,10 @@
       :EndIf
       params.IncludeReference←includeRefeference
       params.Toc←toc
-      ∘∘∘⍝ params.Filename←{(,0)≡,⍵:''⋄⍵}
+      params.Filename←{(,0)≡,⍵:'' ⋄ ⍵}params.Filename
+      :If 0=≢Args.Arguments
+          Args.Arguments←{0::'' ⋄ ⍵[¯1+(⊂'⎕SE')⍳⍨1 ⎕C ⍵]}⌽⎕NSI
+      :EndIf
       'Nothing to process?!'⎕SIGNAL 6/⍨0=≢Args.Arguments
       ref←CheckRefs¨Args.Arguments
       :If ∨/⍬∘≡¨ref
@@ -152,7 +138,7 @@
           :Return
       :EndIf
      
-      params ⎕SE.ADOC.ADOC.Browse ref      ⍝ <=== workhorse
+      params ⎕SE.ADOC.Browse ref      ⍝ <=== workhorse
      
       r←'Watch your browser'
     ∇
@@ -169,30 +155,12 @@
       :For ref :In Args.Arguments
           :If 16>{⍎⍵/⍨1≥+\⍵='.'}(1+⎕IO)⊃# ⎕WG'APLVersion'
               parent←(⎕SI⍳⊂'UCMD')⊃⎕RSI
-              r,←nl nl nl,⍨full ⎕SE.ADOC.ADOC.Info parent⍎ref
+              r,←nl nl nl,⍨full ⎕SE.ADOC.Info parent⍎ref
           :Else
-              r,←nl nl nl,⍨full ⎕SE.ADOC.ADOC.Info(⎕SI⍳⊂'UCMD')(86⌶)ref
+              r,←nl nl nl,⍨full ⎕SE.ADOC.Info(⎕SI⍳⊂'UCMD')(86⌶)ref
           :EndIf
       :EndFor
       r↓⍨←¯3
-    ∇
-
-    ∇ {r}←LoadAdoc path;filename;path;ws;failed
-      r←⍬
-      ws←'ADOC.dws'
-      path←{⍵↓⍨-⌊/'\/'⍳⍨⌽⍵}path
-      filename←path,'/',ws
-      failed←1
-      :Trap 11
-          ⎕SE.ADOC.⎕CY filename  ⍝ Standalone ADOC expects WS to be a sibling of this script
-          failed←0
-      :Else
-          :Trap 11
-              ⎕SE.ADOC.⎕CY ws       ⍝ Make use of Dyalog workspace search path
-              failed←0
-          :EndTrap
-          (failed/6)⎕SIGNAL⍨'Cannot find ',ws,' in ',path
-      :EndTrap
     ∇
 
     ∇ r←LocateStuff r;i;this;type;calledFrom
@@ -217,7 +185,7 @@
           ⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'
       }    
 
-    ∇ r←CheckArgumentsForTatin args;arg;name;ref;flag
+    ∇ (r title)←title CheckArgumentsForTatin args;arg;name;ref;flag;buff;bool
       r←''
       :For arg :In args
           name←⍕ref←⍎arg
@@ -227,8 +195,25 @@
               flag←0
           :EndTrap
           :If flag
-              name←⍕ref.##
+              :If '.code'{⍺≡(-≢⍺)↑⍵}⍕ref
+                  name←⍕ref
+              :ElseIf 9=ref.⎕NC'code'
+                  name←⍕ref←ref⍎'code'
+              :ElseIf ∨/bool←'.code.'⍷⍕ref
+                  name←⍕ref←⍎((¯1+bool⍳1)↑⍕ref),'.code'
+              :Else
+                  name←⍕ref.##
+              :EndIf
+              buff←⎕JSON⍠('Dialect' 'JSON5')⊢ref.TatinVars.CONFIG
+              :If 0<≢buff←(⎕JSON⍠('Dialect' 'JSON5')⊢ref.TatinVars.CONFIG).api
+                  name←⍕ref⍎buff
+              :EndIf
               r,←⊂name
+              :If 0=≢title
+                  title←'.code'{⍵↑⍨¯1+1⍳⍨⍺⍷⍵}name
+                  title←{⍵↑⍨-¯1+'.'⍳⍨⌽⍵}title
+                  title←⊃{⍺,'-',⍵}/2↑'_'(≠⊆⊢)title
+              :EndIf
           :Else
               r,←⊂arg
           :EndIf
@@ -239,6 +224,6 @@
       ⍝ ⍵ is supposed to be a number like 15 or 17.1, representing a version of Dyalog APL.
       ⍝ Returns a Boolean that is 1 only if the current version is at least as good.
           ⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'
-      }    
+      }
 
 :EndClass ⍝ ADOC  $Revision$

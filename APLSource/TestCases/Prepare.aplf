@@ -1,19 +1,27 @@
- Prepare;testPath;testFilename;ask;answer
-⍝ Useful to prepare test cases for execution
- ⎕IO←0 ⋄ ⎕ML←1
+ Prepare;testPath;testFilename;ask;answer;options;flag;ind
+ ⎕IO←1 ⋄ ⎕ML←1
  T←⎕NEW Tester2 ⎕THIS
- testPath←(⊃1 ⎕NPARTS''),'TestResults'
+ ##.∆HOME←FilesAndDirs.PWD,'/packages/'
+ testPath←##.CiderConfig.HOME,'/TestResults'
  testFilename←testPath,'/CodeCoverage'
+ flag←0
  :If ⎕NEXISTS testPath
-     :If ⎕NEXISTS testFilename,'.dcf'
-         ask←{⎕←⍵,'; 1=append, 2=replace' ⋄ a←⎕ ⋄ ~(⊂a)∊1 2:∇ ⍵ ⋄ ⊃a}
-         answer←⊃ask'Coverage file already exists'
-         :If 2≡answer
-             1 ⎕NDELETE testFilename,'.dcf'
+     :If ⎕NEXISTS testFilename,'.profile'
+         ind←('Code Coverage' 0 1)CommTools.Select'Append' 'Replace' 'Neither'
+         →(3=ind)/0
+         flag←1
+         :If 2≡ind
+             1 CodeCoverage.DeleteFiles T.codeCoverage.filename
          :EndIf
+     :Else
+         flag←0 CommTools.YesOrNo'Code coverage?'
      :EndIf
+ :Else
+     flag←0 CommTools.YesOrNo'Code coverage?'
  :EndIf
- 3 ⎕MKDIR testPath  ⍝
- T.codeCoverage←⎕NEW CodeCoverage(,⊂'#.',{⍵,'.',⍵}2↓⍕⎕THIS.##)
- T.codeCoverage.filename←testFilename
+ :If flag
+     3 ⎕MKDIR testPath  ⍝
+     T.codeCoverage←⎕NEW CodeCoverage(,⊂'#.',{⍵,'.',⍵}2↓⍕⎕THIS.##)
+     T.codeCoverage.filename←testFilename
+ :EndIf
 ⍝Done

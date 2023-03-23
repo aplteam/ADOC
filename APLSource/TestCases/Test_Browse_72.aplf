@@ -2,7 +2,7 @@
 ⍝ `Browse` a scripted namespace that has nothing public, therefore the "Reference" chapter should not appear at all.
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
  #.⎕SHADOW'Temp'
  ref←⍎'Temp'#.⎕NS''
@@ -10,10 +10,10 @@
  ref.MyFns←{''Hello''}
  ref.ADOC_Doc←'# Doku' '' 'This should show'
 
- ps←##.ADOC.CreateBrowseDefaults
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
  ps.view←0
- filename←ps ##.ADOC.Browse #.Temp
- ##.ADOC.RestoreDefaults
+ filename←ps ##.ADOC.ADOC.Browse #.Temp
+ ##.ADOC.ADOC.RestoreDefaults
  html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
  html←1↓⊃,/(⎕UCS 10),¨∆RemoveCSS html

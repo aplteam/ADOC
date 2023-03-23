@@ -2,7 +2,7 @@
 ⍝ `Browse` a class with a list with (many) leading blanks.
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
  #.⎕SHADOW'Temp'
  'Temp'#.⎕NS''
  code←⊂':Class MyClass'
@@ -30,12 +30,12 @@
  code,←⊂':EndClass'
  #.Temp.⎕FIX code
 
- ps←##.ADOC.CreateBrowseDefaults
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
  ps.view←0
- filename←ps ##.ADOC.Browse #.Temp.MyClass
+ filename←ps ##.ADOC.ADOC.Browse #.Temp.MyClass
  html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
  html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html
  →T.PassesIf 4=+/'<ul'⍷html
  →T.PassesIf 1=+/'<ol'⍷html

@@ -4,18 +4,18 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  sep←⎕UCS 13
  show←batchFlag∘{⍺:⍬ ⋄ ⎕←⍵ ⋄ ⍬}
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
 
- newdoc←'Full'##.ADOC.Info testclass_a3
- :If Correct_testclass_015≢newdoc
+ newdoc←sep(≠⊆⊢)'Full'##.ADOC.ADOC.Info testclass_a3
+ :If ≢/∆DropEmptyItems¨Correct_testclass_015 newdoc
      _←show'   --- ',0⊃⎕SI
      flag←0
-     :If ~0∊⍴buffer←↑{⍺/⍨~⍺∊⍵}/{⍵⊂⍨sep=⍵}¨Correct_testclass_015 newdoc
+     :If 0≠≢buffer←↑{⍺/⍨~⍺∊⍵}/∆DropEmptyItems¨Correct_testclass_015 newdoc
          _←show'   ***  Should be contained but does:'
          _←show buffer
          flag←1
      :EndIf
-     :If ~0∊⍴buffer←↑{⍺/⍨~⍺∊⍵}/{⍵⊂⍨sep=⍵}¨newdoc Correct_testclass_015
+     :If 0≠≢buffer←↑{⍺/⍨~⍺∊⍵}/∆DropEmptyItems¨newdoc Correct_testclass_015
          _←show'   ***  Should not be contained but does anyway:'
          _←show buffer
          flag←1

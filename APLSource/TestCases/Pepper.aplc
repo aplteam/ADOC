@@ -661,7 +661,7 @@
 
     ∇ r←MakeScriptFromNamespace name
       :Access Public Shared
-      . ⍝TODO⍝
+      ⍝
     ∇
 
     ∇ Settings;∆;fnt;f;res;bkpPath;defaultPath;comparePath;dir;stopFlag;domainPath;wsid

@@ -2,7 +2,7 @@
 ⍝ `Browse` a class that carries a single property definition. Was once a bug (crashed)
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
  #.⎕SHADOW'TEMP'
  'TEMP'#.⎕NS''
  body←':Class Foo' 'ABC_←⍬'
@@ -11,9 +11,9 @@
  body←,¨body
  #.TEMP.⎕FIX(,¨body)
 
- ps←##.ADOC.CreateBrowseDefaults
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
  ps.view←0
- filename←ps ##.ADOC.Browse #.TEMP
+ filename←ps ##.ADOC.ADOC.Browse #.TEMP
  html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
  html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html

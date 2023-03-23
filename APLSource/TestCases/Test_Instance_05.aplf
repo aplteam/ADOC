@@ -3,13 +3,13 @@
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- ps←##.ADOC.CreateBrowseDefaults
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
  ps.embeddedClassesFlag←1
  ps.view←0
- filename←ps ##.ADOC.Browse ##.ADOC
- html←⊃⎕NGET filename
+ filename←ps ##.ADOC.ADOC.Browse ##.ADOC.ADOC
+ html←⊃⎕NGET filename 1
  FilesAndDirs.DeleteFile filename
- expected←⊂'<h1 id="ch0001">Demo (Class embedded into ',(⍕##.⎕THIS),'.ADOC)</h1>'
+ expected←⊂'<h1 id="ch0001">Demo (Class embedded into ',(⍕##.⎕THIS),'.ADOC.ADOC)</h1>'
  expected,←⊂'<h5 class="aplname" id="ch0001:Hello">Hello</h5>'
  →T.PassesIf∧/expected∊html
 

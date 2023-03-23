@@ -1,0 +1,9 @@
+(
+ '*** BaseClass (Class) ***'
+ ''
+ 'Constructors:'
+ '  make'
+ 'Instance Methods:'
+ '  callFns1'
+ '  fns1'
+)

@@ -3,18 +3,18 @@
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
  p←⎕NS''
  p.embeddedClassesFlag←1
  p.Title←'Gathers information about classes embedded into ADOC'
  p.view←0
- filename←p ##.ADOC.Browse ##.ADOC
- ##.ADOC.RestoreDefaults
+ filename←p ##.ADOC.ADOC.Browse ##.ADOC.ADOC
+ ##.ADOC.ADOC.RestoreDefaults
  html←⊃FilesAndDirs.NGET filename 1
  FilesAndDirs.DeleteFile filename
  html←∆ExtractBodyFromHTML 1↓⊃,/(⎕UCS 13),¨html
  expected←⊂'<h1 id="topmost">Gathers information about classes embedded into ADOC</h1>'
- expected,←⊂'<h1 id="ch0001">Demo (Class embedded into #.ADOC.ADOC)</h1>'
+ expected,←⊂'<h1 id="ch0001">Demo (Class embedded into #.ADOC.ADOC.ADOC)</h1>'
  expected,←⊂'<h5 class="aplname" id="ch0001:Hello">Hello</h5>'
  →T.PassesIf∧/∨/¨expected⍷¨⊂html
 

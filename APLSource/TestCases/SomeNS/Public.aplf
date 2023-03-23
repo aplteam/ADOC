@@ -1,0 +1,13 @@
+ r←Public
+ r←''
+ r,←⊂,'Hello'
+ r,←⊂,'Hello2'
+ r,←⊂,'Hello3'
+ r,←⊂,'Hello4'
+ r,←⊂,'Hello5'
+ r,←⊂,'Hello6'
+ r,←⊂,'Hello8'
+ r,←⊂,'op1'
+ r,←⊂,'op2'
+ r,←⊂,'op3'
+ r,←⊂,'op5'

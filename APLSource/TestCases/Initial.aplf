@@ -6,7 +6,7 @@
  ⎕SE.mb.options.ObjSyntax.root.Checked←0
  FilesAndDirs.PolishCurrentDir
  Globals←⎕NS''
- Globals.saveInherit←##.ADOC.Inherit
+ Globals.saveInherit←##.ADOC.ADOC.Inherit
  A←APLTreeUtils2
- ##.ADOC.RestoreDefaults
+ ##.ADOC.ADOC.RestoreDefaults
  MarkAPL←##.MarkAPL

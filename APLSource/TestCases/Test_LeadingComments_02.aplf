@@ -15,9 +15,9 @@
  body←':Class Foo' '∇r←Hello;a;b;c' '⍝ comment line' ';d;e' ';f;g' ':Access Public Shared' '⍝ This is a leading comment' 'a←1' 'b←2' 'r←a+b' '∇' ':EndClass'
  #.TestHelp.⎕FIX body
 
- parms←##.ADOC.CreateBrowseDefaults
+ parms←##.ADOC.ADOC.CreateBrowseDefaults
  parms.view←0
- filename←parms ##.ADOC.Browse #.TestHelp.Foo
+ filename←parms ##.ADOC.ADOC.Browse #.TestHelp.Foo
  html←⊃⎕NGET filename
  →T.GoToTidyUp 0=+/'<p>This is a leading comment</p>'⍷html
 
