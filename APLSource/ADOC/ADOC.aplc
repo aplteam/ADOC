@@ -197,11 +197,14 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'ADOC' '7.0.0+90' '2023-03-22'
+      r←'ADOC' '7.0.1+90' '2023-04-19'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 7.0.1
+      ⍝   * Bug fix: under certain circumstances `Copyright` and/or `Version` and/or `History` did
+      ⍝     not get a caption assigned
       ⍝ * 7.0.0
       ⍝   * Breaking change: requires 18.0 or better
       ⍝   * Breaking change: ADOC is now a Tatin package, and depends on Tatin packages
@@ -1730,7 +1733,6 @@
           txt←''
           :If (⊂'Version')∊ref.⎕NL-3 ⍝ Is there a "Version" function?
               :Trap 0 ⍝ not nice, but these calls may fail for all sorts of reasons.
-                  txt←''
                   :If 9.1≡⎕NC⊂⍕ref  ⍝ Is it an ordinary namespace?!
                       body←ref.⎕NR'Version'
                       txt←ref.{11::'' ⋄ ,⍎⍵}'Version'
@@ -1750,7 +1752,7 @@
               :Else
                   txt←{'Version ',({'+'∊⍵:⍵↑⍨¯1+⍵⍳'+' ⋄ ⍵}⍺),' from ',⍵}/(3=≢txt)↓txt
               :EndIf
-              txt←(⊂'## Version'),txt
+              txt←('' '' '## Version'),txt
               :If 0=≢r
                   r←,⊂'Txt'txt
               :Else
@@ -1777,7 +1779,7 @@
               txt←ref.Copyright
           :EndIf
           :If 0≠≢txt
-              txt←(⊂'## Copyright'),,/txt
+              txt←('' '' '## Copyright'),,/txt
               :If 0=≢r
                   r←,⊂'Txt'txt
               :Else
@@ -1828,11 +1830,11 @@
                   txt←{'<pre>',⍵,'</pre>'}¨↓⎕FMT txt
               :EndIf
               txt←{2=≡⍵:⍵ ⋄ ↓⍵}txt
-              txt←(⊂'## History'),txt
+              txt←('' '' '## History'),txt
               :If 0=≢r
                   r←,⊂'Txt'txt
               :Else
-                  last←⍴r
+                  last←≢r
                   (last⊃r)←txt{⍵[1],(⊂(2⊃⍵),⍺)}last⊃r
               :EndIf
           :EndIf
