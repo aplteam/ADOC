@@ -1,6 +1,7 @@
-﻿:Class  ADOC_uc ⍝ V3.000
+:Class  ADOC_uc ⍝ V3.000
 ⍝ User Command script for "ADOC".
 ⍝ 2023 03 22 Kai: Transformed into a Tatin packages plus plenty of improvements and fixes
+
 
     ⎕IO←⎕ML←1
 
@@ -179,12 +180,6 @@
       :EndFor
     ∇
     
-      IfAtLeastVersion←{
-      ⍝ ⍵ is supposed to be a number like 15 or 17.1, representing a version of Dyalog APL.
-      ⍝ Returns a Boolean that is 1 only if the current version is at least as good.
-          ⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'
-      }    
-
     ∇ (r title)←title CheckArgumentsForTatin args;arg;name;ref;flag;buff;bool
       r←''
       :For arg :In args
