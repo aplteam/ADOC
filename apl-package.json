@@ -19,5 +19,5 @@
   source: "APLSource/ADOC",
   tags: "documentation",
   userCommandScript: "APLSource/ADOC_uc.dyalog",
-  version: "7.0.1+115",
+  version: "7.1.0+125",
 }

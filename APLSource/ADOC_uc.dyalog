@@ -1,6 +1,7 @@
-:Class  ADOC_uc ⍝ V3.000
+﻿:Class  ADOC_uc ⍝ V3.000
 ⍝ User Command script for "ADOC".
-⍝ 2023 03 22 Kai: Transformed into a Tatin packages plus plenty of improvements and fixes
+⍝ 2023 06 11 Kai: Can now process loaded Tatin packages in a smart way
+⍝ 2023 05 30 Kai: Transformed into a Tatin package plus plenty of improvements and fixes
 
 
     ⎕IO←⎕ML←1
@@ -51,7 +52,7 @@
       :EndIf
     ∇
 
-    ∇ r←l Help Cmd
+    ∇ r←l Help Cmd;filename
       :Access Shared Public
       r←''
       :Select l
@@ -83,7 +84,12 @@
           r,←⊂''
       :Case 2
           LoadAdoc ⍬
-          r←⊂'HTML page saved as ',⎕SE.ADOC.ShowDocumentation 1
+          filename←⎕SE.ADOC.ShowDocumentation 1
+          :If 3501⌶⍬ ⍝ Connected to Ride?
+            r←⊂']Open ',filename
+          :Else
+            r←⊂'HTML save in ', filename
+          :EndIf
       :EndSelect
       r,←(l=0)/⊂']',Cmd,' -??  ⍝ for syntax details'
       r,←(l∊0 1)/⊂']',Cmd,' -??? ⍝ to view the complete ADoc documentation in a browser window'
@@ -113,13 +119,14 @@
       :EndIf
     ∇
 
-    ∇ r←AdocBrowse Args;title;ref;cs;browser;params;includeRefeference;toc
+    ∇ r←AdocBrowse Args;title;ref;cs;browser;params;includeRefeference;toc;subTitles
       title←''Args.Switch'title' ⍝ default is empty
-      (Args.Arguments title)←title CheckArgumentsForTatin Args.Arguments
+      (Args.Arguments title subTitles)←title CheckArgumentsForTatin Args.Arguments
       browser←''Args.Switch'browser' ⍝ default is empty
       includeRefeference←1 Args.Switch'ref'
       toc←1 Args.Switch'toc'
       params←⍎'⎕SE.ADOC.CreateBrowseDefaults'Args.Switch'params'
+      params.SubTitles←⊃{⍺,',',⍵}/subTitles
       :If 0≠≢browser
           params.BrowserPath←browser
       :EndIf
@@ -179,9 +186,9 @@
           (i⊃r)←this
       :EndFor
     ∇
-    
-    ∇ (r title)←title CheckArgumentsForTatin args;arg;name;ref;flag;buff;bool
-      r←''
+
+    ∇ (r title subTitles)←title CheckArgumentsForTatin args;arg;name;ref;flag;buff;bool
+      r←subTitles←''
       :For arg :In args
           name←⍕ref←⍎arg
           :Trap 2
@@ -190,27 +197,27 @@
               flag←0
           :EndTrap
           :If flag
-              :If '.code'{⍺≡(-≢⍺)↑⍵}⍕ref
-                  name←⍕ref
-              :ElseIf 9=ref.⎕NC'code'
-                  name←⍕ref←ref⍎'code'
-              :ElseIf ∨/bool←'.code.'⍷⍕ref
-                  name←⍕ref←⍎((¯1+bool⍳1)↑⍕ref),'.code'
+              :If 0<ref.##.⎕NC'TatinVars'
+                  buff←(⎕JSON⍠('Dialect' 'JSON5')⊢ref.##.TatinVars.CONFIG).api
+                  :If (ref.##.⎕NC⊂buff)∊9.4 9.5  ⍝ Class or Interface?
+                      name←⍕ref
+                  :Else
+                      :If 0<≢buff
+                          name←⍕ref.##
+                      :EndIf
+                  :EndIf
+                  subTitles,←{⍺,'-',⍵}/⍕¨(⎕JSON⍠('Dialect' 'JSON5')⊢ref.##.TatinVars.CONFIG).(group name version)
               :Else
-                  name←⍕ref.##
-              :EndIf
-              buff←⎕JSON⍠('Dialect' 'JSON5')⊢ref.TatinVars.CONFIG
-              :If 0<≢buff←(⎕JSON⍠('Dialect' 'JSON5')⊢ref.TatinVars.CONFIG).api
-                  name←⍕ref⍎buff
+                  buff←(⎕JSON⍠('Dialect' 'JSON5')⊢ref.TatinVars.CONFIG).api
+                  :If 0<≢buff
+                      name←⍕ref
+                  :EndIf
+                  subTitles,←{⍺,'-',⍵}/(⎕JSON⍠('Dialect' 'JSON5')⊢ref.TatinVars.CONFIG).(group name version)
               :EndIf
               r,←⊂name
-              :If 0=≢title
-                  title←'.code'{⍵↑⍨¯1+1⍳⍨⍺⍷⍵}name
-                  title←{⍵↑⍨-¯1+'.'⍳⍨⌽⍵}title
-                  title←⊃{⍺,'-',⍵}/2↑'_'(≠⊆⊢)title
-              :EndIf
           :Else
               r,←⊂arg
+              subTitles,←⊂''
           :EndIf
       :EndFor
     ∇

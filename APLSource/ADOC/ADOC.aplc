@@ -135,8 +135,7 @@
 ⍝ this is no longer supported. Replace the function by a variable (vector of character vectors) with the
 ⍝ same name.
 ⍝ ### Tatin packages
-⍝ The user command is able to deal with a reference to a Tatin package provided as argument , but only
-⍝ one package at the time.\\
+⍝ The user command is able to deal with reference(s) to Tatin package(s) provided as argument.\\
 ⍝ For example:
 ⍝ ```
 ⍝       ]LoadPackages [tatin]MakeHelpers
@@ -147,6 +146,8 @@
 ⍝       ]ADoc #._tatin.aplteam_MakeHelpers_0_7_0.code       ⍝ Works as well
 ⍝       ]ADoc #.MakeHelpers                                 ⍝ Works, too
 ⍝ ```
+⍝
+⍝ In such a case the caption becomes `<group>-<name>-<version>`.
 ⍝ ### Reserved names
 ⍝ Since version 3.0 `ADOC` looks for a number of fixed names. If a function or a variable
 ⍝ with such a name is found, the contents of the variable or the result of that function is used.\\
@@ -197,11 +198,13 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'ADOC' '7.0.1+90' '2023-04-19'
+      r←'ADOC' '7.1.0+90' '2023-06-11'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 7.1.0
+      ⍝   `]ADOC` will now process references pointing to a loaded Tatin package in a smart way
       ⍝ * 7.0.1
       ⍝   * Bug fix: under certain circumstances `Copyright` and/or `Version` and/or `History` did
       ⍝     not get a caption assigned
@@ -225,19 +228,24 @@
       ⍝ For information regarding older versions see <https://github.com/aplteam/ADOC/releases>
     ∇
 
-    ∇ vs←CreateBody(vs chapterNo);tail;type;name;flag
+    ∇ vs←CreateBody(vs chapterNo);tail;type;name;flag;title
       tail←vs.devisor{0=≢⍺:⍵ ⋄ ' &lt; ',⍺},{⍵/⍨⍵≢' (Container)'}' (',vs.scriptType,')'
-      _WithRunningNumbers←{¯1=⍵:1<⍴_META ⋄ ⍵}_WithRunningNumbers
+      _WithRunningNumbers←{¯1=⍵:1<≢_META ⋄ ⍵}_WithRunningNumbers
+      :If 0=≢vs.subTitle
+          title←vs.formattedScriptName
+      :Else
+          title←vs.subTitle
+      :EndIf
       :If _WithRunningNumbers
           :If vs.isContainer
-              name←('. ',⍨⍕vs.subHeadingCounter),vs.formattedScriptName
+              name←('. ',⍨⍕vs.subHeadingCounter),title
               vs.subHeadingCounter+←1
               vs.containerCounter←1
           :ElseIf vs.hasContainers
-              name←((⍕vs.subHeadingCounter-1),'.',(⍕vs.containerCounter),' '),vs.formattedScriptName
+              name←((⍕vs.subHeadingCounter-1),'.',(⍕vs.containerCounter),' '),title
               vs.containerCounter+←1
           :Else
-              name←('. ',⍨⍕chapterNo),vs.formattedScriptName
+              name←('. ',⍨⍕chapterNo),title
           :EndIf
       :Else
           name←vs.formattedScriptName
@@ -455,6 +463,14 @@
         ∇
     :EndProperty
 
+    :Property SubTitles
+    ⍝ Used internally in case the object is a Tatin package, otherwise empty
+    :Access Public instance
+        ∇ r←get
+          r←_SubTitles
+        ∇
+    :EndProperty
+
     :Section SpecialFunctions
 
     ⍝ Any of the following three properties might cause a VALUE ERROR when called in a certain context.
@@ -576,6 +592,7 @@
       _OutputType←'Web'
       _IncludeCss←1
       _CssPath←''
+      _SubTitles←''
       _ignoreCopyright←0
       _ignoreVersion←0
       _ignoreHistory←0
@@ -595,6 +612,7 @@
       _IgnorePattern←''
       _IncludeReference←1
       _Toc←1
+      _SubTitles←''
       CssScreen←'screen'
       CssPrint←'Print'
       InLineCodePadding←5
@@ -625,13 +643,13 @@
       r←''
       source←{↓⍵⌽⍨+/∧\' '=⍵}⊃⎕SRC refToClass
       :If ∨/bool←':include'Search source
-          buffer←(⍎{⍵↓⍨-'.'⍳⍨⌽⍵}⍕refToClass).{⎕SRC⍎⍵}¨{⍵↑⍨¯1+⌊/⍵⍳' :'}¨P.APLTreeUtils2.DMB¨{(⍴':Include ')↓⍵}¨source[⍸bool]
+          buffer←(⍎{⍵↓⍨-'.'⍳⍨⌽⍵}⍕refToClass).{⎕SRC⍎⍵}¨{⍵↑⍨¯1+⌊/⍵⍳' :'}¨P.APLTreeUtils2.DMB¨{(≢':Include ')↓⍵}¨source[⍸bool]
           buffer←(~¨':namespace'∘Search¨buffer)/¨buffer
           buffer←(~¨':endnamespace'∘Search¨buffer)/¨buffer
           source,←⊃,/buffer
       :EndIf
-      :If 0≠≢where←1↓{⍵/⍳⍴,⍵}':class'Search source
-          r←{⍵↑⍨¯1+⌊/⍵⍳' :'}¨P.APLTreeUtils2.DMB¨{(⍴':class ')↓⍵}¨source[where],¨' '
+      :If 0≠≢where←1↓{⍵/⍳≢⍵}':class'Search source
+          r←{⍵↑⍨¯1+⌊/⍵⍳' :'}¨P.APLTreeUtils2.DMB¨{(≢':class ')↓⍵}¨source[where],¨' '
       :EndIf
     ∇
 
@@ -640,11 +658,11 @@
     ⍝ also the main header to the top of the document.
       :Access Public Instance
       html←''
-      :If 1<⍴_DOCS  ⍝ Then we have a main TOC (several namespaces)
+      :If 1<≢_DOCS  ⍝ Then we have a main TOC (several namespaces)
           :If ∨/containers←'Container'∘≡¨2⊃¨_META
               k←l←1
               html,←(('h1 ',((0=≢_Title)/'id="topmost"'))tag'Table of Contents'),nl
-              :For chapterNo :In ⍳⍴containers
+              :For chapterNo :In ⍳≢containers
                   :If chapterNo⊃containers
                       html,←'div'tag(⍕l),' ',('a href="#',GetChapterNo,'"')tag chapterNo⊃_DOCS
                       l←l+1
@@ -656,7 +674,11 @@
               :EndFor
               html,←'div'tag'&nbsp;'
           :Else
-              html,←'<br />','ol id="toc"'tag⊃,/'li'∘tag¨_DOCS{('a href="#',⍵,'"')tag ⍺}¨'ch'∘,¨¯4↑¨'0000'∘,¨⍕¨⍳⍴_DOCS
+              :If 0=≢_SubTitles
+                  html,←'<br />','ol id="toc"'tag⊃,/'li'∘tag¨_DOCS{('a href="#',⍵,'"')tag ⍺}¨'ch'∘,¨¯4↑¨'0000'∘,¨⍕¨⍳≢_DOCS
+              :Else
+                  html,←{'<br />','ol id="toc"'tag⊃,/'li'∘tag¨⍵{('a href="#',⍵,'"')tag ⍺}¨'ch'∘,¨¯4↑¨'0000'∘,¨⍕¨⍳≢⍵}','(≠⊆⊢)_SubTitles
+              :EndIf
           :EndIf
           html←'div id="maintoc"'tag html
       :EndIf
@@ -725,7 +747,7 @@
       :EndIf
     ∇
 
-    ∇ {r}←CreateHtml parms;vs;chapterNo
+    ∇ {r}←CreateHtml dummy;vs;chapterNo;subTitles
     ⍝ Create `_HTML` from `_META`.
       r←⍬
       :Access Public Instance
@@ -734,7 +756,17 @@
           vs.hasContainers←∨/'Container'∘≡¨2⊃¨_META
           vs.containerCounter←1
           vs.subHeadingCounter←1     ⍝ In case of containers
-          :For chapterNo :In ⍳⍴_META
+          :If 0=≢_SubTitles
+              subTitles←''
+          :Else
+              subTitles←','(≠⊆⊢)_SubTitles
+          :EndIf
+          :For chapterNo :In ⍳≢_META
+              :If 0=≢subTitles
+                  vs.subTitle←''
+              :Else
+                  vs.subTitle←chapterNo⊃subTitles
+              :EndIf
               vs←vs CreateUpperPartOfHTML_Page chapterNo
               :If _IncludeReference
                   vs.(firstIncludes firstConstructor firstDestructor firstProperty firstField firstInterface)←1
@@ -780,7 +812,7 @@
                       head,←'title'tag Title
                   :EndIf
               :Else
-                  head,←'title'tag{1=⍴⍵:'ADOC: ',1 1⊃⍵ ⋄ 'ADOC: ',(⍕⍴⍵),' scripts'}_META
+                  head,←'title'tag{1=≢⍵:'ADOC: ',1 1⊃⍵ ⋄ 'ADOC: ',(⍕≢⍵),' scripts'}_META
               :EndIf
               :If 0≠≢path←_CssPath
                   path,←'/'/⍨~(¯1↑path)∊'/\'
@@ -789,18 +821,18 @@
               addExt←{'.css'≡¯4↑⎕C ⍵:⍵ ⋄ ⍵,'.css'}
               :If _IncludeCss
                   :If 0=≢path
-                      screenStyles←'style type="text/css" media="screen"'tag(⍴nl)↓∊nl∘,¨GetScreenCss
-                      printStyles←'style type="text/css" media="print"'tag(⍴nl)↓∊nl∘,¨GetPrintCss
+                      screenStyles←'style type="text/css" media="screen"'tag(≢nl)↓∊nl∘,¨GetScreenCss
+                      printStyles←'style type="text/css" media="print"'tag(≢nl)↓∊nl∘,¨GetPrintCss
                   :Else
                       :Trap 22
-                          screenStyles←'style type="text/css" media="screen"'tag(⍴nl)↓∊nl∘,¨ReadAnsiFile path,addExt CssScreen
+                          screenStyles←'style type="text/css" media="screen"'tag(≢nl)↓∊nl∘,¨ReadAnsiFile path,addExt CssScreen
                       :Else
-                          screenStyles←'style type="text/css" media="screen"'tag(⍴nl)↓∊nl∘,¨GetScreenCss
+                          screenStyles←'style type="text/css" media="screen"'tag(≢nl)↓∊nl∘,¨GetScreenCss
                       :EndTrap
                       :Trap 22
-                          printStyles←'style type="text/css" media="print"'tag(⍴nl)↓∊nl∘,¨ReadAnsiFile path,addExt CssPrint
+                          printStyles←'style type="text/css" media="print"'tag(≢nl)↓∊nl∘,¨ReadAnsiFile path,addExt CssPrint
                       :Else
-                          printStyles←'style type="text/css" media="print"'tag(⍴nl)↓∊nl∘,¨GetPrintCss
+                          printStyles←'style type="text/css" media="print"'tag(≢nl)↓∊nl∘,¨GetPrintCss
                       :EndTrap
                   :EndIf
                   head,←screenStyles,printStyles
@@ -823,7 +855,7 @@
       :EndIf
     ∇
 
-    ∇ {filename}←{x}Browse scriptRef;PathToExe;browserPath;bool;allowed;cs;Note;⎕TRAP
+    ∇ {filename}←{x}Browse scriptRef;PathToExe;browserPath;bool;allowed;Note;⎕TRAP
          ⍝ This is the main method when ADOC is used without creating an instance and the documentation
          ⍝ is supposed to be beautified and displayed in a browser.\\
          ⍝ By default, the default browser is used to display the result. The exception is that when
@@ -890,9 +922,8 @@
           Fill_META scriptRef     ⍝ ←←← The work horse!
      
           :If 0≠≢_META
-              _WithRunningNumbers←{¯1=⍵:1<⍴_META ⋄ ⍵}_WithRunningNumbers
-              cs←⎕NS''
-              CreateHtml cs
+              _WithRunningNumbers←{¯1=⍵:1<≢_META ⋄ ⍵}_WithRunningNumbers
+              CreateHtml ⍬
               :If 0=≢_HTML
                   ⎕←'Nothing found'
               :Else
@@ -1033,6 +1064,7 @@
       ps.ignoreCopyright←0
       ps.ignoreHistory←0
       ps.ignoreVersion←0
+      ps.SubTitles←''
       ps.Title←_Title
       ps.Toc←_Toc
       ps.IncludeReference←_IncludeReference
@@ -1079,7 +1111,7 @@
 
     ∇ data←SortPublicStuff data;v1;v2
     ⍝ Needed because the types should be sorted together but with the introduction of namespaces
-    ⍝ a dfns or an operator might be in the wrong place. We enforce a proper sequence here.
+    ⍝ a dfn or an operator might be in the wrong place. We enforce a proper sequence here.
       v1←'Include' 'Constructor' 'Destructor' 'Property' 'Field' 'Variable' 'Method' 'Function' 'Operator' 'Interface Method'
       v2←'Inc' 'Con' 'Des' 'Prp' 'Fld' 'Var' 'Met' 'Fun' 'Opr' 'Int'
       :If 1<≢data
@@ -1195,7 +1227,7 @@
       GetDirectComment←{
           (scriptRef name)←⍵
           body←scriptRef.⎕NR name
-          1=⍴body:P.APLTreeUtils2.DLB{⍵↓⍨⍵⍳'⍝'}1⊃body    ⍝ One-liner?
+          1=≢body:P.APLTreeUtils2.DLB{⍵↓⍨⍵⍳'⍝'}1⊃body    ⍝ One-liner?
           buff←P.APLTreeUtils2.DLB 1↓body
           bool←∧\'⍝'=↑¨buff
           0=+/bool:{⍵↓⍨¯1+⍵⍳'⍝'}1⊃body    ⍝ No leading comments? Done!
@@ -1459,7 +1491,7 @@
               noOf←+/bool←type∘≡¨Get data
           :ElseIf 'Property'≡type
               bool←type∘≡¨Get data
-              noOf←⍴↑,/{','∊⍵:','P.APLTreeUtils2.Split ⍵ ⋄ ⊂⍵}¨'name'Get bool/data
+              noOf←≢↑,/{','∊⍵:','P.APLTreeUtils2.Split ⍵ ⋄ ⊂⍵}¨'name'Get bool/data
           :ElseIf 'Interface Method'≡type
               noOf←+/bool←('Interface Method'∘≡¨Get data)
           :ElseIf 'Operators'≡type
@@ -1518,13 +1550,13 @@
      ⍝ Look for "pattern" in html and make all occurencies an anchor.
      ⍝ Typically "pattern" is something like "http://x.y.z" or "mailto:x@y.z"
      ⍝ of "file:///foo.txt"; You can prevent this from happening with a leading "!"
-      :If 0≠≢where←⌽{⍵/⍳⍴,⍵}pattern⍷r←html
+      :If 0≠≢where←⌽{⍵/⍳≢⍵}pattern⍷r←html
           :For i :In where
               :If '!'=¯1↑r←(i-1)⌽r
                   r←(-i-2)⌽¯1↓r
               :Else
                   ref←{⍵↑⍨¯1+⌊/⍵⍳'  <'}r
-                  r←(-i-1)⌽(('a class="externallink" href="',(ref),'"')tag ref),(⍴ref)↓r
+                  r←(-i-1)⌽(('a class="externallink" href="',(ref),'"')tag ref),(≢ref)↓r
               :EndIf
           :EndFor
       :EndIf
@@ -1689,9 +1721,9 @@
           :EndIf
       :EndIf
       remarks←''
-      noOf←⍴source←RemoveMultiLocalLines source
+      noOf←≢source←RemoveMultiLocalLines source
       :If 0≠≢{⍵/⍨'⍝'=↑¨⍵}buffer←1↓noOf↑source ⍝ remarks
-          buffer/⍨←{~∨/∨/¨':access' ':implements'{⍺≡⎕C(⍴⍺)↑⍵}¨⊂⍵}∘P.APLTreeUtils2.DLB¨buffer
+          buffer/⍨←{~∨/∨/¨':access' ':implements'{⍺≡⎕C(≢⍺)↑⍵}¨⊂⍵}∘P.APLTreeUtils2.DLB¨buffer
           buffer↓¨⍨←{+/∧\' '=⍵}¨buffer
           buffer↑⍨←+/∧\'⍝'=↑¨buffer
           buffer⌿⍨←'⍝⍝'∘≢¨2↑¨buffer
@@ -1699,7 +1731,7 @@
           buffer←(' '=↑¨buffer)↓¨buffer
           remarks←{⍵,' '/⍨' '≠↑¯1↑⍵}¨buffer
       :EndIf
-      :If IgnorePattern{0=≢⍺:1 ⋄ ⍺∨.≠(⍴,⍺)↑⍵}name
+      :If IgnorePattern{0=≢⍺:1 ⋄ ⍺∨.≠(≢⍺)↑⍵}name
            ⍝ A method name may appear again: an included namespace may provide a
            ⍝ method with a name also used in the container class. Therefore, any
            ⍝ additional occurance must be ignored!
@@ -1783,7 +1815,7 @@
               :If 0=≢r
                   r←,⊂'Txt'txt
               :Else
-                  ((⍴r)⊃r)←txt{⍵[1],(⊂(2⊃⍵),⍺)}(⍴r)⊃r
+                  ((≢r)⊃r)←txt{⍵[1],(⊂(2⊃⍵),⍺)}(≢r)⊃r
               :EndIf
           :EndIf
       :EndIf
@@ -1846,14 +1878,14 @@
       :If ∨/bool←∨/¨':access public'∘⍷¨P.APLTreeUtils2.DMB¨masked
           result←⊂'type' 'Property'
           (buffer remarks)←SplitAtLamp source
-          (name keywords)←{((⍴⍵)⊃⍵)(¯1↓⍵)}' 'P.APLTreeUtils2.Split P.APLTreeUtils2.DMB buffer
-      :AndIf IgnorePattern{0=≢⍺:1 ⋄ ⍺∨.≠(⍴,⍺)↑⍵}name
+          (name keywords)←{((≢⍵)⊃⍵)(¯1↓⍵)}' 'P.APLTreeUtils2.Split P.APLTreeUtils2.DMB buffer
+      :AndIf IgnorePattern{0=≢⍺:1 ⋄ ⍺∨.≠(≢⍺)↑⍵}name
           :If _ignoreCopyright∨name≢'Copyright'
           :AndIf _ignoreVersion∨name≢'Version'
           :AndIf _ignoreHistory∨name≢'History'
               keywords↓⍨←':'=↑↑keywords
               result,←⊂'name'name
-              result,←⊂'access'(↑('Instance' 'Shared')[1+∨/∨/⊃'shared'∘⍷¨{(⊂⍵)⊃¨⍨{⍵/⍳⍴,⍵}∨/¨':access'∘⍷¨⍵},¨masked])
+              result,←⊂'access'(↑('Instance' 'Shared')[1+∨/∨/⊃'shared'∘⍷¨{(⊂⍵)⊃¨⍨{⍵/⍳≢⍵}∨/¨':access'∘⍷¨⍵},¨masked])
               result,←⊂'readonly'(~∨/'∇set'⍷∊source~¨' ')
               :If 0=≢remarks
                   result,←⊂'comments'((+/∧\'⍝'={↑¨⍵~¨' '}1↓source)↑1↓source)
@@ -1881,7 +1913,7 @@
               remarks←''
           :EndIf
           buffer←P.APLTreeUtils2.DLB⊃,/' ',¨buffer/⍨~(⎕C buffer)∊':field' 'public' 'instance' 'shared' 'readonly'
-          :If IgnorePattern{0=≢⍺:1 ⋄ ⍺∨.≠(⍴,⍺)↑⍵}buffer
+          :If IgnorePattern{0=≢⍺:1 ⋄ ⍺∨.≠(≢⍺)↑⍵}buffer
               name←buffer↑⍨¯1+buffer⍳'←'
               :If _ignoreCopyright∨name≢'Copyright'
               :AndIf _ignoreVersion∨name≢'Version'
@@ -1921,23 +1953,23 @@
       embeddedClassNames←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'embeddedClassNames'
       :If 0≠≢embeddedClassNames
       ⍝ User asks for a class embedded in another one. So we simply replace "origSource" by the source of the embedded class
-          :If 0=≢buffer←1↓vs.origSource[{⍵/⍳⍴,⍵}':class'∘{⍺≡⎕C(⍴⍺)↑⍵}¨A.DMB¨vs.origSource] ⍝ 1↓ for itself
+          :If 0=≢buffer←1↓vs.origSource[⍸':class'∘{⍺≡⎕C(≢⍺)↑⍵}¨A.DMB¨vs.origSource] ⍝ 1↓ for itself
               :Return
           :EndIf
           bool←vs.origSource∊buffer
-          bool∨←vs.origSource∊¯1↓vs.origSource[⍸':endclass'∘{⍺≡⎕C(⍴⍺)↑⍵}¨A.DMB¨vs.origSource] ⍝ ¯1↓ for itself
+          bool∨←vs.origSource∊¯1↓vs.origSource[⍸':endclass'∘{⍺≡⎕C(≢⍺)↑⍵}¨A.DMB¨vs.origSource] ⍝ ¯1↓ for itself
           buffer←({⍵∨≠\⍵}bool)/vs.origSource
           buffer{(⊂¨⍵/⍺),¨⍺⊂⍨~⍵}←':class'Search A.DMB¨buffer
-          vs.origSource←buffer⊃⍨1⍳⍨embeddedClassNames∘≡¨{{⍵↑⍨¯1+⌊/⍵⍳' :'}(⍴':class ')↓A.DMB ⍵}¨1⊃¨buffer
+          vs.origSource←buffer⊃⍨1⍳⍨embeddedClassNames∘≡¨{{⍵↑⍨¯1+⌊/⍵⍳' :'}(≢':class ')↓A.DMB ⍵}¨1⊃¨buffer
           vs.formattedScriptName←embeddedClassNames
       :ElseIf 0≠≢vs.inheritsFrom←GetBase vs.origSource scriptRef
           (∆EM←'Unknown devisor: ',⍕vs.inheritsFrom)⎕SIGNAL 11/⍨9∨.≠⎕NC⊃vs.inheritsFrom
           Analyze_∘⍎¨vs.inheritsFrom
           vs.devisorMeta←_META[(⍴vs.inheritsFrom){1+⍵-⌽⍳⍺}⍴_META]
-          _META←(-⍴vs.devisorMeta)↓_META
+          _META←(-≢vs.devisorMeta)↓_META
       :EndIf
-      :If 0<+/bool←':include'∘≡¨⎕C(⍴':include')↑¨A.DLB¨vs.origSource
-          vs.namespaceList←∪A.DLB¨{(⍴':include ')↓⍵}¨A.DLB¨vs.origSource[{⍵/⍳⍴,⍵}bool]
+      :If 0<+/bool←':include'∘≡¨⎕C(≢':include')↑¨A.DLB¨vs.origSource
+          vs.namespaceList←∪A.DLB¨{(≢':include ')↓⍵}¨A.DLB¨vs.origSource[⍸bool]
           vs.namespaceList←{⍵↑⍨¯1+⍵⍳' '}¨vs.namespaceList
           buffer←scriptRef MakeScriptFromNamespace¨vs.namespaceList
           buffer←(~¨':namespace'∘Search¨buffer)/¨buffer
@@ -1947,7 +1979,7 @@
       (vs.origSource vs.leadingDoc)←{noOf←+/∧\'⍝'=↑¨⍵ ⋄ (noOf↓⍵)(noOf↑⍵)}vs.origSource
       vs.origSource/⍨←{~(⌽∧\⌽⍵)∨∧\⍵}0=≢¨vs.origSource
       :If 0=≢embeddedClassNames
-          r←':class '{' '~¨⍨(⍴⍺)↓¨A.DMB ⍵/⍨⍺{⍵≡¨⊂⍺}⎕C(⍴⍺)↑¨A.DMB ⍵}1↓vs.origSource
+          r←':class '{' '~¨⍨(≢⍺)↓¨A.DMB ⍵/⍨⍺{⍵≡¨⊂⍺}⎕C(≢⍺)↑¨A.DMB ⍵}1↓vs.origSource
       :EndIf
       vs.isInterface←∨/':interface '⍷⎕C vs.headerLine←1⊃vs.origSource
       vs.devisor←{0=≢⍵:⍵ ⋄ ⊃{⍺,', ',⍵}/⍵}vs.inheritsFrom
@@ -1956,7 +1988,7 @@
           vs.scriptType,←' embedded into ',⍕scriptRef
       :EndIf
       vs.public←''
-      :If vs.isNamespace←':NAMESPACE '{⍺≡(⍴⍺)↑⍵}1 ⎕C A.DLB 1⊃vs.origSource
+      :If vs.isNamespace←':NAMESPACE '{⍺≡(≢⍺)↑⍵}1 ⎕C A.DLB 1⊃vs.origSource
           vs←GetPublicDefinitionFrom_NS scriptRef vs
           :If 2=scriptRef.⎕NC'ADOC_Doc'
               vs.origSource←vs.origSource[1],('⍝ '∘,¨scriptRef⍎'ADOC_Doc'),1↓vs.origSource
@@ -1991,9 +2023,9 @@
     ∇ r←{maxLength}RestrictVectorLength data
       maxLength←{0<⎕NC ⍵:⍎⍵ ⋄ 80}'maxLength'
       :If 0=1↑0⍴data
-          r←maxLength{⍺>⍴⍵:⍵ ⋄ (⍺↑⍵),'...'}⍕data
+          r←maxLength{⍺>≢⍵:⍵ ⋄ (⍺↑⍵),'...'}⍕data
       :Else
-          r←maxLength{⍺>⍴⍵:⍵ ⋄ (⍺↑⍵),'...'}data
+          r←maxLength{⍺>≢⍵:⍵ ⋄ (⍺↑⍵),'...'}data
       :EndIf
     ∇
 
@@ -2007,7 +2039,7 @@
               this←GetNameFromHeader currentline
               name←'∇'~⍨GetNameFromHeader↑vs.origSource
               :If '∇'∊this   ⍝ Is it a function, or an operator in case of a scripted namespace?
-                  noOf←⍴(1+'∇'⍳⍨↑¨' '~¨⍨1↓vs.origSource)↑vs.origSource
+                  noOf←≢(1+'∇'⍳⍨↑¨' '~¨⍨1↓vs.origSource)↑vs.origSource
                   :If ignoreVersion∨'Version'≢name
                   :AndIf ignoreCopyright∨'Copyright'≢name
                   :AndIf ignoreHistory∨'History'≢name
@@ -2025,12 +2057,12 @@
                       noOf←vs.maskedSource⍳⊂':endproperty'
                       buffer,←{0=≢⍵:'' ⋄ ⊂⍵}AnalyzeProperty(noOf,noOf↑¨vs.(origSource maskedSource))
                   :Case ':class' ⍝ embedded class? Not of any interest to a user of a class
-                      noOf←⍴':endclass'{⍵↑⍨1++/∧\((⍴⍺)↑[2]⊃⍵)∨.≠⍺}vs.maskedSource
+                      noOf←≢':endclass'{⍵↑⍨1++/∧\((≢⍺)↑[2]⊃⍵)∨.≠⍺}vs.maskedSource
                   :Case ':endnamespace' ⍝ embedded namespace? Not of any interest to a user of a class
-                      noOf←⍴':endnamespace'{⍵↑⍨1++/∧\((⍴⍺)↑[2]⊃⍵)∨.≠⍺}vs.maskedSource
+                      noOf←≢':endnamespace'{⍵↑⍨1++/∧\((≢⍺)↑[2]⊃⍵)∨.≠⍺}vs.maskedSource
                   :EndSelect
               :Else
-                  :If '{'=1↑(⍴this)↓1⊃vs.origSource ⍝ is it a dynamic function?
+                  :If '{'=1↑(≢this)↓1⊃vs.origSource ⍝ is it a dynamic function?
                       noOf←FindEndOfDfns vs.maskedSource
                   :Else
                       noOf←1⌈+/∧\'∆:'∊⍨↑¨vs.origSource
@@ -2125,7 +2157,7 @@
     ⍝ that are public.\\
     ⍝ If there is a function `Public` then it rules the day. Otherwise
     ⍝ **all** functions, operators and variables are considered public.\\
-      :If ':NAMESPACE '{⍺≡(⍴⍺)↑⍵}1 ⎕C P.APLTreeUtils2.DLB 1⊃vs.origSource
+      :If ':NAMESPACE '{⍺≡(≢⍺)↑⍵}1 ⎕C P.APLTreeUtils2.DLB 1⊃vs.origSource
           :If 0=scriptRef.⎕NC'Public'
               vs.public←' '~¨⍨↓scriptRef.⎕NL 3.1 4.1 2
           :Else
@@ -2173,7 +2205,7 @@
           {⍵∨≠\⍵}⍵∊⍺
       }
 
-    Search←{⍺∘≡¨⎕C ↓(⍴⍺)↑[2]⊃⍵}
+    Search←{⍺∘≡¨⎕C ↓(≢⍺)↑[2]⊃⍵}
 
       Get←{
       ⍝ Get all ⍺ of a series of matrices, typically 5⊃_META; See also GetSingle
@@ -2191,7 +2223,7 @@
       Set←{
           (mat name newValue)←⍵
           where←mat[;1]⍳⊂name
-          (1↑⍴mat)<where:mat,[⎕IO]name newValue
+          (≢mat)<where:mat,[⎕IO]name newValue
           mat[where;2]←⊂(2⊃mat[where;]),newValue
           mat
       }
@@ -2201,6 +2233,7 @@
       :If '∇'∊r
           r←{⍵↑⍨¯1+⍵⍳'⍝'}r                  ⍝ remove comments
           r←P.APLTreeUtils2.DMB{⍵↑⍨¯1+⍵⍳';'}r   ⍝ remove local vars
+      :AndIf '∇'=↑P.APLTreeUtils2.DMB r
           r←{'←'∊⍵:⍵↓⍨⍵⍳'←' ⋄ ⍵}r           ⍝ remove explicit result
           rightArg←0
           :If ')'=¯1↑r                      ⍝ Is there a parathesized right argument?
@@ -2213,7 +2246,7 @@
               r←'∇',2⊃r                     ⍝ With operators it's always the second one
           :Else
               r←{' 'P.APLTreeUtils2.Split P.APLTreeUtils2.DMB ⍵~'∇'}r       ⍝ split by blank, remove any dels first
-              r←'∇',{⍵⊃⍨(1(1+rightArg)2)[1 2 3⍳⍴⍵]}r ⍝ 1=f ⋄ 2=f r ⋄ 3=(l f r)
+              r←'∇',{⍵⊃⍨(1(1+rightArg)2)[1 2 3⍳≢⍵]}r ⍝ 1=f ⋄ 2=f r ⋄ 3=(l f r)
           :EndIf
       :Else
           r←{⍵↑⍨¯1+⍵⍳' '}r
@@ -2232,13 +2265,13 @@
     ∇ keywords←ProcessKeywords data
       keywords←'keywords'Get data
       keywords←('readonly'Get data){⍺:(⊂'ReadOnly'),⍵ ⋄ ⍵}¨keywords
-      keywords←{⍵/⍨0<↑∘⍴¨⍵}¨keywords
-      keywords←{0=≢∊⍵:'' ⋄ 1=⍴⍵:' (',(∊⍵),')' ⋄ ' (',(⊃{⍺,',',⍵}/⍵),')'}¨keywords
+      keywords←{⍵/⍨0<≢¨⍵}¨keywords
+      keywords←{0=≢∊⍵:'' ⋄ 1=≢⍵:' (',(∊⍵),')' ⋄ ' (',(⊃{⍺,',',⍵}/⍵),')'}¨keywords
     ∇
 
     ∇ (key filename)←FileBox y;∆;path;filename;caption;extension;mode;DQ_R;key
       y←{0 1∊⍨≡⍵:⊂⍵ ⋄ ⍵}y
-      (path filename caption extension mode)←y,(⍴y)↓'' '' ''(⊂'*.html' 'ADOC HTML')'write'
+      (path filename caption extension mode)←y,(≢y)↓'' '' ''(⊂'*.html' 'ADOC HTML')'write'
       :If 0=≢path
           path←,⊃⎕CMD'cd'
       :EndIf
@@ -2429,15 +2462,19 @@
       ⍝ Done
     ∇
 
-    ∇ {r}←View filename;wsh;⎕WX;html;b;title
+    ∇ {r}←View filename;wsh;⎕WX;b
       :Access public
     ⍝ Fires up the default browser or uses the Ride browser to display "filename"
       ⎕WX←1
       r←⍬
       :If 3501⌶⍬ ⍝ Connected to Ride?
-          html←⊃⎕NGET EncodeBlanksForNix filename
-          title←'<title'{{⍵↑⍨¯1+⍵⍳'<'}⍵↓⍨(⍴⍺)+1⍳⍨⍺⍷⍵}∊html
-          title(3500⌶)∊html
+⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+⍝ This did work in the past, but not anymore...
+⍝          html←⊃⎕NGET EncodeBlanksForNix filename
+⍝          title←'<title'{{⍵↑⍨¯1+⍵⍳'<'}⍵↓⍨(⍴⍺)+1⍳⍨⍺⍷⍵}∊html
+⍝          title(3500⌶)∊html
+⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+          ⎕←']Open ',filename
       :Else
           :Select P.APLTreeUtils2.GetOperatingSystem ⍬
           :Case 'Win'
@@ -2487,9 +2524,9 @@
               :If 1<noOf←+/∧\(↑¨lc↓¨vtv)=' '
                   buffer←noOf↑vtv
                   :If 1=noOf
-                      (r[⍴r])←⊂((⍴r)⊃r),P.APLTreeUtils2.DLB↑buffer
+                      (r[≢r])←⊂((≢r)⊃r),P.APLTreeUtils2.DLB↑buffer
                   :Else
-                      (r[⍴r])←⊂((⍴r)⊃r),↑,/P.APLTreeUtils2.DLB¨buffer
+                      (r[≢r])←⊂((≢r)⊃r),↑,/P.APLTreeUtils2.DLB¨buffer
                   :EndIf
                   vtv←noOf↓vtv
               :Else
@@ -2505,9 +2542,9 @@
       r←''
       :If _Inherit
           bool←~MaskText¨headerLine
-      :AndIf 0≠≢where←{⍵/⍳⍴,⍵}∨/¨':Class '∘⍷¨bool\¨bool/¨headerLine
+      :AndIf 0≠≢where←⍸∨/¨':Class '∘⍷¨bool\¨bool/¨headerLine
           buffer←(1⊃where)⊃headerLine
-          buffer←(⍴':Class ')↓P.APLTreeUtils2.DMB buffer
+          buffer←(≢':Class ')↓P.APLTreeUtils2.DMB buffer
           buffer←({~⍵∨≠\⍵}buffer='''')/buffer
           buffer↑⍨←¯1+buffer⍳'⍝'
       :AndIf 0≠≢buffer←(buffer⍳':')↓buffer
@@ -2523,7 +2560,7 @@
 
     ∇ {r}←MergeWithDevisor devisor;currentMeta;name;this;scriptName;type;nameList;i;buffer
       ⍝ Implicit argument: _META; is also modified
-      currentMeta←(⍴_META)⊃_META
+      currentMeta←(≢_META)⊃_META
       scriptName←1 1⊃devisor
       type←1 2⊃devisor
       r←''
@@ -2541,7 +2578,7 @@
               :EndIf
           :EndFor
           (5⊃currentMeta)←AnalyzeResult 5⊃currentMeta
-          ((⍴_META)⊃_META)←currentMeta
+          ((≢_META)⊃_META)←currentMeta
       :EndIf
     ∇
 
@@ -2569,11 +2606,11 @@
       :If _Toc
           Toc←⊂'<div class="toctab">'
           :If 0<≢vs.Top
-          :AndIf 0<+/bool←(⍳⍴vs.Top)∊1+'<h[0-9]\b[^>]*>'⎕S 0⍠('Mode' 'D')⊣vs.Top
+          :AndIf 0<+/bool←(⍳≢vs.Top)∊1+'<h[0-9]\b[^>]*>'⎕S 0⍠('Mode' 'D')⊣vs.Top
               level1Flag←0≠≢'<h1\b[^>]*>'⎕S 0⍠('Mode' 'D')⊣vs.Top
               vs.Top←(1,1↓bool){⎕ML←0 ⋄ ⍺⊂⍵}vs.Top
               (First vs.Top)←{(1⊃⍵)(1↓⍵)}vs.Top
-              :For i :In ⍳⍴vs.Top
+              :For i :In ⍳≢vs.Top
                   this←i⊃vs.Top
                   no←⍎this[3]
                   anchor←'toc_',GetChapterNo,':',¯4↑'0000',⍕i
@@ -2593,7 +2630,7 @@
               :If level1Flag
                   vs.Top←First,Toc,'</div>',vs.Top
               :Else
-                  vs.Top←{⍵,Toc,'</div>',(⍴⍵)↓First,vs.Top}'<div class="header">'
+                  vs.Top←{⍵,Toc,'</div>',(≢⍵)↓First,vs.Top}'<div class="header">'
               :EndIf
           :ElseIf 0≠≢vs.topLinks
               Toc,←{'<div class="level2">',⍵,'</div>'}¨vs.topLinks[;2]
@@ -2675,7 +2712,7 @@
           noOf←1++/∧\b
           buffer←noOf↑vtv
           vtv←noOf↓vtv
-          r,←⊂{↑,/(¯1↓¨⍵↑⍨¯1+⍴⍵),⍵[⍴⍵]}buffer
+          r,←⊂{↑,/(¯1↓¨⍵↑⍨¯1+≢⍵),⍵[≢⍵]}buffer
       :EndWhile
     ∇
 
@@ -2693,9 +2730,9 @@
         ⍝ meaning that ordinary CSS is used.
           0=+/b←'`'=w←⍵:w                           ⍝ No inline APL code? return ⍵
           0≠2|+/b:11 ⎕SIGNAL⍨(∆EM←'Odd number of ` (ticks) found; see ',w)
-          ind←{⍵/⍳⍴,⍵}b
-          i1←((⍴ind)⍴1 0)/ind
-          i2←((⍴ind)⍴0 1)/ind
+          ind←{⍵/⍳≢⍵}b
+          i1←((≢ind)⍴1 0)/ind
+          i2←((≢ind)⍴0 1)/ind
           w[i1]←⊂'<span class="aplinlinecode">' ⍝ Opening tag
           w[i2]←⊂'</span>'                       ⍝ Closing tags
           ↑,/w                                   ⍝ Simplify
@@ -2706,7 +2743,7 @@
           0=+/b←''''''⍷w←⍵:w
           mask←~'`'{{⍵∨≠\⍵}⍺=⍵}w
           b∧←mask
-          w[,({⍵/⍳⍴,⍵}b)∘.+¯1+⍳2]←(2×+/b)⍴'<strong>' '' '</strong>' ''
+          w[,(⍸b)∘.+¯1+⍳2]←(2×+/b)⍴'<strong>' '' '</strong>' ''
           ↑,/w
       }
 
@@ -2738,7 +2775,7 @@
       ⍝ has been extended to several lines. To make things worse, those lines, which must
       ⍝ start with a semicolon, may be interrupted by blank lines and/or comment lines.
           ~17≤↑(//)⎕VFI{⍵/⍨2>+\⍵='.'}2⊃'#'⎕WG'APLVersion':⍵
-          candidates←(¯1+⍴⍵)-+/∧\~⌽{';'=↑¨⍵}1↓⍵ ⍝ The last line that starts with a ";" dictates the max number of lines
+          candidates←(¯1+≢⍵)-+/∧\~⌽{';'=↑¨⍵}1↓⍵ ⍝ The last line that starts with a ";" dictates the max number of lines
           buff←↑¨candidates↑1↓⍵
           ((buff∊' ⍝')/buff)←';'                ⍝ Replace space and "⍝" by a ";"
           ⍵[1],(+/∧\';'=buff)↓1↓⍵
