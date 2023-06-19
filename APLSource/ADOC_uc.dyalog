@@ -86,9 +86,9 @@
           LoadAdoc ⍬
           filename←⎕SE.ADOC.ShowDocumentation 1
           :If 3501⌶⍬ ⍝ Connected to Ride?
-            r←⊂']Open ',filename
+              r←⊂']Open ',filename
           :Else
-            r←⊂'HTML save in ', filename
+              r←⊂'HTML save in ',filename
           :EndIf
       :EndSelect
       r,←(l=0)/⊂']',Cmd,' -??  ⍝ for syntax details'
