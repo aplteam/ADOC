@@ -1,5 +1,6 @@
-﻿:Class  ADOC_uc ⍝ V3.000
+:Class  ADOC_uc ⍝ V3.000
 ⍝ User Command script for "ADOC".
+⍝ 2023 06 19 Kai: Check for number of arguments added
 ⍝ 2023 06 11 Kai: Can now process loaded Tatin packages in a smart way
 ⍝ 2023 05 30 Kai: Transformed into a Tatin package plus plenty of improvements and fixes
 
@@ -119,7 +120,8 @@
       :EndIf
     ∇
 
-    ∇ r←AdocBrowse Args;title;ref;cs;browser;params;includeRefeference;toc;subTitles
+    ∇ r←AdocBrowse Args;title;ref;cs;browser;params;includeRefeference;toc;subTitles;list
+      'No argument provided?!'Assert 0<≢Args.Arguments
       title←''Args.Switch'title' ⍝ default is empty
       (Args.Arguments title subTitles)←title CheckArgumentsForTatin Args.Arguments
       browser←''Args.Switch'browser' ⍝ default is empty
@@ -227,5 +229,7 @@
       ⍝ Returns a Boolean that is 1 only if the current version is at least as good.
           ⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'
       }
+
+    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←1 ⋄ ⍺ ⎕SIGNAL 1↓(⊃∊⍵),11}
 
 :EndClass ⍝ ADOC  $Revision$
