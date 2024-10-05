@@ -1,7 +1,7 @@
 {
   api: "ADOC",
   assets: "Docs",
-  description: "Automated generation od documentation",
+  description: "Automated generation of documentation",
   documentation: "",
   files: "",
   group: "aplteam",
