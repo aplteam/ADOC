@@ -1,0 +1,22 @@
+ R←Test_Browse_73(stopFlag batchFlag);body;htmlFilename;⎕TRAP;myAdoc;buff
+⍝ `Browse` an ordinary namespace with a vector of text vectors `ADOC_doc` (lowercase "d"!)
+⍝ Since version 7.1.2 we should find that variable anyway
+ R←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ ##.ADOC.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ #.Temp.ADOC_doc←'My comment from line 1' '' '* This' '* That' '* More'
+
+ myAdoc←⎕NEW ##.ADOC.ADOC
+ htmlFilename←myAdoc.Make #.Temp
+ ##.ADOC.ADOC.RestoreDefaults
+ buff←⊃⎕NGET htmlFilename 1
+ →T.GoToTidyUp~∨/'My comment from line 1'⍷∊buff
+
+ R←T._OK
+
+∆TidyUp:
+ {}FilesAndDirs.RmDirByForce htmlFilename

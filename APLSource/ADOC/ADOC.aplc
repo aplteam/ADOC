@@ -198,11 +198,16 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'ADOC' '7.1.1+90' '2023-10-11'
+      r←'ADOC' '7.1.2+90' '2023-10-12'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 7.1.2
+      ⍝   * Bug fixes:
+      ⍝     * In case there is a `Public` function and it returns an empty vector, nothing should be
+      ⍝       listed as public, but that was not the case.
+      ⍝     * ADOC_Doc is not case sensitive anymore: adoc_doc and ADOC_DOC are found as well
       ⍝ * 7.1.1
       ⍝   * The user command now complains with a useful message when no argument is provided.
       ⍝     So far a DOMAIN ERROR was thrown.
@@ -1130,7 +1135,7 @@
       tmpFilename←↑,/2↑⎕NPARTS tmpFilename
       'Create!'P.FilesAndDirs.CheckPath tmpFilename
       :Trap 903
-          {}⎕SE.SALT.Save ref tmpFilename ⍝,' -convert'
+          {}⎕SE.SALT.Save ref tmpFilename
       :Else
           11 ⎕SIGNAL⍨'Unable to convert "',(⍕ref),'"'
       :EndTrap
@@ -1197,7 +1202,7 @@
       :If 0≠≢list←' '~¨⍨↓ref.⎕NL class
           :Trap 0 ⍝ We have no control over what happen when we execute `Public`
               :If 3=ref.⎕NC'Public'
-              :AndIf 0≠≢public←scriptRef.Public
+                  public←scriptRef.Public
                   list←(list∊public)/list
               :EndIf
           :Else
@@ -1227,7 +1232,7 @@
           buff⍪←'access' 'Shared'
           buff⍪←'name'name
           buff⍪←'syntax'((1+'Function'≡type)⊃'D-Op' 'D-Fns')
-          buff⍪←'comments'(GetDirectComment scriptRef name)
+          buff⍪←'comments'(GetDirectComment ref name)
           buff⍪←'keywords' ''
           buff⍪←'more' ''
           buff
@@ -1933,7 +1938,7 @@
       :EndIf
     ∇
 
-    ∇ {r}←{embeddedClassNames}Analyze_ scriptRef;vs;buffer;bool;tmpFilename;source;A
+    ∇ {r}←{embeddedClassNames}Analyze_ scriptRef;vs;buffer;bool;tmpFilename;source;A;name
       ⍝ Analyzes a particular script and appends the result to the _META array.
       ⍝ If the left argument is specified, only that (or these) embedded class(es) gets analyzed.
       ⍝ Returns either an empty vector or a vector of character vectors with the name(s) of any embedded classes.
@@ -1999,9 +2004,9 @@
       vs.public←''
       :If vs.isNamespace←':NAMESPACE '{⍺≡(≢⍺)↑⍵}1 ⎕C A.DLB 1⊃vs.origSource
           vs←GetPublicDefinitionFrom_NS scriptRef vs
-          :If 2=scriptRef.⎕NC'ADOC_Doc'
-              vs.origSource←vs.origSource[1],('⍝ '∘,¨scriptRef⍎'ADOC_Doc'),1↓vs.origSource
-              vs.origSource←('ADOC_Doc←'{⍺∘≢¨(≢⍺)⍴¨⍵}vs.origSource)/vs.origSource
+          :If 0<≢name←FindADOC scriptRef
+              vs.origSource←vs.origSource[1],('⍝ '∘,¨scriptRef⍎name),1↓vs.origSource
+              vs.origSource←((name,'←'){⍺∘≢¨(≢⍺)⍴¨⍵}vs.origSource)/vs.origSource
           :EndIf
       :EndIf
       vs.origSource←1↓¯1↓vs.origSource
@@ -2081,6 +2086,20 @@
           vs.(origSource maskedSource)←noOf↓¨vs.(origSource maskedSource)
       :Until 0=≢vs.origSource
       vs.publishedStuff,←buffer
+    ∇
+
+    ∇ name←FindADOC parenRef;list;listLC;ind
+      name←''
+      :If 0<≢list←'Aa'parenRef.⎕NL 2
+          list←' '~⍨¨↓list
+          listLC←⎕C list
+      :AndIf 0<≢ind←⍸listLC≡¨⊂'adoc_doc'
+          :If 1<≢ind
+              ('Looked for ADOC_Doc and found more than one: ',⊃{⍺,', ',⍵}/list[ind])⎕SIGNAL 11
+          :EndIf
+      :AndIf (≢list)≥ind
+          name←ind⊃list
+      :EndIf
     ∇
 
     ∇ data←AnalyzeResult data;bool
