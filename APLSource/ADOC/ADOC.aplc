@@ -198,27 +198,32 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'ADOC' '7.1.2+90' '2023-10-12'
+      r←'ADOC' '7.1.3+90' '2024-10-??'
+      ⍝ r←'ADOC' '7.1.2+90' '2023-10-12'   ⍝ Correct would have been: 2024-10-12
     ∇
 
     ∇ History
-      :Access Public Shared
-      ⍝ * 7.1.2
+      :Access Public Shared 
+      ⍝ * 7.1.3 ⋄ 2024-10-??
+      ⍝   * Bug fixes
+      ⍝     * The date of version 7.1.2 was wrong (2023 instead of the correct 2024)
+      ⍝     * Versoin dates added to the `History` 
+      ⍝ * 7.1.2 ⋄ 2024-10-12
       ⍝   * Bug fixes:
       ⍝     * In case there is a `Public` function and it returns an empty vector, nothing should be
       ⍝       listed as public, but that was not the case.
       ⍝     * ADOC_Doc is not case sensitive anymore: adoc_doc and ADOC_DOC are found as well
-      ⍝ * 7.1.1
+      ⍝ * 7.1.1 ⋄ 2024-10-11
       ⍝   * The user command now complains with a useful message when no argument is provided.
       ⍝     So far a DOMAIN ERROR was thrown.
       ⍝   * Safety net added (:Trap 0) when a `Public` function is executed
       ⍝   * Documentation on Tatin packages corrected
-      ⍝ * 7.1.0
+      ⍝ * 7.1.0 ⋄ 2023-06-11
       ⍝   `]ADOC` will now process references pointing to a loaded Tatin package in a smart way
-      ⍝ * 7.0.1
+      ⍝ * 7.0.1 ⋄ 2023-04-20
       ⍝   * Bug fix: under certain circumstances `Copyright` and/or `Version` and/or `History` did
       ⍝     not get a caption assigned
-      ⍝ * 7.0.0
+      ⍝ * 7.0.0 ⋄ 2023-03-23
       ⍝   * Breaking change: requires 18.0 or better
       ⍝   * Breaking change: ADOC is now a Tatin package, and depends on Tatin packages
       ⍝   * Breaking change: "IncludeCss" removed from the default parameter space (CreateBrowseDefaults)
