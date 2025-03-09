@@ -196,18 +196,32 @@
 
     ⎕IO←1 ⋄ ⎕ML←3
 
-    ∇ r←Version
+    ∇ r←Version;v
       :Access Public shared
-      r←'ADOC' '7.1.3+90' '2024-10-??'
-      ⍝ r←'ADOC' '7.1.2+90' '2023-10-12'   ⍝ Correct would have been: 2024-10-12
+      :If 0<##.⎕NC'TatinVars.CONFIG'
+          v←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
+      :ElseIf 0<##.##.⎕NC'TatinVars.CONFIG'
+          v←(⎕JSON⍠('Dialect' 'JSON5')⊢##.##.TatinVars.CONFIG).version
+      :Else
+     ⍝ When a script is not loaded with Tatin, there will be no namespace `TatinVars`.
+     ⍝ In such cases we cannot provide a version number, so we return an empty char vector
+          v←''
+      :EndIf
+      r←'ADOC'v'2025-02-09'
+      ⍝Done
     ∇
 
     ∇ History
-      :Access Public Shared 
-      ⍝ * 7.1.3 ⋄ 2024-10-??
+      :Access Public Shared
+      ⍝ * 7.1.4 ⋄ 2025-03-09
+      ⍝   * Recognizing an ADOC instance when running improved for 20.0
+      ⍝ * 7.1.3 ⋄ 2025-01-27
       ⍝   * Bug fixes
+      ⍝     * Problem with ]ADOC -??? fixed: overcome missing user command framework variable ##.SourceFile
+      ⍝     * A `Version` function that returned a number rather than text crashed ADOC
+      ⍝     * The absence of Tatin now results in a proper message (ADOC depends on Tatin)
       ⍝     * The date of version 7.1.2 was wrong (2023 instead of the correct 2024)
-      ⍝     * Versoin dates added to the `History` 
+      ⍝     * Version dates added to the `History`
       ⍝ * 7.1.2 ⋄ 2024-10-12
       ⍝   * Bug fixes:
       ⍝     * In case there is a `Public` function and it returns an empty vector, nothing should be
@@ -711,7 +725,7 @@
       html←'<br /><br />'
       html,←'<div id="footer">',nl
       html,←'span id="createdate"'tag'Created ',P.APLTreeUtils2.FormatDateTime ⎕TS
-      :If 0≠≢{2=⎕NC ⍵:⍎⍵ ⋄ ⎕AN}'Creator'
+      :If 0≠≢{6::⎕AN ⋄ ⍎⍵}'Creator'
           html,←'span id="createdby"'tag' by ',_Creator,' with ',{({⍵↑⍨1+-'.'⍳⍨⌽⍵}1⊃Version),' ',(2⊃⍵),' from ',3⊃⍵}3↑Version
       :EndIf
       html,←'</div>',nl
@@ -1504,7 +1518,7 @@
       ⍝ Prepare a link list for a given type.
       ⍝ Make it a numbered list if there are more than 4 items.
       r←⍬
-      :If 0=⎕NC'OutputType' ⍝ is it an instance?
+      :If {6::1 ⋄ 1⊣OutputType}⍬ ⍝ is it an instance? (⎕NC results differ in 20.0 from earlier versions)
       :OrIf OutputType≡'Web'
           :If (⊂type)∊'Field' 'Function' 'Operator' 'Variable'
               noOf←+/bool←type∘≡¨Get data
@@ -1786,16 +1800,16 @@
               :Trap 0 ⍝ not nice, but these calls may fail for all sorts of reasons.
                   :If 9.1≡⎕NC⊂⍕ref  ⍝ Is it an ordinary namespace?!
                       body←ref.⎕NR'Version'
-                      txt←ref.{11::'' ⋄ ,⍎⍵}'Version'
+                      txt←⍕ref.{11::'' ⋄ ,⍎⍵}'Version'
                   :Else
-                      txt←ref.Version
+                      txt←⍕ref.Version
                   :EndIf
               :Else
                   qdmx←⎕DMX
                   ⎕←'Processing the "Version" function crashed (',qdmx.EM,')'
               :EndTrap
           :ElseIf (⊂'Version')∊ref.⎕NL-2 ⍝ Is there a "Version" variable?
-              txt←ref.Version
+              txt←⍕ref.Version
           :EndIf
           :If 0≠≢txt
               :If 2>|≡txt
@@ -2125,61 +2139,62 @@
 
     ∇ vs←vs CreateTop(noOfClasses chapterNo);types;publicTypes;bool
      ⍝ Create the top part of the HTML page (title, toc) and the links
+      vs.(topRef topLinks)←⊂⍬
       :If _IncludeReference
-      :AndIf {0=⎕NC ⍵:1 ⋄ OutputType≡'Web'}'OutputType' ⍝ is it an instance?
-          vs.topRef←'<a name="topmost"></a>'
-          :If 1<noOfClasses
-              vs.topRef,←'Go to: ',('a href="#',GetChapterNo,'"')tag'chapter'
-              vs.topRef←'div class="goto"'tag vs.topRef,' | ',('a href="#verytop"')tag'top'
-          :Else
-              vs.topRef,←'div class="goto"'tag'Go to: ',('a href="#verytop"')tag'top'
-          :EndIf
-          vs.topLinks←0 2⍴''
-          :If 0<≢vs.publicStuff
-              bool←2=↑∘⍴∘⍴¨vs.publicStuff
-              types←Get bool/vs.publicStuff
-              :If types∊⍨⊂'Constructor'
-                  vs.topLinks⍪←'ctor'(('a href="#',GetChapterNo,':ctor"')tag'Constructors')
+          :If {6::1 ⋄ 0⊣OutputType}⍬  ⍝ is it an instance?
+          :OrIf OutputType≡'Web'
+              vs.topRef←'<a name="topmost"></a>'
+              :If 1<noOfClasses
+                  vs.topRef,←'Go to: ',('a href="#',GetChapterNo,'"')tag'chapter'
+                  vs.topRef←'div class="goto"'tag vs.topRef,' | ',('a href="#verytop"')tag'top'
+              :Else
+                  vs.topRef,←'div class="goto"'tag'Go to: ',('a href="#verytop"')tag'top'
               :EndIf
-              :If types∊⍨⊂'Destructor'
-                  vs.topLinks⍪←'dtor'(('a href="#',GetChapterNo,':dtor"')tag'Destructors')
-              :EndIf
-              :If types∊⍨⊂'Interface'
-                  vs.topLinks⍪←'interface'(('a href="#',GetChapterNo,':infc"')tag'Interfaces')
-              :EndIf
-              :If types∊⍨⊂'Property'
-                  vs.topLinks⍪←'properties'(('a href="#',GetChapterNo,':props"')tag'Properties')
-              :EndIf
-              :If types∊⍨⊂'Field'
-                  vs.topLinks⍪←'fields'(('a href="#',GetChapterNo,':fields"')tag'Fields')
-              :EndIf
-              :If types∊⍨⊂'Method'
-                  publicTypes←'access'Get(bool/vs.publicStuff)/⍨types≡¨⊂'Method'
-                  :If publicTypes∊⍨⊂'Instance'
-                      vs.topLinks⍪←'instancemethods'(('a href="#',GetChapterNo,':instancemethods"')tag'Instance Methods')
+              vs.topLinks←0 2⍴''
+              :If 0<≢vs.publicStuff
+                  bool←2=↑∘⍴∘⍴¨vs.publicStuff
+                  types←Get bool/vs.publicStuff
+                  :If types∊⍨⊂'Constructor'
+                      vs.topLinks⍪←'ctor'(('a href="#',GetChapterNo,':ctor"')tag'Constructors')
                   :EndIf
-                  :If publicTypes∊⍨⊂'Shared'
+                  :If types∊⍨⊂'Destructor'
+                      vs.topLinks⍪←'dtor'(('a href="#',GetChapterNo,':dtor"')tag'Destructors')
+                  :EndIf
+                  :If types∊⍨⊂'Interface'
+                      vs.topLinks⍪←'interface'(('a href="#',GetChapterNo,':infc"')tag'Interfaces')
+                  :EndIf
+                  :If types∊⍨⊂'Property'
+                      vs.topLinks⍪←'properties'(('a href="#',GetChapterNo,':props"')tag'Properties')
+                  :EndIf
+                  :If types∊⍨⊂'Field'
+                      vs.topLinks⍪←'fields'(('a href="#',GetChapterNo,':fields"')tag'Fields')
+                  :EndIf
+                  :If types∊⍨⊂'Method'
+                      publicTypes←'access'Get(bool/vs.publicStuff)/⍨types≡¨⊂'Method'
+                      :If publicTypes∊⍨⊂'Instance'
+                          vs.topLinks⍪←'instancemethods'(('a href="#',GetChapterNo,':instancemethods"')tag'Instance Methods')
+                      :EndIf
+                      :If publicTypes∊⍨⊂'Shared'
+                          vs.topLinks⍪←'sharedmethods'(('a href="#',GetChapterNo,':sharedmethods"')tag'Shared Methods')
+                      :EndIf
+                      :If publicTypes∊⍨⊂'Public'
+                          vs.topLinks⍪←'publicmethods'(('a href="#',GetChapterNo,':publicmethods"')tag'Interface Methods')
+                      :EndIf
+                  :EndIf
+                  :If types∊⍨⊂'Function'
                       vs.topLinks⍪←'sharedmethods'(('a href="#',GetChapterNo,':sharedmethods"')tag'Shared Methods')
                   :EndIf
-                  :If publicTypes∊⍨⊂'Public'
-                      vs.topLinks⍪←'publicmethods'(('a href="#',GetChapterNo,':publicmethods"')tag'Interface Methods')
+                  :If types∊⍨⊂'Operator'
+                      vs.topLinks⍪←'sharedoperators'(('a href="#',GetChapterNo,':sharedoperators"')tag'Shared Operators')
+                  :EndIf
+                  :If types∊⍨⊂'Interface Method'
+                      vs.topLinks⍪←'implementedinterfacemethods'(('a href="#',GetChapterNo,':implementedinterfacemethods"')tag'Implemented Interface(s)')
+                  :EndIf
+                  :If types∊⍨⊂'Destructor'
+                      vs.topLinks,←⊂'a href="#',GetChapterNo,':dtor"'tag'Destructor'
                   :EndIf
               :EndIf
-              :If types∊⍨⊂'Function'
-                  vs.topLinks⍪←'sharedmethods'(('a href="#',GetChapterNo,':sharedmethods"')tag'Shared Methods')
-              :EndIf
-              :If types∊⍨⊂'Operator'
-                  vs.topLinks⍪←'sharedoperators'(('a href="#',GetChapterNo,':sharedoperators"')tag'Shared Operators')
-              :EndIf
-              :If types∊⍨⊂'Interface Method'
-                  vs.topLinks⍪←'implementedinterfacemethods'(('a href="#',GetChapterNo,':implementedinterfacemethods"')tag'Implemented Interface(s)')
-              :EndIf
-              :If types∊⍨⊂'Destructor'
-                  vs.topLinks,←⊂'a href="#',GetChapterNo,':dtor"'tag'Destructor'
-              :EndIf
           :EndIf
-      :Else
-          vs.(topRef topLinks)←⊂⍬
       :EndIf
     ∇
 

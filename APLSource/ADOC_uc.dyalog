@@ -1,14 +1,14 @@
-:Class  ADOC_uc ⍝ V3.000
+:Namespace  ADOC_uc
 ⍝ User Command script for "ADOC".
-⍝ 2023 06 19 Kai: Check for number of arguments added
-⍝ 2023 06 11 Kai: Can now process loaded Tatin packages in a smart way
-⍝ 2023 05 30 Kai: Transformed into a Tatin package plus plenty of improvements and fixes
-
+⍝ 2023-06-19 Kai: Check for number of arguments added
+⍝ 2023-06-11 Kai: Can now process loaded Tatin packages in a smart way
+⍝ 2023-05-30 Kai: Transformed into a Tatin package plus plenty of improvements and fixes
+⍝ 2025-02-23 Kai: Converted to a namespace
+⍝ 2025-03-09 Kai: Help fixed
 
     ⎕IO←⎕ML←1
 
     ∇ r←List
-      :Access Shared Public
       r←⎕NS''
       r.Group←'TOOLS'
       r.Name←'ADoc'
@@ -17,7 +17,6 @@
     ∇
 
     ∇ r←Run(Cmd Args);bool;calledFrom;wasLoaded
-      :Access Shared Public
       wasLoaded←LoadAdoc ⍬
       :If Args.Switch'version'
           r←{⍵↓⍨+/∧\' '=⍵}⍕1↓⎕SE.ADOC.Version
@@ -38,7 +37,7 @@
       :EndIf
     ∇
 
-    ∇ {r}←LoadAdoc dummy
+    ∇ {r}←LoadAdoc dummy;path
     ⍝ Loads ADOC into ⎕SE if it's not already there.
     ⍝ Returns 1 if it was loaded and 0 when it was already there
       :If 0=⎕SE.⎕NC'Tatin'
@@ -49,12 +48,15 @@
           :EndTrap
       :EndIf
       :If r←0=⎕SE.⎕NC'ADOC'
-          {}⎕SE.Tatin.LoadDependencies(⊃⎕NPARTS ##.SourceFile)'⎕SE'
+          path←FindUserCommandADOC ⍬
+          :If 0=≢path
+              'Could not find the ADOC package'⎕SIGNAL 11
+          :EndIf
+          {}⎕SE.Tatin.LoadDependencies path'⎕SE'
       :EndIf
     ∇
 
     ∇ r←l Help Cmd;filename
-      :Access Shared Public
       r←''
       :Select l
       :Case 0
@@ -232,4 +234,21 @@
 
     Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←1 ⋄ ⍺ ⎕SIGNAL 1↓(⊃∊⍵),11}
 
-:EndClass ⍝ ADOC  $Revision$
+    ∇ path←FindUserCommandADOC dummy;buff;sep;list;here
+	⍝ In case `##,SourceFile` cannot be found, all SALT CMDDIRs are scanned for ADOC
+      :If 0<##.⎕NC'SourceFile'
+          path←⊃⎕NPARTS ##.SourceFile
+      :Else
+          buff←⎕SE.SALT.Settings'cmddir'
+          sep←':;'[1+'Win'≡3↑⊃'.'⎕WG'APLVersion']
+          list←sep(≠⊆⊢)buff
+          :For here :In list
+              :If ⎕NEXISTS here,'/ADOC'
+                  path←here,'/ADOC'
+                  :Leave
+              :EndIf
+          :EndFor
+      :EndIf
+    ∇
+
+:EndNamespace ⍝ ADOC  $Revision$

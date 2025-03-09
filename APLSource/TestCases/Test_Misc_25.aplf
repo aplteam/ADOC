@@ -1,0 +1,21 @@
+ R←Test_Misc_25(stopFlag batchFlag);⎕TRAP;buffer;ps;filename;html
+⍝ `Browse` a class that has a `Version` function that returns a number rather than text (was once a bug)
+ R←T._Failed
+
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ ##.ADOC.ADOC.RestoreDefaults
+
+ #.⎕SHADOW'Temp'
+ 'Temp'#.⎕NS''
+ 'VersionNumeric'#.Temp.⎕CY ##.CiderConfig.HOME,'/Tests/TestData'
+
+ ps←##.ADOC.ADOC.CreateBrowseDefaults
+ ps.view←0
+ filename←ps ##.ADOC.ADOC.Browse #.Temp.VersionNumeric
+ ##.ADOC.ADOC.RestoreDefaults
+ html←⊃⎕NGET filename 1
+ FilesAndDirs.DeleteFile filename
+ html←1↓⊃,/(⎕UCS 13),¨∆RemoveCSS html
+ →T.PassesIf 1=+/'>Version</h'⍷html
+
+ R←T._OK

@@ -3,8 +3,8 @@
  R←T._Failed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
- shouldBe←APLTreeUtils2.DLB⍕1↓##.ADOC.ADOC.Version
- itIs←⎕SE.UCMD'ADOC -version'
+ shouldBe←1⊃##.ADOC.ADOC.Version
+ itIs←{⍵↑⍨⍵⍳' '}⎕SE.UCMD'ADOC -version'
  →T.PassesIf≡/{⍵/⍨3>+\'.'=⍵}¨shouldBe itIs
 
  R←T._OK

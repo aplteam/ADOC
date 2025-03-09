@@ -2,6 +2,6 @@
  fn←FilesAndDirs.GetTempFilename2''
  FilesAndDirs.DeleteFile fn
  fn←(¯3↓fn),'html'
- APLTreeUtils.WriteUtf8File fn html
- APLTreeUtils.GoToWebPage'file:///',fn
+ (⊂html)⎕NPUT fn
+ APLTreeUtils2.GoToWebPage'file:///',fn
 ⍝Done

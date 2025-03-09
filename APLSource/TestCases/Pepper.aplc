@@ -1,6 +1,5 @@
 :Class Pepper
-⍝ Very simple APL Library Toolkit for V11
-⍝ Copyright: Kai Jaeger ⋄ APL Team Ltd
+⍝ Used in one of the test cases
 
     ⎕USING←0⍴⊂'' ⋄ ⎕ML←3 ⋄ ⎕IO←1 ⋄ ⎕wx←1
 
