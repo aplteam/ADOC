@@ -6,7 +6,4 @@
  'This is a temporary solution in order to get around ADOC''s dependency of Tatin while Tatin is in these versions'
  'of Dyalog APL only available when activated.'
  ''
- 'Because a class or namespace with the name ADOC would cause a name clash when ADOC is opened as a Cider project,'
- 'I have changed the name of the namespace from ADOC to ADOC_uc. It does not matter in any other respect.'
- ''
 )
