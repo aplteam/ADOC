@@ -1,6 +1,7 @@
 {
   api: "ADOC",
   assets: "Docs",
+  checkLICENSEfile: 1,
   description: "Automated generation of documentation",
   documentation: "",
   files: "",
@@ -19,5 +20,5 @@
   source: "APLSource/ADOC",
   tags: "documentation",
   userCommandScript: "APLSource/ADOC_uc.dyalog",
-  version: "7.1.4+143",
+  version: "7.2.0+144",
 }

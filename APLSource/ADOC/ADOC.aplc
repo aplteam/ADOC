@@ -207,7 +207,7 @@
      ⍝ In such cases we cannot provide a version number, so we return an empty char vector
           v←''
       :EndIf
-      r←'ADOC'v'2025-02-09'
+      r←'ADOC'v'2026-06-22'
       ⍝Done
     ∇
 
