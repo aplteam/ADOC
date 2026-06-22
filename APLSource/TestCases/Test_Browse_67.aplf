@@ -50,8 +50,8 @@
  html←∆RemoveCSS html
  FilesAndDirs.DeleteFile filename
  →T.PassesIf 3=+/∨/¨'class="aplname"'∘⍷¨html   ⍝ Two functions and one operator, dfns and tfn
- →T.PassesIf 1=+/∨/¨' id="Version"'∘⍷¨html     ⍝ The special "Version" function
- →T.PassesIf 1=+/∨/¨' id="Copyright"'∘⍷¨html   ⍝ The special "copyright" function
- →T.PassesIf 1=+/∨/¨' id="History"'∘⍷¨html     ⍝ The special "History" function
+ →T.PassesIf 1=+/∨/¨' id="version"'∘⍷¨html     ⍝ The special "Version" function
+ →T.PassesIf 1=+/∨/¨' id="copyright"'∘⍷¨html   ⍝ The special "copyright" function
+ →T.PassesIf 1=+/∨/¨' id="history"'∘⍷¨html     ⍝ The special "History" function
 
  R←T._OK

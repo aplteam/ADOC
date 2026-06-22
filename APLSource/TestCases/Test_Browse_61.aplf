@@ -18,6 +18,6 @@
  allVars←' '~¨⍨↓#.Temp.MyApp.EXIT.⎕NL 2
  →T.PassesIf(⍴allVars)=+/↑∨/('>',¨allVars,¨⊂'</h5>')⍷¨⊂html
  →T.PassesIf+/'<p>&lt;Really!&gt;</p>'⍷html
- →T.PassesIf+/'<p>&lt;Is single-line <em>however</em>!&gt;</p>'⍷html
- →T.PassesIf+/'<p>&lt;Does <strong>not</strong> show becaus it''s a matrix&gt;</p>'⍷html
+ →T.PassesIf+/'<p>Is single-line <em>however</em>!</p>'⍷html
+ →T.PassesIf+/'<p>Does <strong>not</strong> show becaus it''s a matrix</p>'⍷html
  R←T._OK

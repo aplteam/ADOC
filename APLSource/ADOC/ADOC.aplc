@@ -75,7 +75,7 @@
 ⍝ dependencies.\\
 ⍝ Since this keyword lives outside classes and namespaces while the older --- and deprecated ---
 ⍝ synonym `⍝∇:require` lives inside classes and namespaces we have a conflict here: `ADOC` can't
-⍝ report what's not in the source code.
+⍝ report what's not in the source code, so there is no way to overcome this. 
 ⍝ ### Markup syntax
 ⍝ You can use Markdown, a simplified markup language, within the comment sections of public
 ⍝ functions and the so-called leading comments of scripts. `ADOC` uses the APLTree class
@@ -207,12 +207,18 @@
      ⍝ In such cases we cannot provide a version number, so we return an empty char vector
           v←''
       :EndIf
-      r←'ADOC'v'2025-02-09'
+      r←'ADOC'v'2026-06-22'
       ⍝Done
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 8.0.0 ⋄ 2026-06-23
+      ⍝   * Packages updated. Newer MarkAPL means that "<>" in comments are now treated as HTML tags;
+      ⍝     That means they are NOT translated to &lt; and &gt; anymore!
+      ⍝   * Documentation polished/corrected.
+      ⍝   * Bug fixes
+      ⍝     `Reset` wrongly attempted to call `Init` rather than `Init_HTML`.
       ⍝ * 7.1.4 ⋄ 2025-03-09
       ⍝   * Recognizing an ADOC instance when running improved for 20.0
       ⍝ * 7.1.3 ⋄ 2025-01-27
@@ -816,7 +822,7 @@
     ⍝
     ⍝ After having called this method the instance can be reused. HTML only.
       :Access Public Instance
-      Init
+      Init_HTML
     ∇
 
     ∇ FinaliseHtml dummy;head;html;path;screenStyles;printStyles;addExt;tmp;fn
@@ -910,7 +916,7 @@
          ⍝ Prior to version 6.0 of ADOC it could also be the name of a function; this is
          ⍝ not supported any more.\\
          ⍝ ## Reference to a script
-         ⍝ If `scriptRef` is empty, the formerly created HTML is displayed.\\
+         ⍝ If `scriptRef` is empty, the previously created HTML is displayed.\\
          ⍝ Note that in this case the HTML remains untouched. Therefore it can still be used for other purposes.\\
          ⍝ You can pass the name of one or more embedded classes --- classes locally defined
          ⍝ within a class script; see `ADOC` itself as an example --- or embedded namespaces.
@@ -2348,7 +2354,8 @@
 
     ∇ r←GetPrintCss
       :Access Public Shared
-    ⍝ Returns the CSS for printing purposes.
+    ⍝ Returns the CSS for print purposes.\\
+    ⍝ Override this method in a subclass to apply custom styling.
       r←''
       r,←⊂'html {font-family: "Verdana", "Arial"; font-size:9pt; margin:0; padding:0 6pt;}'
       r,←⊂'html * {text-decoration: none;}'
@@ -2397,7 +2404,8 @@
 
     ∇ r←GetScreenCss
       :Access Public Shared
-    ⍝ Return the CSS for screen purposes.
+    ⍝ Return the CSS for screen purposes.\\
+    ⍝ Override this method in a subclass to apply custom styling.
       r←''
       r,←⊂'html {font-family: "DejaVu Sans","Noto Sans","Lucida Sans Unicode", Sans-Serif; background-color: #fffeea; font-size: medium; margin:0; padding:0; color:#4b4b4b;}'
       r,←⊂'body {max-width:920px; margin-left: auto; margin-right: auto;}'
@@ -2696,7 +2704,8 @@
     IsChar←{⎕ml←1  ⋄ ' '=1↑0⍴∊⍵}
 
     ∇ {append}WriteFile(filename data);fno;fullname;flag
-         ⍝ Write UTF-8 "data" to "filename".
+    ⍝ Write UTF-8 "data" to "filename".
+    ⍝ If the write operation fails it waits 0.2 seconds and then tries again. 
       :Access Public Shared
       append←{2=⎕NC ⍵:⍎⍵ ⋄ 0}'append'
       flag←0
